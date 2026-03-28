@@ -19,5 +19,7 @@ data/public-share-origin.json
 .env*.local
 tsconfig.tsbuildinfo
 
-# GitHub Actions: ejecuta `gh auth refresh -h github.com -s workflow` y borra esta línea para subir .github/
+# GitHub Actions: plantilla versionada en scripts/ci-github-actions.yml.
+# Para activar CI: gh auth refresh -h github.com -s workflow, copia ese YAML a
+# .github/workflows/ci.yml, borra la línea siguiente y haz commit.
 .github/

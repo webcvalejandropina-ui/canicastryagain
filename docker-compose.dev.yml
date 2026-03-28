@@ -1,0 +1,21 @@
+services:
+  app-dev:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      NEXT_DIST_DIR: .next-dev-docker
+      SQLITE_PATH: /app/data/game.db
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./:/app
+      - node_modules_dev:/app/node_modules
+      - sqlite_data_dev:/app/data
+    command: sh -c "npm install && npm run dev"
+
+volumes:
+  node_modules_dev:
+  sqlite_data_dev:

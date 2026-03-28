@@ -1,0 +1,52 @@
+{
+  "name": "canicas-try-again",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Canicas Try Again con Next.js, SQLite y arquitectura DDD",
+  "scripts": {
+    "dev": "cross-env NEXT_DIST_DIR=.next-dev next dev --port 13000",
+    "dev:host": "cross-env NEXT_DIST_DIR=.next-dev next dev --hostname 0.0.0.0 --port 13000",
+    "dev:public": "node scripts/dev-public.mjs",
+    "dev:clean": "cross-env NEXT_DIST_DIR=.next-dev node scripts/clean-next-cache.mjs && cross-env NEXT_DIST_DIR=.next-dev next dev --port 13000",
+    "dev:reset": "cross-env CLEAN_ALL_NEXT_DIRS=1 node scripts/clean-next-cache.mjs && cross-env NEXT_DIST_DIR=.next-dev next dev --hostname 0.0.0.0 --port 13000",
+    "dev:docker": "docker compose -f docker-compose.dev.yml up --build",
+    "dev:docker:down": "docker compose -f docker-compose.dev.yml down",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:runtime": "node scripts/test-runtime-guard.mjs --mode=all",
+    "test:runtime:prod": "node scripts/test-runtime-guard.mjs --mode=prod",
+    "test:runtime:dev": "node scripts/test-runtime-guard.mjs --mode=dev",
+    "test:rules": "tsx scripts/test-game-rules.ts",
+    "test": "npm run lint && npm run test:rules && npm run test:docker && npm run test:runtime",
+    "test:docker": "node scripts/check-docker-prod.mjs",
+    "db:migrate": "node scripts/migrate-db.mjs",
+    "docker:build": "docker build -t canicas-try-again:latest .",
+    "docker:build:tag": "docker build -t canicas-try-again:$(node -p \"require('./package.json').version\") ."
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "next": "15.2.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "three": "^0.183.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.13.1",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/three": "^0.183.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.21.0",
+    "eslint-config-next": "15.2.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

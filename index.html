@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Juego de canicas en pirámide - Juega localmente con un amigo">
+    <meta name="theme-color" content="#4a90e2">
+    <title>Canicas Try Again - Pirámide</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css?v=3.1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<body>
+    <!-- Modal de Login -->
+    <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-modal-title" aria-hidden="false">
+        <div class="modal-content">
+            <h2 id="login-modal-title">👋 Iniciar Sesión</h2>
+            <p>Ingresa tu nombre para comenzar a jugar</p>
+            <label for="login-name-input">Tu nombre:</label>
+            <input type="text" id="login-name-input" placeholder="Ingresa tu nombre" maxlength="20" autofocus>
+            <button id="login-submit-btn">🚀 Continuar</button>
+        </div>
+    </div>
+
+    <div class="container" id="main-container" style="display: none;">
+        <header>
+            <h1>🎯 Canicas Try Again</h1>
+            <div class="user-info" id="user-info">
+                <span id="logged-user-name"></span>
+                <button id="logout-btn">Cerrar Sesión</button>
+            </div>
+            <div class="config-section" role="group" aria-label="Configuración del juego">
+                <button id="mode-toggle-btn" aria-label="Cambiar modo">🔄 Modo Local</button>
+                <label for="rows-input">Filas:</label>
+                <input 
+                    type="number" 
+                    id="rows-input" 
+                    min="7" 
+                    max="12" 
+                    value="7" 
+                    aria-label="Número de filas del juego"
+                >
+                <button id="reset-btn" aria-label="Reiniciar juego">🔄 Reiniciar</button>
+                <button id="install-btn" class="install-btn" aria-label="Instalar aplicación" style="display: none;">
+                    Instalar App
+                </button>
+            </div>
+            <div class="multiplayer-section" id="multiplayer-section" style="display: none;">
+                <button id="create-game-btn">➕ Crear Partida</button>
+                <button id="view-rankings-btn">🏆 Ver Ranking</button>
+                <div id="connection-status" class="connection-status"></div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-info" role="status" aria-live="polite">
+                <div class="players-info" id="players-info" style="display: none;">
+                    <div class="player-card" id="player1-card">
+                        <div class="player-badge player1-badge">Jugador 1</div>
+                        <div class="player-name" id="player1-name">-</div>
+                        <div class="player-status" id="player1-status"></div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div class="player-card" id="player2-card">
+                        <div class="player-badge player2-badge">Jugador 2</div>
+                        <div class="player-name" id="player2-name">-</div>
+                        <div class="player-status" id="player2-status"></div>
+                    </div>
+                </div>
+                <div class="turn-indicator">
+                    <span id="turn-text">⏳ Turno: Jugador 1</span>
+                </div>
+                <div class="stats">
+                    <span id="total-balls">🔵 Canicas restantes: 28</span>
+                    <span id="blocked-row" class="blocked-info" style="display: none;"></span>
+                </div>
+            </div>
+
+            <div class="selection-controls" role="group" aria-label="Controles de selección">
+                <div class="quantity-control">
+                    <label for="quantity-display">Cantidad a quitar:</label>
+                    <div class="quantity-buttons">
+                        <button id="decrease-btn" aria-label="Disminuir cantidad">−</button>
+                        <span id="quantity-display" aria-live="polite">0</span>
+                        <button id="increase-btn" aria-label="Aumentar cantidad">+</button>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button id="confirm-btn" disabled aria-label="Confirmar jugada">✅ Confirmar</button>
+                    <button id="cancel-btn" disabled aria-label="Cancelar selección">❌ Cancelar</button>
+                </div>
+            </div>
+
+            <div class="board" id="board" role="grid" aria-label="Tablero de juego">
+                <!-- Las filas se generan dinámicamente -->
+            </div>
+
+            <div class="move-history" role="log" aria-label="Historial de jugadas">
+                <h2>📜 Historial</h2>
+                <div id="history-list" aria-live="polite"></div>
+            </div>
+
+            <div class="rankings-section" id="rankings-section" style="display: none;">
+                <h2>🏆 Ranking</h2>
+                <div id="rankings-list"></div>
+            </div>
+        </main>
+
+        <div id="message-area" class="message-area" role="alert" aria-live="assertive"></div>
+    </div>
+
+    <!-- Modal de fin de juego -->
+    <div id="game-over-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <h2 id="modal-title">Fin del Juego</h2>
+            <p id="modal-message"></p>
+            <button id="modal-restart-btn" aria-label="Reiniciar juego">🔄 Nuevo Juego</button>
+        </div>
+    </div>
+
+    <!-- Modal de multijugador -->
+    <div id="multiplayer-modal" class="modal" role="dialog" aria-labelledby="multiplayer-modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <h2 id="multiplayer-modal-title">Multijugador</h2>
+            <div id="create-game-form" style="display: none;">
+                <p>Se creará una partida nueva. Comparte la URL con tu oponente.</p>
+                <button id="create-game-submit-btn">✨ Crear Partida</button>
+            </div>
+            <div id="game-id-display" style="display: none;">
+                <p>Comparte esta URL con tu oponente:</p>
+                <div class="game-url-container">
+                    <input type="text" id="game-url-input" readonly>
+                    <button id="copy-game-url-btn">📋 Copiar URL</button>
+                </div>
+                <p class="game-code-info">O comparte este código:</p>
+                <p id="game-code-text" class="game-code"></p>
+                <button id="copy-game-code-btn">📋 Copiar Código</button>
+            </div>
+            <button id="close-multiplayer-modal-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

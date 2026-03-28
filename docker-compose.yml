@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      SQLITE_PATH: /app/data/game.db
+    volumes:
+      - sqlite_data:/app/data
+
+volumes:
+  sqlite_data:

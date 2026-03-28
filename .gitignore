@@ -1,0 +1,23 @@
+node_modules/
+npm-debug.log
+rankings.json
+data/*.db
+data/*.db-shm
+data/*.db-wal
+.next-smoke-prod/
+.next-smoke-dev/
+.DS_Store
+*.log
+bolas.zip
+bolas-17.zip
+data/public-share-origin.json
+.next-dev-public/
+.next-dev/
+.next/
+.env
+.env.local
+.env*.local
+tsconfig.tsbuildinfo
+
+# GitHub Actions: el token OAuth de gh a veces no tiene scope workflow; sube .github/ con SSH o PAT con workflow.
+.github/

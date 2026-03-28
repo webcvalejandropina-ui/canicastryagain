@@ -302,6 +302,21 @@ body {
   }
 }
 
+@keyframes turnSpotlightPop {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .drawer-slide-in {
   animation: slideInRight 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
@@ -326,6 +341,10 @@ body {
   animation: selectionSheetRise 220ms cubic-bezier(0.2, 0.7, 0, 1) both;
 }
 
+.turn-spotlight-enter {
+  animation: turnSpotlightPop 260ms cubic-bezier(0.2, 0.7, 0, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marble-idle-float,
   .marble-selected-pulse,
@@ -337,7 +356,8 @@ body {
   .turn-banner-enter,
   .turn-badge-pulse,
   .selection-sheet-enter,
-  .turn-coach-enter {
+  .turn-coach-enter,
+  .turn-spotlight-enter {
     animation: none !important;
     transform: none !important;
   }

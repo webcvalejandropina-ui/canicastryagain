@@ -721,9 +721,11 @@ export function HomePage(): React.ReactElement {
   const [gameGuideCollapsed, setGameGuideCollapsed] = useState(false);
   const [pendingMove, setPendingMove] = useState<{ rowIndex: number; startIndex: number; endIndex: number } | null>(null);
   const [turnBannerKey, setTurnBannerKey] = useState(0);
+  const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
 
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
+  const turnSpotlightTimerRef = useRef<number | null>(null);
   const moveInFlightRef = useRef(false);
   const pendingActionBarRef = useRef<HTMLDivElement | null>(null);
   const applyMoveButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -1005,6 +1007,9 @@ export function HomePage(): React.ReactElement {
       if (toastTimerRef.current) {
         window.clearTimeout(toastTimerRef.current);
       }
+      if (turnSpotlightTimerRef.current) {
+        window.clearTimeout(turnSpotlightTimerRef.current);
+      }
     };
   }, []);
 
@@ -1085,11 +1090,27 @@ export function HomePage(): React.ReactElement {
 
     if (!game || game.status !== 'playing') {
       previousCanInteractRef.current = false;
+      setShowTurnSpotlight(false);
+      if (turnSpotlightTimerRef.current) {
+        window.clearTimeout(turnSpotlightTimerRef.current);
+        turnSpotlightTimerRef.current = null;
+      }
       return;
     }
 
-    if (canInteract && !previousCanInteractRef.current && typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-      navigator.vibrate([24, 40, 24]);
+    const becameInteractive = canInteract && !previousCanInteractRef.current;
+    if (becameInteractive) {
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate([24, 40, 24]);
+      }
+      setShowTurnSpotlight(true);
+      if (turnSpotlightTimerRef.current) {
+        window.clearTimeout(turnSpotlightTimerRef.current);
+      }
+      turnSpotlightTimerRef.current = window.setTimeout(() => {
+        setShowTurnSpotlight(false);
+        turnSpotlightTimerRef.current = null;
+      }, 2400);
     }
 
     previousCanInteractRef.current = canInteract;
@@ -2351,6 +2372,21 @@ export function HomePage(): React.ReactElement {
           </main>
         </div>
       )}
+
+      {showTurnSpotlight && isGameMode && canInteract && !pendingMove ? (
+        <div
+          className="pointer-events-none fixed inset-x-0 top-[4.4rem] z-[78] flex justify-center px-4 sm:top-[5rem]"
+          aria-live="assertive"
+        >
+          <div className="turn-spotlight-enter max-w-md rounded-2xl border border-emerald-400/25 bg-emerald-500/92 px-4 py-3 text-center text-white shadow-2xl shadow-emerald-900/30 backdrop-blur-xl dark:border-emerald-300/20 dark:bg-emerald-500/82">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-50/90">Piiiiiiiishi, te toca</p>
+            <p className="mt-1 text-base font-black leading-tight sm:text-lg">Haz tu jugada · máximo {turnLimit}</p>
+            <p className="mt-1 text-[11px] font-semibold leading-snug text-emerald-50/90">
+              Toca el tablero y selecciona un bloque seguido en una sola fila.
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       {showTurnCoach ? (
         <div

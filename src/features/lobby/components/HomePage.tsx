@@ -108,7 +108,23 @@ const gameKeyInstructions: string[] = [
 const waitingRoomTips: string[] = [
   'Comparte el código o el enlace con tu rival.',
   'Cuando entre, la partida empezará sola.',
-  'Si tarda, comprueba que el enlace no haya caducado (al salir se invalida).'
+  'Si tarda, comprueba que el enlace no haya caducado (al salir se invalida).',
+  'Si estáis en móvil, mejor usar una URL pública estable y no localhost.'
+];
+
+const quickFaq = [
+  {
+    q: '¿Qué hago si no veo cambios?',
+    a: 'Pulsa refrescar en el encabezado. Si sigues sin ver turno nuevo, vuelve al lobby y entra otra vez con el código.'
+  },
+  {
+    q: '¿Cómo se gana?',
+    a: 'En misère, pierdes si quitas la última canica. El truco está en dejarle esa jugada al rival.'
+  },
+  {
+    q: '¿Qué pasa con el dado?',
+    a: 'Cada jugador puede usarlo una vez por partida. Cuenta como jugada y puede cambiar el ritmo por completo.'
+  }
 ];
 
 function KeyInstructionsCard(): React.ReactElement {
@@ -1840,6 +1856,21 @@ export function HomePage(): React.ReactElement {
                           <div key={`sr-${r.label}`} className="rounded-lg bg-white/60 px-3 py-2 text-center dark:bg-dark-surface/80">
                             <p className={`text-lg font-black ${r.pts.startsWith('+') ? 'text-emerald-500' : 'text-rose-500'}`}>{r.pts}</p>
                             <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-[#8c7d6b] dark:text-dark-muted">{r.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-5 rounded-xl border border-brown/10 bg-white/60 p-4 dark:border-white/10 dark:bg-dark-surface/80">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">🛟</span>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-[#4a3f32] dark:text-dark-text">Preguntas rápidas</h4>
+                      </div>
+                      <div className="mt-3 space-y-3">
+                        {quickFaq.map((item) => (
+                          <div key={item.q} className="rounded-lg border border-brown/10 bg-white/70 px-3 py-2 dark:border-white/10 dark:bg-dark-card/70">
+                            <p className="text-[11px] font-black text-[#4a3f32] dark:text-dark-text">{item.q}</p>
+                            <p className="mt-1 text-[11px] leading-relaxed text-[#8c7d6b] dark:text-dark-muted">{item.a}</p>
                           </div>
                         ))}
                       </div>

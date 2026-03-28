@@ -26,14 +26,13 @@
   },
   "dependencies": {
     "better-sqlite3": "^11.8.1",
-    "next": "15.2.0",
+    "next": "^15.5.14",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "three": "^0.183.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.10",
     "@types/better-sqlite3": "^7.6.12",
@@ -42,6 +41,7 @@
     "@types/react-dom": "^19.0.4",
     "@types/three": "^0.183.1",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "eslint": "^9.21.0",
     "eslint-config-next": "15.2.0",
     "postcss": "^8.5.3",

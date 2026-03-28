@@ -15,6 +15,8 @@ export type Move = {
   timestamp: string;
   /** Una sola entrada por tirada de dado (no una por celda afectada). */
   fromDice?: boolean;
+  dicePower?: DicePowerName;
+  affectedCount?: number;
 };
 
 export type DicePowerName = 'bomba' | 'rayo' | 'diagonal' | 'resurreccion';

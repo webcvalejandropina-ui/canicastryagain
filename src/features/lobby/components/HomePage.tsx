@@ -199,11 +199,27 @@ function KeyInstructionsCard(): React.ReactElement {
 }
 
 const DICE_POWER_LABELS: Record<string, string> = {
-  bomba: 'Bomba — destruyó toda una fila',
-  rayo: 'Rayo — eliminó una canica de cada fila',
-  diagonal: 'Diagonal — eliminó canicas en diagonal',
-  resurreccion: 'Resurrección — restauró una fila entera'
+  bomba: 'Bomba',
+  rayo: 'Rayo',
+  diagonal: 'Diagonal',
+  resurreccion: 'Resurrección'
 };
+
+function formatAffectedCountLabel(affectedCount: number | undefined): string {
+  if (!affectedCount || affectedCount <= 0) return 'sin efecto';
+  return `${affectedCount} canica${affectedCount === 1 ? '' : 's'}`;
+}
+
+function formatDiceEffectSummary(power: string | undefined, affectedCount: number | undefined): string {
+  const powerLabel = DICE_POWER_LABELS[power ?? ''] ?? 'Dado especial';
+  const impactLabel = formatAffectedCountLabel(affectedCount);
+
+  if (power === 'bomba') return `${powerLabel} · fila barrida (${impactLabel})`;
+  if (power === 'rayo') return `${powerLabel} · descarga sobre el tablero (${impactLabel})`;
+  if (power === 'diagonal') return `${powerLabel} · corte diagonal (${impactLabel})`;
+  if (power === 'resurreccion') return `${powerLabel} · fila restaurada (${impactLabel})`;
+  return `${powerLabel} · ${impactLabel}`;
+}
 
 function formatLatestMoveSummary(game: NonNullable<ReturnType<typeof useRemoteGame>['game']>): string {
   const latestMove = game.moveHistory[game.moveHistory.length - 1];
@@ -211,7 +227,7 @@ function formatLatestMoveSummary(game: NonNullable<ReturnType<typeof useRemoteGa
 
   const actorName = latestMove.player === 1 ? game.player1?.name : game.player2?.name;
   if (latestMove.fromDice) {
-    return `${actorName ?? `J${latestMove.player}`} usó el dado especial`;
+    return `${actorName ?? `J${latestMove.player}`} usó ${formatDiceEffectSummary(latestMove.dicePower, latestMove.affectedCount)}`;
   }
 
   return `${actorName ?? `J${latestMove.player}`} quitó ${latestMove.count} en fila ${latestMove.rowIndex + 1}`;
@@ -974,7 +990,7 @@ export function HomePage(): React.ReactElement {
     try {
       const dice = await sendDice();
       if (dice) {
-        showTemporaryMessage(DICE_POWER_LABELS[dice.power] ?? `Poder: ${dice.power}`);
+        showTemporaryMessage(`Dado especial: ${formatDiceEffectSummary(dice.power, dice.affected.length)}`);
         return dice;
       }
     } catch {
@@ -1104,7 +1120,9 @@ export function HomePage(): React.ReactElement {
         if (!isMyMove && latestMove) {
           const rivalName = latestMove.player === 1 ? game.player1?.name : game.player2?.name;
           if (latestMove.fromDice) {
-            showTemporaryMessage(`${rivalName ?? 'Rival'} usó el dado especial.`);
+            showTemporaryMessage(
+              `${rivalName ?? 'Rival'} usó ${formatDiceEffectSummary(latestMove.dicePower, latestMove.affectedCount)}.`
+            );
           } else {
             showTemporaryMessage(
               `${rivalName ?? 'Rival'} quitó ${latestMove.count} canica${latestMove.count > 1 ? 's' : ''} (fila ${latestMove.rowIndex + 1}).`
@@ -2524,7 +2542,9 @@ export function HomePage(): React.ReactElement {
                       .map((move, index) => {
                         const turnNumber = game.moveHistory.length - index;
                         const player = move.player === 1 ? game.player1?.name : game.player2?.name;
-                        const detail = move.fromDice ? 'Dado especial' : `×${move.count} fila ${move.rowIndex + 1}`;
+                        const detail = move.fromDice
+                          ? formatDiceEffectSummary(move.dicePower, move.affectedCount)
+                          : `×${move.count} fila ${move.rowIndex + 1}`;
                         return (
                           <div
                             key={`${move.timestamp}-${index}`}

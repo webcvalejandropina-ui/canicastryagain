@@ -16,6 +16,8 @@ export type Move = {
   count: number;
   timestamp: string;
   fromDice?: boolean;
+  dicePower?: DicePowerName;
+  affectedCount?: number;
 };
 
 export type GameState = {

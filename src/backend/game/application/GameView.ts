@@ -26,6 +26,8 @@ export type GameView = {
     count: number;
     timestamp: string;
     fromDice?: boolean;
+    dicePower?: 'bomba' | 'rayo' | 'diagonal' | 'resurreccion';
+    affectedCount?: number;
   }[];
 };
 

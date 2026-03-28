@@ -287,7 +287,9 @@ export class Game {
       startIndex: first?.col ?? 0,
       count: 1,
       timestamp: diceTimestamp,
-      fromDice: true
+      fromDice: true,
+      dicePower: power,
+      affectedCount: affected.length
     });
 
     const totalBalls = this.state.rows.reduce(

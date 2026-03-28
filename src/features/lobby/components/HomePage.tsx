@@ -656,6 +656,9 @@ export function HomePage(): React.ReactElement {
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
   const moveInFlightRef = useRef(false);
+  const pendingActionBarRef = useRef<HTMLDivElement | null>(null);
+  const applyMoveButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousCanInteractRef = useRef(false);
   const gameFeedbackRef = useRef<{
     gameId: string;
     moveCount: number;
@@ -922,6 +925,48 @@ export function HomePage(): React.ReactElement {
     if (!game || game.status !== 'playing') return;
     setTurnBannerKey((previous) => previous + 1);
   }, [game]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!pendingMove) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      navigator.vibrate(18);
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      pendingActionBarRef.current?.scrollIntoView({
+        block: 'nearest',
+        inline: 'nearest',
+        behavior: reduceMotion ? 'auto' : 'smooth'
+      });
+    });
+
+    const focusTimer = window.setTimeout(() => {
+      applyMoveButtonRef.current?.focus({ preventScroll: true });
+    }, reduceMotion ? 0 : 180);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(focusTimer);
+    };
+  }, [pendingMove]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (!game || game.status !== 'playing') {
+      previousCanInteractRef.current = false;
+      return;
+    }
+
+    if (canInteract && !previousCanInteractRef.current && typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      navigator.vibrate([24, 40, 24]);
+    }
+
+    previousCanInteractRef.current = canInteract;
+  }, [game, canInteract]);
 
   useEffect(() => {
     if (!game) {
@@ -2024,10 +2069,11 @@ export function HomePage(): React.ReactElement {
 
       {isGameMode && pendingMove ? (
         <div
+          ref={pendingActionBarRef}
           className="fixed inset-x-0 bottom-0 z-[80] flex justify-center px-4 pt-2 sm:justify-end sm:px-6 md:px-8"
           style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="pointer-events-auto w-full max-w-md rounded-2xl border border-primary/20 bg-white/95 p-3 shadow-2xl shadow-black/15 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:shadow-black/35">
+          <div className="selection-sheet-enter pointer-events-auto w-full max-w-md rounded-2xl border border-primary/20 bg-white/95 p-3 shadow-2xl shadow-black/15 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:shadow-black/35">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Jugada lista</p>
@@ -2048,10 +2094,11 @@ export function HomePage(): React.ReactElement {
                   Cancelar
                 </button>
                 <button
+                  ref={applyMoveButtonRef}
                   type="button"
                   onClick={() => void applyPendingMove()}
                   disabled={!canInteract || isBusy}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-black uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-black uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45 dark:focus-visible:ring-offset-[#1c1912]"
                 >
                   <IconCheck className="h-4 w-4 shrink-0" />
                   <span>Aplicar</span>

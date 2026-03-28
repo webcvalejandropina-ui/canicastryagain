@@ -1049,9 +1049,9 @@ export function HomePage(): React.ReactElement {
   }, [game?.moveHistory.length, game?.currentTurn, game?.status]);
 
   useEffect(() => {
-    if (!game || game.status !== 'playing') return;
+    if (game?.status !== 'playing') return;
     setTurnBannerKey((previous) => previous + 1);
-  }, [game]);
+  }, [game?.gameId, game?.status, game?.currentTurn, game?.moveHistory.length]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

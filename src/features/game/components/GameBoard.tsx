@@ -1215,6 +1215,22 @@ export function GameBoard({
     return canInteract ? 'Click/Tap para elegir cantidad en la fila' : 'Esperando tu turno';
   }, [renderMode, canInteract, selectedRowIndex, selectedStartIndex, selectedEndIndex]);
 
+  const turnLimit = game.moveHistory.length + 1;
+  const selectedCount =
+    selectedRowIndex !== null &&
+    selectedStartIndex !== null &&
+    selectedEndIndex !== null &&
+    selectedEndIndex >= selectedStartIndex
+      ? selectedEndIndex - selectedStartIndex + 1
+      : 0;
+  const remainingSelectionCapacity = Math.max(0, turnLimit - selectedCount);
+  const boardHudTitle = selectedCount > 0 ? `Fila ${selectedRowIndex! + 1}` : canInteract ? 'Tu turno' : 'Esperando';
+  const boardHudBody = selectedCount > 0
+    ? `${selectedCount}/${turnLimit} seleccionadas · restan ${remainingSelectionCapacity}`
+    : canInteract
+      ? `Hasta ${turnLimit} seguida${turnLimit === 1 ? '' : 's'} en una fila`
+      : 'Esperando jugada rival';
+
   useEffect(() => {
     onBallClickRef.current = onBallClick;
   }, [onBallClick]);
@@ -1491,6 +1507,58 @@ export function GameBoard({
           ) : null}
         </div>
       )}
+
+      {game.status === 'playing' ? (
+        <div className="pointer-events-none absolute left-3 top-3 z-10 max-w-[15rem] sm:left-4 sm:top-4">
+          <div
+            className={[
+              'board-legend-enter rounded-2xl border px-3 py-2.5 shadow-lg backdrop-blur-xl',
+              selectedCount > 0
+                ? 'border-primary/30 bg-white/92 text-[#4a3f32] dark:border-primary/30 dark:bg-dark-card/92 dark:text-dark-text'
+                : canInteract
+                  ? 'border-emerald-500/25 bg-white/90 text-[#4a3f32] dark:border-emerald-500/25 dark:bg-dark-card/92 dark:text-dark-text'
+                  : 'border-brown/15 bg-white/88 text-[#4a3f32] dark:border-white/10 dark:bg-dark-card/88 dark:text-dark-text'
+            ].join(' ')}
+            role="status"
+            aria-live="polite"
+          >
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span
+                className={[
+                  'rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
+                  selectedCount > 0
+                    ? 'bg-primary/15 text-primary'
+                    : canInteract
+                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                      : 'bg-slate-500/10 text-slate-500 dark:text-slate-400'
+                ].join(' ')}
+              >
+                {boardHudTitle}
+              </span>
+              <span className="rounded-full border border-brown/15 bg-sand/55 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
+                max {turnLimit}
+              </span>
+              {canInteract ? (
+                <span className="rounded-full border border-brown/15 bg-sand/55 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
+                  {diceAvailable ? 'dado listo' : 'sin dado'}
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-2 text-[11px] font-semibold leading-snug text-inherit">
+              {boardHudBody}
+            </p>
+            {selectedCount > 0 ? (
+              <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
+                Toca fuera del bloque para ampliarlo si sigue contiguo; toca un extremo para recortar.
+              </p>
+            ) : canInteract ? (
+              <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
+                El HUD se actualiza al tocar una fila, así no tienes que bajar para comprobar la selección.
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {showDiceAction ? (
         <div className="pointer-events-none absolute right-3 top-3 z-10 flex max-w-[13rem] justify-end sm:right-4 sm:top-4">

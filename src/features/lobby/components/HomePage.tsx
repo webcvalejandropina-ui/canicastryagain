@@ -152,6 +152,18 @@ const DICE_POWER_LABELS: Record<string, string> = {
   resurreccion: 'Resurrección — restauró una fila entera'
 };
 
+function formatLatestMoveSummary(game: NonNullable<ReturnType<typeof useRemoteGame>['game']>): string {
+  const latestMove = game.moveHistory[game.moveHistory.length - 1];
+  if (!latestMove) return 'Aún no hay jugadas';
+
+  const actorName = latestMove.player === 1 ? game.player1?.name : game.player2?.name;
+  if (latestMove.fromDice) {
+    return `${actorName ?? `J${latestMove.player}`} usó el dado especial`;
+  }
+
+  return `${actorName ?? `J${latestMove.player}`} quitó ${latestMove.count} en fila ${latestMove.rowIndex + 1}`;
+}
+
 const scoringRulesRows = [
   { label: 'Victoria ante rival mucho mejor', pts: '+15' },
   { label: 'Victoria ante rival mejor', pts: '+13' },
@@ -639,6 +651,7 @@ export function HomePage(): React.ReactElement {
   const [showKeyRulesInMenu, setShowKeyRulesInMenu] = useState(false);
   const [gameGuideCollapsed, setGameGuideCollapsed] = useState(false);
   const [pendingMove, setPendingMove] = useState<{ rowIndex: number; startIndex: number; endIndex: number } | null>(null);
+  const [turnBannerKey, setTurnBannerKey] = useState(0);
 
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
@@ -678,6 +691,17 @@ export function HomePage(): React.ReactElement {
     () => (pendingMove ? pendingMove.rowIndex + 1 : null),
     [pendingMove]
   );
+  const latestMoveSummary = useMemo(() => (game ? formatLatestMoveSummary(game) : ''), [game]);
+  const turnBannerText = useMemo(() => {
+    if (!game || game.status !== 'playing') return '';
+    if (pendingMove) {
+      return `Fila ${pendingMove.rowIndex + 1} · ${pendingMove.endIndex - pendingMove.startIndex + 1} canica${pendingMove.endIndex - pendingMove.startIndex === 0 ? '' : 's'} lista${pendingMove.endIndex - pendingMove.startIndex === 0 ? '' : 's'} para aplicar.`;
+    }
+    if (canInteract) {
+      return `Tu turno: hasta ${turnLimit} canica${turnLimit > 1 ? 's' : ''} seguidas en una sola fila.`;
+    }
+    return 'Esperando la jugada del rival…';
+  }, [game, pendingMove, canInteract, turnLimit]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -893,6 +917,11 @@ export function HomePage(): React.ReactElement {
     setPendingMove(null);
     moveInFlightRef.current = false;
   }, [game?.moveHistory.length, game?.currentTurn, game?.status]);
+
+  useEffect(() => {
+    if (!game || game.status !== 'playing') return;
+    setTurnBannerKey((previous) => previous + 1);
+  }, [game]);
 
   useEffect(() => {
     if (!game) {
@@ -1937,6 +1966,44 @@ export function HomePage(): React.ReactElement {
                     </div>
                   </div>
                 ) : null}
+                {isGameMode && game.status === 'playing' ? (
+                  <div key={turnBannerKey} className="turn-banner-enter mx-2 mb-2 shrink-0 sm:mx-3" aria-live="polite">
+                    <div className="rounded-2xl border border-brown/15 bg-white/90 px-3 py-2.5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-dark-card/92">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8c7d6b] dark:text-dark-muted">
+                            {pendingMove ? 'Selección activa' : canInteract ? 'Momento de jugar' : 'Estado de turno'}
+                          </p>
+                          <p className="mt-1 text-sm font-bold leading-snug text-[#4a3f32] dark:text-dark-text">
+                            {turnBannerText}
+                          </p>
+                        </div>
+                        <div
+                          className={[
+                            'inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]',
+                            canInteract
+                              ? 'turn-badge-pulse bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                              : 'bg-slate-500/10 text-slate-500 dark:bg-slate-500/15 dark:text-slate-400'
+                          ].join(' ')}
+                        >
+                          {canInteract ? 'Tu turno' : 'Rival'}
+                        </div>
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
+                          Max {turnLimit}
+                        </span>
+                        <span className="rounded-full border border-brown/15 bg-sand/55 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
+                          {game.yourDiceAvailable ? 'Dado listo' : 'Dado gastado'}
+                        </span>
+                        <span className="rounded-full border border-brown/15 bg-sand/55 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
+                          {latestMoveSummary}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
                 <GameBoard
                   game={game}
                   selectedRowIndex={pendingMove?.rowIndex ?? null}
@@ -1956,7 +2023,10 @@ export function HomePage(): React.ReactElement {
       )}
 
       {isGameMode && pendingMove ? (
-        <div className="fixed inset-x-0 bottom-0 z-[80] flex justify-center px-4 pb-5 pt-2 sm:justify-end sm:px-6 md:px-8">
+        <div
+          className="fixed inset-x-0 bottom-0 z-[80] flex justify-center px-4 pt-2 sm:justify-end sm:px-6 md:px-8"
+          style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
+        >
           <div className="pointer-events-auto w-full max-w-md rounded-2xl border border-primary/20 bg-white/95 p-3 shadow-2xl shadow-black/15 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:shadow-black/35">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">

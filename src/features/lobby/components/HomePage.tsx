@@ -711,6 +711,9 @@ export function HomePage(): React.ReactElement {
   const moveInFlightRef = useRef(false);
   const pendingActionBarRef = useRef<HTMLDivElement | null>(null);
   const applyMoveButtonRef = useRef<HTMLButtonElement | null>(null);
+  const gameMenuTriggerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const gameMenuCloseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const gameMenuPanelRef = useRef<HTMLDivElement | null>(null);
   const previousCanInteractRef = useRef(false);
   const gameFeedbackRef = useRef<{
     gameId: string;
@@ -766,6 +769,13 @@ export function HomePage(): React.ReactElement {
     }
     return 'Esperando la jugada del rival…';
   }, [game, pendingMove, canInteract, turnLimit]);
+  const gameMenuSummaryText = useMemo(() => {
+    if (!game || game.status !== 'playing') return '';
+    if (pendingMove) {
+      return `Fila ${pendingMove.rowIndex + 1} preparada · ${pendingRemoveCount}/${turnLimit}`;
+    }
+    return canInteract ? `Te toca · máximo ${turnLimit}` : 'Turno del rival';
+  }, [game, pendingMove, pendingRemoveCount, canInteract, turnLimit]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -819,6 +829,45 @@ export function HomePage(): React.ReactElement {
       second: '2-digit'
     });
   }, [lastSyncedAt]);
+
+  const syncStatus = useMemo(() => {
+    const staleMs = lastSyncedAt ? Date.now() - lastSyncedAt : Number.POSITIVE_INFINITY;
+    const isLagging = !hasLiveChannel && staleMs > 9_000;
+
+    if (hasLiveChannel) {
+      return {
+        tone: 'live' as const,
+        shortLabel: 'En vivo',
+        detail: 'Canal en vivo activo',
+        hint: 'Los turnos deberían llegar solos.'
+      };
+    }
+
+    if (isSyncing) {
+      return {
+        tone: 'syncing' as const,
+        shortLabel: 'Sync',
+        detail: 'Sincronizando tablero…',
+        hint: 'Estamos pidiendo el estado más reciente.'
+      };
+    }
+
+    if (isLagging) {
+      return {
+        tone: 'lagging' as const,
+        shortLabel: 'Reconectando',
+        detail: lastSyncLabel ? `Sin canal en vivo · última sync ${lastSyncLabel}` : 'Sin canal en vivo · reintento automático',
+        hint: 'Si tarda demasiado, pulsa refrescar.'
+      };
+    }
+
+    return {
+      tone: 'polling' as const,
+      shortLabel: 'Auto-sync',
+      detail: lastSyncLabel ? `Última sync ${lastSyncLabel}` : 'Preparando sincronización',
+      hint: 'Seguimos comprobando cambios en segundo plano.'
+    };
+  }, [hasLiveChannel, isSyncing, lastSyncedAt, lastSyncLabel]);
 
   const shareUrl = useMemo(() => {
     if (!browserLocation) return '';
@@ -1093,11 +1142,57 @@ export function HomePage(): React.ReactElement {
     if (!showGameMenu) return;
 
     const previousOverflow = document.body.style.overflow;
+    const triggerButton = gameMenuTriggerButtonRef.current;
     document.body.style.overflow = 'hidden';
 
+    const focusTimer = window.setTimeout(() => {
+      gameMenuCloseButtonRef.current?.focus({ preventScroll: true });
+    }, 10);
+
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.style.overflow = previousOverflow;
+      triggerButton?.focus({ preventScroll: true });
     };
+  }, [showGameMenu]);
+
+  useEffect(() => {
+    if (!showGameMenu || typeof window === 'undefined') return;
+
+    const handleTrapFocus = (event: KeyboardEvent): void => {
+      if (event.key !== 'Tab') return;
+
+      const panel = gameMenuPanelRef.current;
+      if (!panel) return;
+
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => !element.hasAttribute('disabled') && element.tabIndex !== -1);
+
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          event.preventDefault();
+          last.focus();
+        }
+        return;
+      }
+
+      if (active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleTrapFocus);
+    return () => window.removeEventListener('keydown', handleTrapFocus);
   }, [showGameMenu]);
 
   useEffect(() => {
@@ -1668,29 +1763,55 @@ export function HomePage(): React.ReactElement {
                 {isGameMode ? (
                   <div className="flex w-full items-center gap-2 rounded-2xl bg-white/90 px-2 py-1.5 shadow-sm backdrop-blur dark:bg-dark-card/90 dark:shadow-none sm:px-3">
                     <button
+                      ref={gameMenuTriggerButtonRef}
                       type="button"
                       onClick={() => setShowGameMenu((previous) => !previous)}
                       aria-label="Abrir menú"
                       title="Abrir menú"
+                      aria-expanded={showGameMenu}
+                      aria-controls="game-menu-drawer"
                       className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#4a3f32] transition-colors hover:bg-primary/10 hover:text-primary active:scale-95 dark:text-dark-text dark:hover:bg-primary/15"
                     >
                       <IconMenu className="h-5 w-5 shrink-0" />
                     </button>
-                    <div className="flex min-w-0 flex-1 flex-col items-center gap-0.5">
-                      <div
-                        className={[
-                          'rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider',
-                          canInteract
-                            ? 'bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
-                            : 'bg-slate-500/10 text-slate-500 dark:bg-slate-500/15 dark:text-slate-400'
-                        ].join(' ')}
-                      >
-                        {canInteract ? '🟢 Tu turno' : '⏳ Rival'} · max {turnLimit}
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <div className="flex flex-wrap items-center justify-center gap-1.5">
+                        <div
+                          className={[
+                            'rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider',
+                            canInteract
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                              : 'bg-slate-500/10 text-slate-500 dark:bg-slate-500/15 dark:text-slate-400'
+                          ].join(' ')}
+                        >
+                          {canInteract ? '🟢 Tu turno' : '⏳ Rival'} · max {turnLimit}
+                        </div>
+                        <div
+                          aria-live="polite"
+                          className={[
+                            'rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em]',
+                            syncStatus.tone === 'live'
+                              ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400'
+                              : syncStatus.tone === 'syncing'
+                                ? 'border-sky-500/25 bg-sky-500/10 text-sky-600 dark:border-sky-500/30 dark:bg-sky-500/15 dark:text-sky-300'
+                                : syncStatus.tone === 'lagging'
+                                  ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300'
+                                  : 'border-brown/15 bg-sand/55 text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted'
+                          ].join(' ')}
+                          title={syncStatus.detail}
+                        >
+                          {syncStatus.shortLabel}
+                        </div>
                       </div>
                       {game && (
-                        <span className="truncate text-[9px] font-medium text-[#8c7d6b] dark:text-dark-muted">
-                          {game.player1?.name ?? '?'} vs {game.player2?.name ?? '?'}
-                        </span>
+                        <div className="flex min-w-0 flex-col items-center gap-0.5">
+                          <span className="max-w-full truncate text-[9px] font-medium text-[#8c7d6b] dark:text-dark-muted">
+                            {game.player1?.name ?? '?'} vs {game.player2?.name ?? '?'}
+                          </span>
+                          <span className="max-w-full truncate text-[9px] font-semibold text-[#9a8c7c] dark:text-dark-muted/90">
+                            {syncStatus.detail}
+                          </span>
+                        </div>
                       )}
                     </div>
                     <button
@@ -2145,6 +2266,23 @@ export function HomePage(): React.ReactElement {
                         </span>
                       </div>
 
+                      <div
+                        className={[
+                          'mt-2 rounded-xl border px-2.5 py-2 text-[11px] font-semibold leading-snug',
+                          syncStatus.tone === 'live'
+                            ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300'
+                            : syncStatus.tone === 'lagging'
+                              ? 'border-amber-500/25 bg-amber-500/10 text-amber-800 dark:border-amber-500/25 dark:bg-amber-500/10 dark:text-amber-200'
+                              : 'border-brown/10 bg-sand/45 text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface/80 dark:text-dark-muted'
+                        ].join(' ')}
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <span className="font-black uppercase tracking-[0.14em]">{syncStatus.shortLabel}</span>
+                        <span className="mx-1.5 opacity-50">·</span>
+                        <span>{syncStatus.hint}</span>
+                      </div>
+
                       {canInteract ? (
                         <div className="mt-3 rounded-xl border border-primary/15 bg-primary/5 px-2.5 py-2 dark:border-primary/20 dark:bg-primary/10">
                           <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-[0.14em]">
@@ -2254,13 +2392,21 @@ export function HomePage(): React.ReactElement {
       {isGameMode && showGameMenu && game ? (
         <>
           <div className="drawer-backdrop fixed inset-0 z-[89] bg-black/40 backdrop-blur-sm dark:bg-black/60" onClick={() => setShowGameMenu(false)} aria-hidden />
-          <div className="drawer-slide-in fixed inset-y-0 right-0 z-[90] flex w-full max-w-xs flex-col bg-white/95 shadow-2xl backdrop-blur-xl dark:bg-dark-card sm:max-w-sm">
+          <div
+            id="game-menu-drawer"
+            ref={gameMenuPanelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menú de partida"
+            className="drawer-slide-in fixed inset-y-0 right-0 z-[90] flex w-full max-w-xs flex-col bg-white/95 shadow-2xl backdrop-blur-xl dark:bg-dark-card sm:max-w-sm"
+          >
             <div className="flex items-center justify-between border-b border-brown/10 px-4 py-3 dark:border-white/10">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🍍</span>
                 <p className="text-sm font-bold uppercase tracking-wider text-[#4a3f32] dark:text-dark-text">Partida</p>
               </div>
               <button
+                ref={gameMenuCloseButtonRef}
                 type="button"
                 onClick={() => setShowGameMenu(false)}
                 aria-label="Cerrar menú"
@@ -2272,9 +2418,40 @@ export function HomePage(): React.ReactElement {
             </div>
 
             <div className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
+              <div className="mx-1 mb-2 rounded-2xl border border-primary/15 bg-primary/5 p-3 dark:border-primary/20 dark:bg-primary/10">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={[
+                      'rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
+                      canInteract
+                        ? 'bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                        : 'bg-slate-500/10 text-slate-500 dark:bg-slate-500/15 dark:text-slate-400'
+                    ].join(' ')}
+                  >
+                    {gameMenuSummaryText}
+                  </span>
+                  <span className="rounded-full border border-brown/15 bg-white/80 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
+                    {syncStatus.shortLabel}
+                  </span>
+                </div>
+                <p className="mt-2 text-[11px] font-semibold leading-snug text-[#4a3f32] dark:text-dark-text">
+                  Última jugada: {latestMoveSummary}
+                </p>
+                <p className="mt-1 text-[10px] leading-relaxed text-[#8c7d6b] dark:text-dark-muted">
+                  {syncStatus.detail}
+                </p>
+                {game.gameCode ? (
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8c7d6b] dark:text-dark-muted">
+                    Código · <span className="text-primary">{game.gameCode}</span>
+                  </p>
+                ) : null}
+              </div>
               <button
                 type="button"
-                onClick={() => { void handleManualRefresh(); }}
+                onClick={() => {
+                  setShowGameMenu(false);
+                  void handleManualRefresh();
+                }}
                 disabled={isSyncing || isBusy}
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#4a3f32] transition-colors hover:bg-primary/10 active:scale-[0.98] disabled:opacity-40 dark:text-dark-text dark:hover:bg-primary/15"
               >
@@ -2283,7 +2460,10 @@ export function HomePage(): React.ReactElement {
               </button>
               <button
                 type="button"
-                onClick={() => { void handleCopyUrl(); }}
+                onClick={() => {
+                  setShowGameMenu(false);
+                  void handleCopyUrl();
+                }}
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#4a3f32] transition-colors hover:bg-primary/10 active:scale-[0.98] dark:text-dark-text dark:hover:bg-primary/15"
               >
                 <IconLinkExternal className="h-5 w-5 shrink-0 text-primary" />

@@ -747,6 +747,14 @@ export function HomePage(): React.ReactElement {
     () => (pendingMove ? pendingMove.rowIndex + 1 : null),
     [pendingMove]
   );
+  const remainingSelectionCapacity = useMemo(
+    () => Math.max(0, turnLimit - pendingRemoveCount),
+    [turnLimit, pendingRemoveCount]
+  );
+  const selectionUsagePercent = useMemo(
+    () => (turnLimit > 0 ? Math.min(100, (pendingRemoveCount / turnLimit) * 100) : 0),
+    [pendingRemoveCount, turnLimit]
+  );
   const latestMoveSummary = useMemo(() => (game ? formatLatestMoveSummary(game) : ''), [game]);
   const turnBannerText = useMemo(() => {
     if (!game || game.status !== 'playing') return '';
@@ -1081,6 +1089,18 @@ export function HomePage(): React.ReactElement {
   }, [game?.status, fetchRankings]);
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (!showGameMenu) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showGameMenu]);
+
+  useEffect(() => {
     if (!game && loggedIn) {
       void fetchRankings();
     }
@@ -1339,6 +1359,39 @@ export function HomePage(): React.ReactElement {
   const clearPendingMove = useCallback(() => {
     setPendingMove(null);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!isGameMode) return;
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') {
+        if (showGameMenu) {
+          event.preventDefault();
+          setShowGameMenu(false);
+          return;
+        }
+
+        if (pendingMove) {
+          event.preventDefault();
+          clearPendingMove();
+        }
+        return;
+      }
+
+      if (event.key === 'Enter' && pendingMove && canInteract && !isBusy) {
+        const target = event.target as HTMLElement | null;
+        const tagName = target?.tagName;
+        if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA') return;
+
+        event.preventDefault();
+        void applyPendingMove();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isGameMode, showGameMenu, pendingMove, canInteract, isBusy, clearPendingMove, applyPendingMove]);
 
   const handleCopyCode = useCallback(async () => {
     if (!game?.gameCode) return;
@@ -2091,6 +2144,34 @@ export function HomePage(): React.ReactElement {
                           {latestMoveSummary}
                         </span>
                       </div>
+
+                      {canInteract ? (
+                        <div className="mt-3 rounded-xl border border-primary/15 bg-primary/5 px-2.5 py-2 dark:border-primary/20 dark:bg-primary/10">
+                          <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-[0.14em]">
+                            <span className="text-[#6b5d4f] dark:text-dark-muted">
+                              {pendingMove ? 'Selección preparada' : 'Aún puedes elegir'}
+                            </span>
+                            <span className="text-primary">
+                              {pendingMove
+                                ? `${pendingRemoveCount}/${turnLimit} · restan ${remainingSelectionCapacity}`
+                                : `${turnLimit} disponibles`}
+                            </span>
+                          </div>
+                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-brown/10 dark:bg-white/10">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-primary to-leaf transition-all duration-200"
+                              style={{ width: `${pendingMove ? selectionUsagePercent : 0}%` }}
+                            />
+                          </div>
+                          <p className="mt-2 text-[11px] leading-snug text-[#6b5d4f] dark:text-dark-muted">
+                            {pendingMove
+                              ? remainingSelectionCapacity > 0
+                                ? `Puedes ampliar el bloque hasta ${remainingSelectionCapacity} canica${remainingSelectionCapacity === 1 ? '' : 's'} más si siguen siendo contiguas.`
+                                : 'Has llegado al máximo de este turno. Ya puedes aplicar la jugada.'
+                              : 'Toca una fila para empezar. Si quieres más de una, amplía solo con canicas contiguas.'}
+                          </p>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 ) : null}
@@ -2119,17 +2200,30 @@ export function HomePage(): React.ReactElement {
           style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
         >
           <div className="selection-sheet-enter pointer-events-auto w-full max-w-md rounded-2xl border border-primary/20 bg-white/95 p-3 shadow-2xl shadow-black/15 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:shadow-black/35">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Jugada lista</p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">Jugada lista</p>
+                  <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-primary">
+                    {pendingRemoveCount}/{turnLimit}
+                  </span>
+                </div>
                 <p className="mt-1 text-sm font-bold text-[#4a3f32] dark:text-dark-text">
                   Fila {pendingRowLabel} · {pendingRemoveCount} canica{pendingRemoveCount === 1 ? '' : 's'}
                 </p>
-                <p className="mt-0.5 text-[11px] text-[#8c7d6b] dark:text-dark-muted">
-                  Revisa el bloque: solo una fila y canicas seguidas. Cancelar deshace la selección.
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-brown/10 dark:bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-primary to-leaf transition-all duration-200"
+                    style={{ width: `${selectionUsagePercent}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-[11px] text-[#8c7d6b] dark:text-dark-muted">
+                  {remainingSelectionCapacity > 0
+                    ? `Puedes ampliar ${remainingSelectionCapacity} canica${remainingSelectionCapacity === 1 ? '' : 's'} más si siguen siendo contiguas.`
+                    : 'Límite del turno completado. Ya puedes aplicar la jugada.'}
                 </p>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2 self-end sm:self-auto">
                 <button
                   type="button"
                   onClick={clearPendingMove}
@@ -2146,10 +2240,13 @@ export function HomePage(): React.ReactElement {
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-black uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45 dark:focus-visible:ring-offset-[#1c1912]"
                 >
                   <IconCheck className="h-4 w-4 shrink-0" />
-                  <span>Aplicar</span>
+                  <span>Aplicar jugada</span>
                 </button>
               </div>
             </div>
+            <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8c7d6b] dark:text-dark-muted">
+              Tip: Enter aplica · Escape cancela.
+            </p>
           </div>
         </div>
       ) : null}

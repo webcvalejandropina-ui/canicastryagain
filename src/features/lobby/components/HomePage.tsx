@@ -481,7 +481,7 @@ function VictoryOverlay({
   winnerName,
   playerName,
   rivalName,
-  siteOrigin,
+  shareOrigin,
   onToast,
   onExit
 }: {
@@ -489,7 +489,7 @@ function VictoryOverlay({
   winnerName: string;
   playerName: string;
   rivalName: string;
-  siteOrigin: string;
+  shareOrigin: string;
   onToast: (text: string) => void;
   onExit: () => void;
 }): React.ReactElement {
@@ -509,22 +509,26 @@ function VictoryOverlay({
   }, [playerName, winnerName, rivalName]);
 
   const handleShareResult = useCallback(async (): Promise<void> => {
-    const base =
-      siteOrigin.trim() ||
-      (typeof window !== 'undefined' ? window.location.origin : '') ||
-      'https://canicas-try-again.app';
+    const trimmedShareOrigin = shareOrigin.trim();
+    const fallbackOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    const base = trimmedShareOrigin || fallbackOrigin;
+    const publicBaseAvailable = Boolean(trimmedShareOrigin);
     const text = isWin
-      ? `¡Acabo de ganar en Canicas Try Again 🍍 contra ${rivalName || 'un crack'}! ¿Quién se apunta a un misère con buen rollo? ${base}`
-      : `Partidazo en Canicas Try Again 🍍: ganó ${winnerName || 'mi rival'}. Yo sigo con buen rollo y ganas de revancha 😄 ${base}`;
+      ? `¡Acabo de ganar en Canicas Try Again 🍍 contra ${rivalName || 'un crack'}! ¿Quién se apunta a un misère con buen rollo?${publicBaseAvailable ? ` ${base}` : ''}`
+      : `Partidazo en Canicas Try Again 🍍: ganó ${winnerName || 'mi rival'}. Yo sigo con buen rollo y ganas de revancha 😄${publicBaseAvailable ? ` ${base}` : ''}`;
 
     if (typeof navigator.share === 'function') {
       try {
         await navigator.share({
           title: 'Canicas Try Again 🍍',
           text,
-          url: base
+          ...(publicBaseAvailable ? { url: base } : {})
         });
-        onToast('¡Gracias por compartir! Así crece la comunidad con buena energía.');
+        onToast(
+          publicBaseAvailable
+            ? '¡Gracias por compartir! Esta vez el reto sale con enlace bueno, no con localhost travieso 🍍'
+            : 'Resultado compartido. Si quieres incluir enlace público, abre la app desde la URL del túnel.'
+        );
         return;
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') return;
@@ -533,11 +537,19 @@ function VictoryOverlay({
 
     const copied = await copyTextWithFallback(text);
     if (copied) {
-      onToast('Texto copiado: pégalo en WhatsApp, Instagram, donde quieras retar con cariño 🍍');
+      onToast(
+        publicBaseAvailable
+          ? 'Texto copiado con enlace listo para retar por WhatsApp, Instagram o donde quieras 🍍'
+          : 'Texto copiado sin URL pública. Si quieres enlace compartible, abre la app con la URL del túnel.'
+      );
     } else {
-      onToast('No pude copiarlo solo. Usa compartir del sistema o copia el enlace desde el menú de partida (⋮).');
+      onToast(
+        publicBaseAvailable
+          ? 'No pude copiarlo solo. Usa compartir del sistema o copia el enlace desde el menú de partida (⋮).'
+          : 'No pude copiarlo solo. Primero consigue una URL pública (npm run dev:public o túnel) y luego comparte.'
+      );
     }
-  }, [isWin, rivalName, winnerName, siteOrigin, onToast]);
+  }, [isWin, rivalName, winnerName, shareOrigin, onToast]);
 
   useEffect(() => {
     const container = confettiRef.current;
@@ -918,6 +930,14 @@ export function HomePage(): React.ReactElement {
 
     return 'Estás en localhost o red local. Para invitar desde el móvil usa npm run dev:public o abre la app con la URL pública.';
   }, [browserLocation, isWaitingForOpponent, isPrivateOrigin, shareUrl, publicShareOriginStatus]);
+
+  const shareResultOrigin = useMemo(() => {
+    if (!browserLocation) return '';
+    if (isPrivateOrigin) {
+      return publicShareOrigin ?? '';
+    }
+    return browserLocation.origin;
+  }, [browserLocation, isPrivateOrigin, publicShareOrigin]);
 
   useEffect(() => {
     if (!browserLocation) return;
@@ -2677,7 +2697,7 @@ export function HomePage(): React.ReactElement {
                 ? game.player1?.name ?? ''
                 : ''
           }
-          siteOrigin={browserLocation?.origin ?? ''}
+          shareOrigin={shareResultOrigin}
           onToast={showTemporaryMessage}
           onExit={() => {
             clearGame();

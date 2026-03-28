@@ -1194,6 +1194,7 @@ export function GameBoard({
   const onDiceRollRef = useRef(onDiceRoll);
   const prevRowsRef = useRef<number[][] | null>(null);
   const [renderMode, setRenderMode] = useState<'loading' | 'three' | 'fallback'>('loading');
+  const [isRollingDice, setIsRollingDice] = useState(false);
 
   const statusLabel = useMemo(() => {
     if (renderMode === 'loading') return 'Inicializando tablero 3D...';
@@ -1381,14 +1382,47 @@ export function GameBoard({
     }
   }, [renderMode, game, selectedRowIndex, selectedStartIndex, selectedEndIndex, canInteract]);
 
+  const showDiceAction = !!diceAvailable && canInteract && game.status === 'playing';
+
+  const triggerDiceRoll = useMemo(
+    () => async (): Promise<void> => {
+      const rollFn = onDiceRollRef.current;
+      const context = sceneRef.current;
+      if (!rollFn || isRollingDice) return;
+
+      setIsRollingDice(true);
+      if (context) {
+        context.diceSpinning = true;
+        context.diceSpinT = 0;
+      }
+
+      try {
+        await rollFn();
+      } finally {
+        window.setTimeout(() => {
+          const latestContext = sceneRef.current;
+          if (latestContext) {
+            latestContext.diceSpinning = false;
+          }
+          setIsRollingDice(false);
+        }, 1200);
+      }
+    },
+    [isRollingDice]
+  );
+
+  useEffect(() => {
+    if (!showDiceAction && isRollingDice) {
+      setIsRollingDice(false);
+    }
+  }, [showDiceAction, isRollingDice]);
+
   useEffect(() => {
     if (renderMode !== 'three') return;
     const context = sceneRef.current;
     if (!context) return;
 
-    const showDice = !!diceAvailable && canInteract && game.status === 'playing';
-
-    if (showDice && !context.diceGroup) {
+    if (showDiceAction && !context.diceGroup) {
       const { diceGroup, diceMesh } = createDice3D(context.THREE, context.scene);
 
       const cam = context.camera;
@@ -1405,36 +1439,22 @@ export function GameBoard({
       context.diceMesh = diceMesh;
       context.diceSpinning = false;
       context.diceSpinT = 0;
-    } else if (!showDice && context.diceGroup) {
+    } else if (!showDiceAction && context.diceGroup) {
       context.scene.remove(context.diceGroup);
       context.diceGroup = null;
       context.diceMesh = null;
+      context.diceSpinning = false;
     }
 
-    context.onDiceClickCb = showDice
-      ? () => {
-          if (context.diceSpinning) return;
-          context.diceSpinning = true;
-          context.diceSpinT = 0;
-
-          const rollFn = onDiceRollRef.current;
-          if (!rollFn) return;
-
-          void rollFn().then(() => {
-            setTimeout(() => {
-              context.diceSpinning = false;
-            }, 1200);
-          });
-        }
-      : null;
-  }, [renderMode, diceAvailable, canInteract, game.status, game.numRows]);
+    context.onDiceClickCb = showDiceAction ? () => { void triggerDiceRoll(); } : null;
+  }, [renderMode, showDiceAction, triggerDiceRoll, game.numRows]);
 
   return (
     <section
       id="board"
       role="grid"
       aria-label={`Tablero de juego. ${statusLabel}`}
-      className="flex flex-1 flex-col bg-background-dark dark:bg-dark-bg min-h-0"
+      className="relative flex flex-1 flex-col bg-background-dark dark:bg-dark-bg min-h-0"
     >
       {renderMode === 'fallback' ? (
         <LegacyBoardGrid
@@ -1458,6 +1478,30 @@ export function GameBoard({
           ) : null}
         </div>
       )}
+
+      {showDiceAction ? (
+        <div className="pointer-events-none absolute right-3 top-3 z-10 flex max-w-[13rem] justify-end sm:right-4 sm:top-4">
+          <div className="pointer-events-auto flex flex-col items-end gap-1.5">
+            <button
+              type="button"
+              onClick={() => void triggerDiceRoll()}
+              disabled={isRollingDice}
+              aria-label={isRollingDice ? 'Lanzando dado especial' : 'Usar dado especial'}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-amber-300/45 bg-black/60 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-amber-100 shadow-lg shadow-amber-950/30 backdrop-blur transition hover:border-amber-200/70 hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              <span className="text-base leading-none" aria-hidden>
+                {isRollingDice ? '🎲' : '✨'}
+              </span>
+              <span>{isRollingDice ? 'Lanzando...' : 'Dado x1'}</span>
+            </button>
+            <p className="rounded-full bg-black/45 px-2.5 py-1 text-right text-[10px] font-semibold leading-tight text-white/80 backdrop-blur">
+              {renderMode === 'fallback'
+                ? 'Tu navegador usa tablero 2D: el dado sigue disponible aquí.'
+                : 'Acceso táctil rápido al dado especial.'}
+            </p>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

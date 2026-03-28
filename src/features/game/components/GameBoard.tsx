@@ -12,6 +12,7 @@ type Props = {
   selectedEndIndex: number | null;
   canInteract: boolean;
   hasPendingMove?: boolean;
+  hasTurnCoach?: boolean;
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onDiceRoll?: () => Promise<DiceResult | null>;
   diceAvailable?: boolean;
@@ -1186,6 +1187,7 @@ export function GameBoard({
   selectedEndIndex,
   canInteract,
   hasPendingMove = false,
+  hasTurnCoach = false,
   onBallClick,
   onDiceRoll,
   diceAvailable
@@ -1453,7 +1455,9 @@ export function GameBoard({
 
   const boardBottomInsetClass = hasPendingMove
     ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom))] sm:pb-[calc(8.25rem+env(safe-area-inset-bottom))]'
-    : 'pb-[calc(0.75rem+env(safe-area-inset-bottom))]';
+    : hasTurnCoach
+      ? 'pb-[calc(6.75rem+env(safe-area-inset-bottom))] sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))]'
+      : 'pb-[calc(0.75rem+env(safe-area-inset-bottom))]';
 
   return (
     <section

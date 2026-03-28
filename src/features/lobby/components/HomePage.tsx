@@ -792,6 +792,7 @@ export function HomePage(): React.ReactElement {
     }
     return canInteract ? `Te toca · máximo ${turnLimit}` : 'Turno del rival';
   }, [game, pendingMove, pendingRemoveCount, canInteract, turnLimit]);
+  const showTurnCoach = isGameMode && game?.status === 'playing' && canInteract && !pendingMove;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -2338,6 +2339,7 @@ export function HomePage(): React.ReactElement {
                   selectedEndIndex={pendingMove?.endIndex ?? null}
                   canInteract={canSelectBalls}
                   hasPendingMove={!!pendingMove}
+                  hasTurnCoach={showTurnCoach}
                   onBallClick={handleBallClick}
                   onDiceRoll={handleUseDice3D}
                   diceAvailable={!!game.yourDiceAvailable && canInteract}
@@ -2349,6 +2351,52 @@ export function HomePage(): React.ReactElement {
           </main>
         </div>
       )}
+
+      {showTurnCoach ? (
+        <div
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-[75] flex justify-center px-4 pt-2 sm:hidden"
+          style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+          aria-live="polite"
+        >
+          <div className="turn-coach-enter pointer-events-auto w-full max-w-lg rounded-2xl border border-emerald-500/20 bg-white/94 px-3 py-3 shadow-2xl shadow-black/10 backdrop-blur-xl dark:border-emerald-500/25 dark:bg-dark-card/94 dark:shadow-black/35">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="turn-badge-pulse rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                    Tu turno
+                  </span>
+                  <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-primary">
+                    Max {turnLimit}
+                  </span>
+                  <span className="rounded-full border border-brown/15 bg-sand/55 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
+                    {game?.yourDiceAvailable ? 'Dado listo' : 'Sin dado'}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm font-bold leading-snug text-[#4a3f32] dark:text-dark-text">
+                  Toca una fila para empezar y amplía solo con canicas contiguas.
+                </p>
+                <p className="mt-1 text-[11px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
+                  Última jugada: {latestMoveSummary}. Cuando tengas bloque válido, abajo te saldrá “Aplicar jugada”.
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowGameMenu(true)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brown/15 bg-white/80 text-[#4a3f32] transition-colors hover:border-primary/30 hover:text-primary active:scale-95 dark:border-white/10 dark:bg-dark-surface dark:text-dark-text"
+                  aria-label="Abrir menú de partida"
+                  title="Abrir menú de partida"
+                >
+                  <IconMenu className="h-4 w-4 shrink-0" />
+                </button>
+                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8c7d6b] dark:text-dark-muted">
+                  toca tablero
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {isGameMode && pendingMove ? (
         <div

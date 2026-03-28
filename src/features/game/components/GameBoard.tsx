@@ -11,6 +11,7 @@ type Props = {
   selectedStartIndex: number | null;
   selectedEndIndex: number | null;
   canInteract: boolean;
+  hasPendingMove?: boolean;
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onDiceRoll?: () => Promise<DiceResult | null>;
   diceAvailable?: boolean;
@@ -1184,6 +1185,7 @@ export function GameBoard({
   selectedStartIndex,
   selectedEndIndex,
   canInteract,
+  hasPendingMove = false,
   onBallClick,
   onDiceRoll,
   diceAvailable
@@ -1449,12 +1451,19 @@ export function GameBoard({
     context.onDiceClickCb = showDiceAction ? () => { void triggerDiceRoll(); } : null;
   }, [renderMode, showDiceAction, triggerDiceRoll, game.numRows]);
 
+  const boardBottomInsetClass = hasPendingMove
+    ? 'pb-[calc(7.5rem+env(safe-area-inset-bottom))] sm:pb-[calc(8.25rem+env(safe-area-inset-bottom))]'
+    : 'pb-[calc(0.75rem+env(safe-area-inset-bottom))]';
+
   return (
     <section
       id="board"
       role="grid"
       aria-label={`Tablero de juego. ${statusLabel}`}
-      className="relative flex flex-1 flex-col bg-background-dark dark:bg-dark-bg min-h-0"
+      className={[
+        'relative flex flex-1 flex-col bg-background-dark dark:bg-dark-bg min-h-0 transition-[padding] duration-200',
+        boardBottomInsetClass
+      ].join(' ')}
     >
       {renderMode === 'fallback' ? (
         <LegacyBoardGrid

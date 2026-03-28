@@ -2337,6 +2337,7 @@ export function HomePage(): React.ReactElement {
                   selectedStartIndex={pendingMove?.startIndex ?? null}
                   selectedEndIndex={pendingMove?.endIndex ?? null}
                   canInteract={canSelectBalls}
+                  hasPendingMove={!!pendingMove}
                   onBallClick={handleBallClick}
                   onDiceRoll={handleUseDice3D}
                   diceAvailable={!!game.yourDiceAvailable && canInteract}

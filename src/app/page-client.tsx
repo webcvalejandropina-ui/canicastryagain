@@ -14,7 +14,7 @@ function PageShell(): React.ReactElement {
       </div>
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6">
         <div className="glass-panel rounded-2xl px-8 py-6 text-sm uppercase tracking-[0.2em] text-brown/80 dark:text-dark-muted">
-          Inicializando plataforma...
+          Preparando tablero y buen rollo…
         </div>
       </div>
     </div>

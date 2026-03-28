@@ -82,17 +82,52 @@ function buildInviteUrl(baseOrigin: string, pathname: string, gameCode: string, 
   return inviteUrl.toString();
 }
 
+/** Reglas detalladas (lobby y menú). */
 const quickRules = [
-  'En cada turno debes retirar canicas de una sola fila que todavía tenga canicas disponibles.',
-  'El número de turno es global: en el turno N puedes retirar entre 1 y N canicas de una sola fila.',
-  'Si en la fila elegida quedan menos canicas que el máximo permitido, solo puedes retirar las que queden disponibles en esa fila.',
-  'Las canicas retiradas en un turno deben ser consecutivas y pertenecer a un único bloque continuo dentro de la fila.',
-  'No puedes atravesar huecos vacíos ni retirar canicas de bloques distintos en una misma jugada.',
-  'No es obligatorio empezar por un borde: puedes retirar cualquier bloque consecutivo que esté disponible dentro de la fila.',
-  'Una misma fila puede usarse en varios turnos y por ambos jugadores mientras todavía queden canicas.',
-  'Para jugar, selecciona manualmente cada canica del bloque que quieras retirar; el sistema valida y aplica la jugada automáticamente.',
-  'Si retiras la última canica del tablero, pierdes la partida.'
+  'Objetivo (misère): pierdes si quitas la última canica que queda en el tablero.',
+  'Cada turno solo una fila con canicas; en ese turno quitas entre 1 y N canicas, donde N es el número de jugada global (1.ª jugada → 1 como máx., 2.ª → 2, etc.).',
+  'Las canicas deben ser consecutivas en la fila, sin saltar huecos: un solo bloque continuo por jugada.',
+  'Si en la fila quedan menos canicas que tu máximo permitido, solo puedes quitar las que haya en ese bloque.',
+  'Puedes elegir cualquier bloque válido dentro de la fila; no hace falta empezar por un extremo.',
+  'Selecciona canicas tocándolas (o clic); cuando el bloque sea válido, pulsa Aplicar para enviar la jugada.',
+  'La fila que acabas de jugar puede aparecer marcada (bloqueada) para el rival en el siguiente turno según el estado de la partida.',
+  'Dado especial: una sola vez por jugador en la partida; en vista 3D suele estar arriba a la derecha. Cuenta como una jugada para el contador de turno.',
+  'Una misma fila puede usarse en varios turnos mientras queden canicas.',
+  'Si no ves el tablero 3D, la app usará la vista 2D; las reglas son las mismas.'
 ];
+
+/** Resumen muy corto para cabeceras y guías. */
+const gameKeyInstructions: string[] = [
+  'Pierdes si quitas la última canica (misère).',
+  'Solo una fila por turno; bloque consecutivo de canicas.',
+  'Máximo por turno = número de jugada global (ver chip “max N”).',
+  'Selecciona tocando → Aplicar para confirmar.',
+  'Dado: 1 uso por jugador; en 3D, arriba a la derecha.'
+];
+
+const waitingRoomTips: string[] = [
+  'Comparte el código o el enlace con tu rival.',
+  'Cuando entre, la partida empezará sola.',
+  'Si tarda, comprueba que el enlace no haya caducado (al salir se invalida).'
+];
+
+function KeyInstructionsCard(): React.ReactElement {
+  return (
+    <div className="mb-4 rounded-xl border border-primary/30 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent p-4 dark:border-primary/35 dark:from-primary/20 dark:via-primary/10 dark:to-transparent">
+      <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary">Instrucciones clave</p>
+      <ul className="mt-2.5 space-y-2 text-xs font-semibold leading-snug text-[#4a3f32] dark:text-dark-text">
+        {gameKeyInstructions.map((line) => (
+          <li key={line} className="flex gap-2">
+            <span className="mt-0.5 shrink-0 text-primary" aria-hidden>
+              ▸
+            </span>
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 const DICE_POWER_LABELS: Record<string, string> = {
   bomba: 'Bomba — destruyó toda una fila',
@@ -295,11 +330,16 @@ function IconShield({ className }: { className?: string }): React.ReactElement {
 
 function Brand(): React.ReactElement {
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="text-2xl" role="img" aria-label="piña">🍍</span>
-      <h2 className="text-lg font-black uppercase tracking-tight text-[#4a3f32] dark:text-dark-text sm:text-xl">
-        Canicas<span className="ml-1 font-black text-primary">Try Again</span>
-      </h2>
+    <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2.5">
+      <div className="flex items-center gap-2.5">
+        <span className="text-2xl" role="img" aria-label="piña">🍍</span>
+        <h2 className="text-lg font-black uppercase tracking-tight text-[#4a3f32] dark:text-dark-text sm:text-xl">
+          Canicas<span className="ml-1 font-black text-primary">Try Again</span>
+        </h2>
+      </div>
+      <p className="pl-[2.25rem] text-[9px] font-bold uppercase tracking-[0.2em] text-[#a89880] dark:text-dark-muted sm:pl-0 sm:text-[10px]">
+        Gratis · 2 jugadores · Buen rollo
+      </p>
     </div>
   );
 }
@@ -319,13 +359,41 @@ function AmbientBackground(): React.ReactElement {
 const CONFETTI_COLORS = ['#F4C542', '#5C8D3A', '#8FBF5A', '#E9D8A6', '#8C6239', '#F2E9D0', '#d4a82e', '#a67c52'];
 const CONFETTI_COUNT = 60;
 
+const WHOLESOME_LOSS_LINES = [
+  'El misère es así: hoy toca aplaudir al rival. Sin drama, solo respeto.',
+  'Partida limpia = victoria moral. La revancha queda pendiente con una sonrisa.',
+  'Perder con buen rollo también es ganar en amistad. Gracias por jugar.',
+  'Tu rival jugó muy bien. Disfruta del momento y pásale el juego a otro amigo.',
+  'Aquí no hay toxicidad: solo canicas, risas y “try again”.'
+];
+
+function IconShare({ className }: { className?: string }): React.ReactElement {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className={className} aria-hidden="true">
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <path d="M8.59 13.51l6.83 3.98" />
+      <path d="M15.41 6.51l-6.82 3.98" />
+    </svg>
+  );
+}
+
 function VictoryOverlay({
   isWin,
   winnerName,
+  playerName,
+  rivalName,
+  siteOrigin,
+  onToast,
   onExit
 }: {
   isWin: boolean;
   winnerName: string;
+  playerName: string;
+  rivalName: string;
+  siteOrigin: string;
+  onToast: (text: string) => void;
   onExit: () => void;
 }): React.ReactElement {
   const confettiRef = useRef<HTMLDivElement>(null);
@@ -335,6 +403,44 @@ function VictoryOverlay({
     const timer = setTimeout(() => setShowContent(true), 150);
     return () => clearTimeout(timer);
   }, []);
+
+  const wholesomeLine = useMemo(() => {
+    const seed = `${playerName}:${winnerName}:${rivalName}`;
+    let h = 0;
+    for (let i = 0; i < seed.length; i += 1) h = (h + seed.charCodeAt(i) * (i + 1)) % 997;
+    return WHOLESOME_LOSS_LINES[h % WHOLESOME_LOSS_LINES.length];
+  }, [playerName, winnerName, rivalName]);
+
+  const handleShareResult = useCallback(async (): Promise<void> => {
+    const base =
+      siteOrigin.trim() ||
+      (typeof window !== 'undefined' ? window.location.origin : '') ||
+      'https://canicas-try-again.app';
+    const text = isWin
+      ? `¡Acabo de ganar en Canicas Try Again 🍍 contra ${rivalName || 'un crack'}! ¿Quién se apunta a un misère con buen rollo? ${base}`
+      : `Partidazo en Canicas Try Again 🍍: ganó ${winnerName || 'mi rival'}. Yo sigo con buen rollo y ganas de revancha 😄 ${base}`;
+
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title: 'Canicas Try Again 🍍',
+          text,
+          url: base
+        });
+        onToast('¡Gracias por compartir! Así crece la comunidad con buena energía.');
+        return;
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      onToast('Texto copiado: pégalo en WhatsApp, Instagram, donde quieras retar con cariño 🍍');
+    } catch {
+      onToast('Copia el enlace desde el menú de partida (⋮) y compártelo a mano.');
+    }
+  }, [isWin, rivalName, winnerName, siteOrigin, onToast]);
 
   useEffect(() => {
     const container = confettiRef.current;
@@ -384,7 +490,7 @@ function VictoryOverlay({
         style={{
           background: isWin
             ? 'radial-gradient(ellipse at center, rgba(34,211,238,0.15) 0%, rgba(0,0,0,0.75) 70%)'
-            : 'radial-gradient(ellipse at center, rgba(248,113,113,0.1) 0%, rgba(0,0,0,0.75) 70%)',
+            : 'radial-gradient(ellipse at center, rgba(244,197,66,0.14) 0%, rgba(92,141,58,0.08) 45%, rgba(0,0,0,0.78) 72%)',
           opacity: showContent ? 1 : 0
         }}
       />
@@ -403,47 +509,74 @@ function VictoryOverlay({
             <span className="text-5xl sm:text-6xl">🏆</span>
           </div>
         ) : (
-          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-white/10 sm:h-28 sm:w-28">
-            <span className="text-5xl sm:text-6xl">💀</span>
+          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full border border-primary/25 bg-primary/10 sm:h-28 sm:w-28">
+            <span className="text-5xl sm:text-6xl" role="img" aria-label="apretón de manos">
+              🤝
+            </span>
           </div>
         )}
 
         <h2
           className={[
             'text-4xl font-black uppercase tracking-tight sm:text-5xl',
-            isWin ? 'victory-text-shimmer' : 'text-white/80'
+            isWin ? 'victory-text-shimmer' : 'text-white/90'
           ].join(' ')}
         >
-          {isWin ? '¡Victoria!' : 'Derrota'}
+          {isWin ? '¡Victoria!' : '¡Qué partida!'}
         </h2>
 
         <p className="mt-3 text-sm text-white/60 sm:text-base">
-          {winnerName
-            ? <><span className={isWin ? 'font-bold text-primary' : 'font-bold text-rose-400'}>{winnerName}</span> ganó la partida</>
-            : 'Un jugador abandonó la sesión.'}
+          {winnerName ? (
+            <>
+              <span className={isWin ? 'font-bold text-primary' : 'font-bold text-primary/90'}>{winnerName}</span>
+              {isWin ? ' se lleva la victoria. ¡A celebrar con deportividad! 🏆' : ' jugó genial. Chapeau y hasta la revancha.'}
+            </>
+          ) : (
+            'La sesión terminó (abandono o desconexión). Sin culpas: se puede volver a intentar cuando quieras.'
+          )}
         </p>
 
+        {!isWin && winnerName ? (
+          <p className="mx-auto mt-3 max-w-sm text-xs leading-relaxed text-white/50 sm:text-sm">{wholesomeLine}</p>
+        ) : null}
+
+        {isWin ? (
+          <p className="mt-3 text-xs text-white/45 sm:text-sm">Pásale el juego a alguien: aquí mandan el respeto y las risas.</p>
+        ) : null}
+
         <div className="mt-4 flex items-center justify-center gap-2">
-          <div className={['h-0.5 w-10 rounded-full', isWin ? 'bg-primary/40' : 'bg-white/20'].join(' ')} />
+          <div className={['h-0.5 w-10 rounded-full', isWin ? 'bg-primary/40' : 'bg-primary/25'].join(' ')} />
           <span className="text-sm">🍍</span>
-          <div className={['h-0.5 w-10 rounded-full', isWin ? 'bg-primary/40' : 'bg-white/20'].join(' ')} />
+          <div className={['h-0.5 w-10 rounded-full', isWin ? 'bg-primary/40' : 'bg-primary/25'].join(' ')} />
         </div>
 
-        <button
-          type="button"
-          onClick={onExit}
-          aria-label="Volver al lobby"
-          title="Volver al lobby"
-          className={[
-            'mt-8 inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
-            isWin
-              ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-              : 'border border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20'
-          ].join(' ')}
-        >
-          <IconHome className="h-4 w-4 shrink-0" />
-          <span>Volver</span>
-        </button>
+        <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+          <button
+            type="button"
+            onClick={() => void handleShareResult()}
+            aria-label="Compartir resultado"
+            title="Compartir resultado"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white backdrop-blur transition-all hover:bg-white/20 active:scale-[0.97]"
+          >
+            <IconShare className="h-4 w-4 shrink-0" />
+            <span>Compartir y retar</span>
+          </button>
+          <button
+            type="button"
+            onClick={onExit}
+            aria-label="Volver al lobby"
+            title="Volver al lobby"
+            className={[
+              'inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
+              isWin
+                ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
+                : 'border border-primary/40 bg-primary/15 text-white hover:bg-primary/25'
+            ].join(' ')}
+          >
+            <IconHome className="h-4 w-4 shrink-0" />
+            <span>Volver al lobby</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -487,6 +620,8 @@ export function HomePage(): React.ReactElement {
   const [message, setMessage] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [showGameMenu, setShowGameMenu] = useState(false);
+  const [showKeyRulesInMenu, setShowKeyRulesInMenu] = useState(false);
+  const [gameGuideCollapsed, setGameGuideCollapsed] = useState(false);
   const [pendingMove, setPendingMove] = useState<{ rowIndex: number; startIndex: number; endIndex: number } | null>(null);
 
   const autoJoinAttemptedRef = useRef(false);
@@ -663,10 +798,11 @@ export function HomePage(): React.ReactElement {
       window.clearTimeout(toastTimerRef.current);
     }
 
+    const durationMs = Math.min(10_000, 2600 + text.length * 42);
     toastTimerRef.current = window.setTimeout(() => {
       setMessage('');
       toastTimerRef.current = null;
-    }, 3200);
+    }, durationMs);
   }, []);
 
   const handleManualRefresh = useCallback(async () => {
@@ -751,7 +887,15 @@ export function HomePage(): React.ReactElement {
     const previous = gameFeedbackRef.current;
     if (previous && previous.gameId === game.gameId) {
       if (previous.status === 'waiting' && game.status === 'playing') {
-        showTemporaryMessage('Tu rival ya se conectó. La partida comenzó.');
+        if (game.yourPlayerNumber === game.currentTurn) {
+          const maxN = game.moveHistory.length + 1;
+          const diceHint = game.yourDiceAvailable ? ' Dado especial 1× (vista 3D, arriba derecha).' : '';
+          showTemporaryMessage(
+            `¡Partida en marcha! Empiezas tú: hasta ${maxN} canica${maxN > 1 ? 's' : ''} en una fila (bloque seguido). Toca y luego Aplicar.${diceHint}`
+          );
+        } else {
+          showTemporaryMessage('¡Partida en marcha! Empieza tu rival; te avisaremos cuando sea tu turno.');
+        }
       }
 
       if (game.status === 'playing' && game.moveHistory.length > previous.moveCount) {
@@ -760,17 +904,22 @@ export function HomePage(): React.ReactElement {
         if (!isMyMove && latestMove) {
           const rivalName = latestMove.player === 1 ? game.player1?.name : game.player2?.name;
           if (latestMove.fromDice) {
-            showTemporaryMessage(`${rivalName ?? 'Rival'} usó el dado`);
+            showTemporaryMessage(`${rivalName ?? 'Rival'} usó el dado especial.`);
           } else {
             showTemporaryMessage(
-              `${rivalName ?? 'Rival'} quitó ${latestMove.count} canica${latestMove.count > 1 ? 's' : ''} de fila ${latestMove.rowIndex + 1}`
+              `${rivalName ?? 'Rival'} quitó ${latestMove.count} canica${latestMove.count > 1 ? 's' : ''} (fila ${latestMove.rowIndex + 1}).`
             );
           }
+        }
+        if (isMyMove && latestMove && !latestMove.fromDice) {
+          showTemporaryMessage('Tu jugada quedó registrada. Turno del rival.');
         }
       }
 
       if (game.status === 'playing' && game.currentTurn === game.yourPlayerNumber && previous.currentTurn !== game.currentTurn) {
-        showTemporaryMessage('Es tu turno');
+        const maxN = game.moveHistory.length + 1;
+        const diceHint = game.yourDiceAvailable ? ' Dado 1× disponible (3D).' : '';
+        showTemporaryMessage(`Tu turno: hasta ${maxN} canica${maxN > 1 ? 's' : ''} en una fila (seguidas).${diceHint}`);
       }
     }
 
@@ -896,7 +1045,7 @@ export function HomePage(): React.ReactElement {
         numRows: normalizedRowsInput
       });
 
-      showTemporaryMessage('Partida creada. Comparte el código con tu rival.');
+      showTemporaryMessage('Partida creada. Envía el código o el enlace a tu rival; cuando entre, empezará la partida.');
     } catch {
       // Se maneja en el hook
     }
@@ -947,11 +1096,14 @@ export function HomePage(): React.ReactElement {
       if (!game) return;
 
       if (!canInteract) {
-        showTemporaryMessage('No es tu turno');
+        showTemporaryMessage('Ahora le toca a tu rival. Espera a que juegue.');
         return;
       }
 
       if (isBusy || moveInFlightRef.current) {
+        if (isBusy) {
+          showTemporaryMessage('Espera un momento, se está aplicando la jugada…');
+        }
         return;
       }
 
@@ -983,6 +1135,7 @@ export function HomePage(): React.ReactElement {
             return { rowIndex, startIndex: previous.startIndex, endIndex: newEnd };
           }
           // Click en el medio del bloque: no cambiar selección
+          showTemporaryMessage('Toca un extremo del bloque para quitar una canica, o otra fila para empezar de nuevo.');
           return previous;
         }
 
@@ -1007,11 +1160,14 @@ export function HomePage(): React.ReactElement {
       if (!game || !pendingMove) return;
 
       if (!canInteract) {
-        showTemporaryMessage('No es tu turno');
+        showTemporaryMessage('Ahora le toca a tu rival.');
         return;
       }
 
       if (isBusy || moveInFlightRef.current) {
+        if (isBusy) {
+          showTemporaryMessage('Espera un momento…');
+        }
         return;
       }
 
@@ -1070,8 +1226,8 @@ export function HomePage(): React.ReactElement {
     if (typeof navigator.share === 'function') {
       try {
         await navigator.share({
-          title: 'Canicas Try Again',
-          text: `Únete a mi partida de Canicas: ${game?.gameCode ?? ''}`,
+          title: 'Canicas Try Again 🍍',
+          text: `🍍 ¿Un misère de canicas con buen rollo? Entra gratis (sin instalar nada). Código: ${game?.gameCode ?? '—'} — te espero.`,
           url: inviteUrl
         });
         return;
@@ -1190,15 +1346,15 @@ export function HomePage(): React.ReactElement {
                     <span className="text-primary">Evita la última canica.</span>
                   </h3>
                   <p className="max-w-sm text-sm leading-relaxed text-[#6b5d4f] dark:text-dark-muted lg:text-base">
-                    Juego táctico 1v1 con regla misère. Estrategia pura, sin azar.
+                    Reto 1v1 con regla misère: estrategia en vivo, gratis y con buen rollo. Reta a un amigo y comparte el enlace: así crece el juego.
                   </p>
                 </div>
                 <div className="relative mt-8 flex gap-6">
                   <div className="flex items-center gap-3 rounded-xl bg-white/50 px-4 py-3 dark:bg-dark-surface/60">
-                    <span className="text-2xl">⚔️</span>
+                    <span className="text-2xl">🤝</span>
                     <div>
                       <p className="text-xl font-black text-[#4a3f32] dark:text-dark-text">1v1</p>
-                      <p className="text-[9px] font-bold uppercase tracking-wider text-[#8c7d6b] dark:text-dark-muted">Tiempo real</p>
+                      <p className="text-[9px] font-bold uppercase tracking-wider text-[#8c7d6b] dark:text-dark-muted">Fair play</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 rounded-xl bg-white/50 px-4 py-3 dark:bg-dark-surface/60">
@@ -1216,7 +1372,7 @@ export function HomePage(): React.ReactElement {
                   <span className="text-3xl md:hidden">🍍</span>
                   <h1 className="mt-2 text-2xl font-black tracking-tight text-[#4a3f32] dark:text-dark-text sm:text-3xl md:mt-0">Entrar</h1>
                   <p className="mt-2 text-sm text-[#8c7d6b] dark:text-dark-muted">
-                    Elige tu alias y empieza a jugar
+                    Elige tu alias. Aquí mandan el respeto, las risas y las revanchas con abrazo virtual.
                   </p>
                 </div>
 
@@ -1278,7 +1434,9 @@ export function HomePage(): React.ReactElement {
                 <span className="text-lg">📜</span>
                 <h3 className="text-sm font-black uppercase tracking-wider text-[#4a3f32] dark:text-dark-text">Reglas</h3>
               </div>
-              <ul className="mt-3 space-y-1.5 text-sm leading-relaxed text-[#6b5d4f] dark:text-dark-muted">
+              <KeyInstructionsCard />
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#8c7d6b] dark:text-dark-muted">Detalle</p>
+              <ul className="mt-1 space-y-1.5 text-sm leading-relaxed text-[#6b5d4f] dark:text-dark-muted">
                 {quickRules.map((rule) => (
                   <li key={rule} className="flex gap-2">
                     <span className="mt-0.5 text-primary">●</span>
@@ -1307,7 +1465,7 @@ export function HomePage(): React.ReactElement {
 
           <footer className="px-6 pb-6 pt-2 text-center">
             <p className="text-[10px] font-bold uppercase tracking-widest text-[#b5a898] dark:text-dark-muted">
-              🍍 Canicas Try Again · 2026
+              🍍 Canicas Try Again · Juega bien · Comparte mejor · 2026
             </p>
           </footer>
         </div>
@@ -1459,6 +1617,15 @@ export function HomePage(): React.ReactElement {
                             ? `Última sync: ${lastSyncLabel}`
                             : 'Conectando...'}
                     </p>
+
+                    <ul className="mx-auto mt-4 max-w-xs space-y-1.5 text-left text-[10px] leading-relaxed text-[#8c7d6b] dark:text-dark-muted">
+                      {waitingRoomTips.map((tip) => (
+                        <li key={tip} className="flex gap-2">
+                          <span className="shrink-0 text-primary">💡</span>
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
 
                     <div className="mx-auto mt-6 w-fit rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 px-6 py-4 dark:from-primary/15 dark:to-primary/5">
                       <p className="text-[9px] font-black uppercase tracking-widest text-[#8c7d6b] dark:text-dark-muted">Código</p>
@@ -1652,7 +1819,9 @@ export function HomePage(): React.ReactElement {
                       <span className="text-lg">📜</span>
                       <h3 className="text-sm font-black uppercase tracking-wider text-[#4a3f32] dark:text-dark-text">Reglas</h3>
                     </div>
-                    <ul className="mt-3 space-y-1.5 text-sm leading-relaxed text-[#6b5d4f] dark:text-dark-muted">
+                    <KeyInstructionsCard />
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#8c7d6b] dark:text-dark-muted">Detalle</p>
+                    <ul className="mt-1 space-y-1.5 text-sm leading-relaxed text-[#6b5d4f] dark:text-dark-muted">
                       {quickRules.map((rule) => (
                         <li key={`lobby-rule-${rule}`} className="flex gap-2">
                           <span className="mt-0.5 text-primary">●</span>
@@ -1689,6 +1858,54 @@ export function HomePage(): React.ReactElement {
 
             {game ? (
               <section className={isGameMode ? 'flex flex-1 flex-col' : 'order-2'}>
+                {isGameMode && game.status === 'playing' ? (
+                  <div className="mx-2 mb-1.5 shrink-0 sm:mx-3">
+                    <div className="rounded-2xl border border-leaf/25 bg-white/90 shadow-sm backdrop-blur dark:border-leaf-soft/20 dark:bg-dark-card/92">
+                      <div className="flex items-center justify-between gap-2 border-b border-leaf/10 px-3 py-2 dark:border-white/10">
+                        <p className="text-[9px] font-black uppercase tracking-[0.18em] text-leaf dark:text-leaf-soft">Guía y avisos</p>
+                        <button
+                          type="button"
+                          onClick={() => setGameGuideCollapsed((c) => !c)}
+                          aria-expanded={!gameGuideCollapsed}
+                          className="rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-wider text-[#8c7d6b] transition-colors hover:bg-primary/10 hover:text-primary dark:text-dark-muted"
+                        >
+                          {gameGuideCollapsed ? 'Mostrar' : 'Ocultar'}
+                        </button>
+                      </div>
+                      {!gameGuideCollapsed ? (
+                        <div className="space-y-2 px-3 py-2.5">
+                          <ul className="space-y-1 text-[10px] leading-snug text-[#5c5248] dark:text-dark-muted">
+                            {gameKeyInstructions.map((line) => (
+                              <li key={`guide-${line}`} className="flex gap-1.5">
+                                <span className="shrink-0 text-primary" aria-hidden>
+                                  ·
+                                </span>
+                                <span>{line}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <div
+                            className={[
+                              'rounded-xl border px-2.5 py-2 text-[10px] font-bold leading-snug',
+                              canInteract
+                                ? 'border-primary/30 bg-primary/10 text-[#4a3f32] dark:border-primary/35 dark:bg-primary/15 dark:text-dark-text'
+                                : 'border-slate-200/80 bg-slate-500/5 text-[#6b5d4f] dark:border-white/10 dark:bg-white/[0.04] dark:text-dark-muted'
+                            ].join(' ')}
+                            role="status"
+                          >
+                            {!canInteract
+                              ? 'Turno del rival. Si el tablero no cambia, usa el botón de refrescar del encabezado.'
+                              : pendingMove
+                                ? `Selección lista: fila ${pendingMove.rowIndex + 1}, ${pendingMove.endIndex - pendingMove.startIndex + 1} canica(s). Confirma con Aplicar abajo o Cancelar para empezar otra vez.`
+                                : game.yourDiceAvailable
+                                  ? `Te toca jugar: hasta ${turnLimit} canica(s) en una sola fila (bloque seguido). Opcional: dado especial una vez (vista 3D, arriba a la derecha).`
+                                  : `Te toca jugar: elige hasta ${turnLimit} canica(s) consecutivas en una sola fila y confirma con Aplicar.`}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
                 <GameBoard
                   game={game}
                   selectedRowIndex={pendingMove?.rowIndex ?? null}
@@ -1717,7 +1934,7 @@ export function HomePage(): React.ReactElement {
                   Fila {pendingRowLabel} · {pendingRemoveCount} canica{pendingRemoveCount === 1 ? '' : 's'}
                 </p>
                 <p className="mt-0.5 text-[11px] text-[#8c7d6b] dark:text-dark-muted">
-                  Pulsa aplicar para confirmar la jugada.
+                  Revisa el bloque: solo una fila y canicas seguidas. Cancelar deshace la selección.
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -1791,6 +2008,30 @@ export function HomePage(): React.ReactElement {
                 <IconHistory className="h-5 w-5 shrink-0 text-primary" />
                 <span>{showHistory ? 'Ocultar historial' : 'Ver historial'}</span>
               </button>
+              <button
+                type="button"
+                onClick={() => setShowKeyRulesInMenu((prev) => !prev)}
+                aria-expanded={showKeyRulesInMenu}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#4a3f32] transition-colors hover:bg-primary/10 active:scale-[0.98] dark:text-dark-text dark:hover:bg-primary/15"
+              >
+                <IconBook className="h-5 w-5 shrink-0 text-primary" />
+                <span>{showKeyRulesInMenu ? 'Ocultar instrucciones' : 'Instrucciones clave'}</span>
+              </button>
+              {showKeyRulesInMenu ? (
+                <div className="mx-1 rounded-xl border border-brown/10 bg-background-dark/50 p-3 dark:border-white/10 dark:bg-dark-surface/90">
+                  <ul className="space-y-2 text-[11px] font-medium leading-snug text-[#4a3f32] dark:text-dark-text">
+                    {gameKeyInstructions.map((line) => (
+                      <li key={`menu-rule-${line}`} className="flex gap-2">
+                        <span className="shrink-0 text-primary">▸</span>
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-[10px] leading-relaxed text-[#8c7d6b] dark:text-dark-muted">
+                    Reglas completas en la pantalla principal del lobby (sección Reglas). Objetivo: misère (quien quita la última canica pierde).
+                  </p>
+                </div>
+              ) : null}
               {game.status !== 'finished' ? (
                 <button
                   type="button"
@@ -1813,6 +2054,7 @@ export function HomePage(): React.ReactElement {
                       .map((move, index) => {
                         const turnNumber = game.moveHistory.length - index;
                         const player = move.player === 1 ? game.player1?.name : game.player2?.name;
+                        const detail = move.fromDice ? 'Dado especial' : `×${move.count} fila ${move.rowIndex + 1}`;
                         return (
                           <div
                             key={`${move.timestamp}-${index}`}
@@ -1823,7 +2065,7 @@ export function HomePage(): React.ReactElement {
                               <span className="font-semibold text-[#4a3f32] dark:text-dark-text">
                                 {player ?? `J${move.player}`}
                               </span>{' '}
-                              ×{move.count} F{move.rowIndex + 1}
+                              <span className="text-[#8c7d6b] dark:text-dark-muted">{detail}</span>
                             </span>
                           </div>
                         );
@@ -1852,11 +2094,23 @@ export function HomePage(): React.ReactElement {
         <VictoryOverlay
           isWin={game.winner === game.yourPlayerNumber}
           winnerName={game.winner ? (game.winner === 1 ? game.player1?.name : game.player2?.name) ?? '' : ''}
+          playerName={playerName}
+          rivalName={
+            game.yourPlayerNumber === 1
+              ? game.player2?.name ?? ''
+              : game.yourPlayerNumber === 2
+                ? game.player1?.name ?? ''
+                : ''
+          }
+          siteOrigin={browserLocation?.origin ?? ''}
+          onToast={showTemporaryMessage}
           onExit={() => {
             clearGame();
             clearError();
             setPendingMove(null);
             setShowGameMenu(false);
+            setShowKeyRulesInMenu(false);
+            setGameGuideCollapsed(false);
             setSharedCode('');
             setSharedInviteToken('');
             setJoinCode('');

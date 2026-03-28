@@ -734,10 +734,12 @@ export function HomePage(): React.ReactElement {
   const [pendingMove, setPendingMove] = useState<{ rowIndex: number; startIndex: number; endIndex: number } | null>(null);
   const [turnBannerKey, setTurnBannerKey] = useState(0);
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
+  const [boardAttentionPulse, setBoardAttentionPulse] = useState(false);
 
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
   const turnSpotlightTimerRef = useRef<number | null>(null);
+  const boardAttentionTimerRef = useRef<number | null>(null);
   const moveInFlightRef = useRef(false);
   const pendingActionBarRef = useRef<HTMLDivElement | null>(null);
   const applyMoveButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -997,6 +999,27 @@ export function HomePage(): React.ReactElement {
     }, durationMs);
   }, []);
 
+  const focusBoard = useCallback(() => {
+    if (typeof window === 'undefined') return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const boardNode = document.getElementById('board');
+    boardNode?.scrollIntoView({
+      block: 'start',
+      behavior: reduceMotion ? 'auto' : 'smooth'
+    });
+
+    setBoardAttentionPulse(false);
+    window.requestAnimationFrame(() => setBoardAttentionPulse(true));
+    if (boardAttentionTimerRef.current) {
+      window.clearTimeout(boardAttentionTimerRef.current);
+    }
+    boardAttentionTimerRef.current = window.setTimeout(() => {
+      setBoardAttentionPulse(false);
+      boardAttentionTimerRef.current = null;
+    }, reduceMotion ? 120 : 980);
+  }, []);
+
   const handleManualRefresh = useCallback(async () => {
     if (!game || isSyncing || isBusy) return;
     showTemporaryMessage('Sincronizando partida...');
@@ -1029,6 +1052,9 @@ export function HomePage(): React.ReactElement {
       }
       if (turnSpotlightTimerRef.current) {
         window.clearTimeout(turnSpotlightTimerRef.current);
+      }
+      if (boardAttentionTimerRef.current) {
+        window.clearTimeout(boardAttentionTimerRef.current);
       }
     };
   }, []);
@@ -2381,6 +2407,7 @@ export function HomePage(): React.ReactElement {
                   canInteract={canSelectBalls}
                   hasPendingMove={!!pendingMove}
                   hasTurnCoach={showTurnCoach}
+                  boardAttentionPulse={boardAttentionPulse}
                   onBallClick={handleBallClick}
                   onDiceRoll={handleUseDice3D}
                   diceAvailable={!!game.yourDiceAvailable && canInteract}
@@ -2435,18 +2462,45 @@ export function HomePage(): React.ReactElement {
                   Última jugada: {latestMoveSummary}. Cuando tengas bloque válido, abajo te saldrá “Aplicar jugada”.
                 </p>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowGameMenu(true)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brown/15 bg-white/80 text-[#4a3f32] transition-colors hover:border-primary/30 hover:text-primary active:scale-95 dark:border-white/10 dark:bg-dark-surface dark:text-dark-text"
-                  aria-label="Abrir menú de partida"
-                  title="Abrir menú de partida"
-                >
-                  <IconMenu className="h-4 w-4 shrink-0" />
-                </button>
+              <div className="flex shrink-0 flex-col items-end gap-2 self-stretch sm:self-auto">
+                <div className="flex items-center gap-2 self-stretch sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={focusBoard}
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-3 text-[10px] font-black uppercase tracking-[0.16em] text-[#4a3f32] shadow-md shadow-primary/20 transition-all hover:brightness-110 active:scale-95"
+                    aria-label="Ir al tablero"
+                    title="Ir al tablero"
+                  >
+                    <span aria-hidden>🎯</span>
+                    <span>Tablero</span>
+                  </button>
+                  {game?.yourDiceAvailable ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        focusBoard();
+                        void handleUseDice3D();
+                      }}
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-amber-300/45 bg-black/70 px-3 text-[10px] font-black uppercase tracking-[0.16em] text-amber-100 shadow-lg shadow-amber-950/20 transition-all hover:border-amber-200/70 hover:bg-black/80 active:scale-95"
+                      aria-label="Lanzar dado especial"
+                      title="Lanzar dado especial"
+                    >
+                      <span aria-hidden>✨</span>
+                      <span>Dado</span>
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setShowGameMenu(true)}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brown/15 bg-white/80 text-[#4a3f32] transition-colors hover:border-primary/30 hover:text-primary active:scale-95 dark:border-white/10 dark:bg-dark-surface dark:text-dark-text"
+                    aria-label="Abrir menú de partida"
+                    title="Abrir menú de partida"
+                  >
+                    <IconMenu className="h-4 w-4 shrink-0" />
+                  </button>
+                </div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8c7d6b] dark:text-dark-muted">
-                  toca tablero
+                  acceso rápido móvil
                 </span>
               </div>
             </div>

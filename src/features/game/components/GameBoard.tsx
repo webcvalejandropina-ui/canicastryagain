@@ -13,6 +13,7 @@ type Props = {
   canInteract: boolean;
   hasPendingMove?: boolean;
   hasTurnCoach?: boolean;
+  boardAttentionPulse?: boolean;
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onDiceRoll?: () => Promise<DiceResult | null>;
   diceAvailable?: boolean;
@@ -1188,6 +1189,7 @@ export function GameBoard({
   canInteract,
   hasPendingMove = false,
   hasTurnCoach = false,
+  boardAttentionPulse = false,
   onBallClick,
   onDiceRoll,
   diceAvailable
@@ -1481,7 +1483,8 @@ export function GameBoard({
       role="grid"
       aria-label={`Tablero de juego. ${statusLabel}`}
       className={[
-        'relative flex flex-1 flex-col bg-background-dark dark:bg-dark-bg min-h-0 transition-[padding] duration-200',
+        'relative flex flex-1 scroll-mt-24 flex-col bg-background-dark dark:bg-dark-bg min-h-0 transition-[padding,box-shadow,border-color] duration-200',
+        boardAttentionPulse ? 'board-attention-pulse' : '',
         boardBottomInsetClass
       ].join(' ')}
     >

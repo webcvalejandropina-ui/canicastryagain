@@ -27,7 +27,7 @@ const config: Config = {
         'dark-border': 'rgba(244, 197, 66, 0.18)'
       },
       fontFamily: {
-        display: ['"Space Grotesk"', 'sans-serif']
+        display: ['var(--font-display)', 'system-ui', 'sans-serif']
       },
       borderRadius: {
         DEFAULT: '0.75rem',

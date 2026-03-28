@@ -19,5 +19,5 @@ data/public-share-origin.json
 .env*.local
 tsconfig.tsbuildinfo
 
-# GitHub Actions: el token OAuth de gh a veces no tiene scope workflow; sube .github/ con SSH o PAT con workflow.
+# GitHub Actions: ejecuta `gh auth refresh -h github.com -s workflow` y borra esta línea para subir .github/
 .github/

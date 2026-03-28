@@ -26,6 +26,9 @@ export function HomePageClient(): React.ReactElement {
 
   useEffect(() => {
     setMounted(true);
+    void import('three').catch(() => {
+      /* El tablero 3D cargará three de nuevo si falla el precalentamiento. */
+    });
   }, []);
 
   if (!mounted) {

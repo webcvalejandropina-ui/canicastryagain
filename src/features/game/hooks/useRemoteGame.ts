@@ -5,12 +5,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ApiRequestError, createGame, getGame, joinGame, leaveGame, makeMove, rollDice } from '@/features/game/api/gameApi';
 import { DiceResult, GameState } from '@/features/game/types';
 
-const WAITING_SYNC_INTERVAL_MS = 3_000;
-const PLAYING_SYNC_INTERVAL_MS = 4_000;
-const HIDDEN_SYNC_INTERVAL_MS = 15_000;
-const LIVE_CHANNEL_FALLBACK_MS = 30_000;
-const LIVE_HEALTH_STALE_MS = 18_000;
-const FOCUS_SYNC_STALE_MS = 5_000;
+const WAITING_SYNC_INTERVAL_MS = 2_000;
+const PLAYING_SYNC_INTERVAL_MS = 2_200;
+const HIDDEN_SYNC_INTERVAL_MS = 12_000;
+const LIVE_CHANNEL_FALLBACK_MS = 18_000;
+const LIVE_HEALTH_STALE_MS = 14_000;
+const FOCUS_SYNC_STALE_MS = 3_500;
 
 function getSyncInterval(gameStatus: GameState['status'] | undefined, hasLiveChannel: boolean): number {
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
@@ -47,6 +47,7 @@ export function useRemoteGame(playerId: string): {
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const syncInFlightRef = useRef(false);
+  const pendingRefreshRef = useRef(false);
   const lastSyncedAtRef = useRef<number>(0);
 
   const gameId = game?.gameId ?? null;
@@ -72,16 +73,24 @@ export function useRemoteGame(playerId: string): {
 
   const refreshGame = useCallback(async () => {
     if (!gameId || !playerId) return;
-    if (syncInFlightRef.current) return;
+    if (syncInFlightRef.current) {
+      pendingRefreshRef.current = true;
+      return;
+    }
 
     syncInFlightRef.current = true;
     setIsSyncing(true);
 
     try {
-      const latest = await getGame(gameId, playerId);
-      setGame(latest);
-      markSynced();
+      for (;;) {
+        pendingRefreshRef.current = false;
+        const latest = await getGame(gameId, playerId);
+        setGame(latest);
+        markSynced();
+        if (!pendingRefreshRef.current) break;
+      }
     } catch (err) {
+      pendingRefreshRef.current = false;
       if (err instanceof ApiRequestError && err.code === 'GAME_NOT_FOUND') {
         setGame(null);
         setError('La partida dejó de estar disponible (caducó, se canceló o alguien salió).');

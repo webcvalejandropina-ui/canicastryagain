@@ -82,6 +82,59 @@ function buildInviteUrl(baseOrigin: string, pathname: string, gameCode: string, 
   return inviteUrl.toString();
 }
 
+async function copyTextWithFallback(text: string): Promise<boolean> {
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Seguimos con fallback para HTTP, WebViews y navegadores quisquillosos.
+    }
+  }
+
+  if (typeof document === 'undefined') {
+    return false;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.setAttribute('aria-hidden', 'true');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.left = '-9999px';
+  textarea.style.opacity = '0';
+  textarea.style.pointerEvents = 'none';
+
+  document.body.appendChild(textarea);
+
+  const selection = document.getSelection();
+  const originalRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+  textarea.focus({ preventScroll: true });
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch {
+    copied = false;
+  }
+
+  textarea.blur();
+  document.body.removeChild(textarea);
+
+  if (selection) {
+    selection.removeAllRanges();
+    if (originalRange) {
+      selection.addRange(originalRange);
+    }
+  }
+
+  return copied;
+}
+
 /** Reglas detalladas (lobby y menú). */
 const quickRules = [
   'Objetivo (misère): pierdes si quitas la última canica que queda en el tablero.',
@@ -462,11 +515,11 @@ function VictoryOverlay({
       }
     }
 
-    try {
-      await navigator.clipboard.writeText(text);
+    const copied = await copyTextWithFallback(text);
+    if (copied) {
       onToast('Texto copiado: pégalo en WhatsApp, Instagram, donde quieras retar con cariño 🍍');
-    } catch {
-      onToast('Copia el enlace desde el menú de partida (⋮) y compártelo a mano.');
+    } else {
+      onToast('No pude copiarlo solo. Usa compartir del sistema o copia el enlace desde el menú de partida (⋮).');
     }
   }, [isWin, rivalName, winnerName, siteOrigin, onToast]);
 
@@ -1290,12 +1343,8 @@ export function HomePage(): React.ReactElement {
   const handleCopyCode = useCallback(async () => {
     if (!game?.gameCode) return;
 
-    try {
-      await navigator.clipboard.writeText(game.gameCode);
-      showTemporaryMessage('Código copiado');
-    } catch {
-      showTemporaryMessage('No se pudo copiar el código');
-    }
+    const copied = await copyTextWithFallback(game.gameCode);
+    showTemporaryMessage(copied ? 'Código copiado' : 'No se pudo copiar el código automáticamente');
   }, [game?.gameCode, showTemporaryMessage]);
 
   const handleCopyUrl = useCallback(async () => {
@@ -1326,12 +1375,8 @@ export function HomePage(): React.ReactElement {
       }
     }
 
-    try {
-      await navigator.clipboard.writeText(inviteUrl);
-      showTemporaryMessage('URL copiada');
-    } catch {
-      showTemporaryMessage('No se pudo copiar la URL');
-    }
+    const copied = await copyTextWithFallback(inviteUrl);
+    showTemporaryMessage(copied ? 'URL copiada' : 'No se pudo copiar la URL automáticamente');
   }, [shareUrl, activeGameCode, activeInviteToken, browserLocation, game?.gameCode, loadPublicShareOrigin, showTemporaryMessage]);
 
   const handleViewRankings = useCallback(async () => {

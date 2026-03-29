@@ -15,6 +15,7 @@ type Props = {
   hasPendingMove?: boolean;
   hasTurnCoach?: boolean;
   boardAttentionPulse?: boolean;
+  hasLiveChannel?: boolean;
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onDiceRoll?: () => Promise<DiceResult | null>;
   diceAvailable?: boolean;
@@ -94,6 +95,7 @@ type SceneContext = {
   lastFrameTime: number;
   boardWidth: number;
   baseCameraZ: number;
+  contextLost: boolean;
 };
 
 let threeModuleCache: typeof import('three') | null = null;
@@ -662,6 +664,13 @@ function spawnFlash(
 
 function animateFrame(context: SceneContext, timeMs: number): void {
   const { THREE } = context;
+
+  // Skip rendering if WebGL context was lost (will be restarted on restore)
+  if (context.contextLost) {
+    context.rafId = window.requestAnimationFrame((nextTime) => animateFrame(context, nextTime));
+    return;
+  }
+
   const t = timeMs * 0.001;
   const rawDt = context.lastFrameTime > 0 ? (timeMs - context.lastFrameTime) * 0.001 : 1 / 60;
   const dt = Math.min(rawDt, 0.05);
@@ -927,12 +936,19 @@ function drawDiceFace(ctx: CanvasRenderingContext2D, faceIndex: number, s: numbe
   }
 }
 
+// Cache dice face data URLs — compute once per face index, reuse forever
+const diceFaceCache = new Map<number, string>();
+
 /**
  * Returns a data-URL of a 48×48 canvas drawing the given dice face symbol.
  * Face indices match drawDiceFace: 0=bomb, 1=bolt, 2=spark, 3=shield, 4=die-pips, 5=question.
  * Used to render the dice button icon in the HUD without any external emoji/font.
+ * Result is cached after first computation per face index.
  */
 function getDiceFaceDataUrl(faceIndex: number): string {
+  if (diceFaceCache.has(faceIndex)) {
+    return diceFaceCache.get(faceIndex)!;
+  }
   const size = 48;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -965,7 +981,9 @@ function getDiceFaceDataUrl(faceIndex: number): string {
   drawDiceFace(ctx, faceIndex, size);
 
   ctx.restore();
-  return canvas.toDataURL('image/png');
+  const dataUrl = canvas.toDataURL('image/png');
+  diceFaceCache.set(faceIndex, dataUrl);
+  return dataUrl;
 }
 
 function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any } {
@@ -1118,7 +1136,8 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     cachedP2Initial: '',
     lastFrameTime: 0,
     boardWidth: 0,
-    baseCameraZ: 0
+    baseCameraZ: 0,
+    contextLost: false
   };
 
   const updatePointerFromEvent = (event: PointerEvent): void => {
@@ -1167,6 +1186,44 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   context.cleanupHandlers.push(() => renderer.domElement.removeEventListener('pointermove', onPointerMove));
   context.cleanupHandlers.push(() => renderer.domElement.removeEventListener('pointerleave', onPointerLeave));
   context.cleanupHandlers.push(() => window.removeEventListener('resize', onResize));
+
+  // WebGL context loss / restore — critical for mobile stability
+  const onContextLost = (event: Event): void => {
+    event.preventDefault();
+    context.contextLost = true;
+    if (context.rafId !== null) {
+      window.cancelAnimationFrame(context.rafId);
+      context.rafId = null;
+    }
+  };
+
+  const onContextRestored = (): void => {
+    context.contextLost = false;
+    // Re-initialise the scene objects that were lost
+    context.activeTexture?.dispose?.();
+    context.removedTexture?.dispose?.();
+    context.removedTexture = createMarbleTexture(THREE, {
+      base: '#64748b',
+      veins: '#94a3b8',
+      highlight: '#cbd5e1',
+      shadow: '#334155'
+    });
+    context.activeTexture = createMarbleTexture(THREE, {
+      base: '#38bdf8',
+      veins: '#bae6fd',
+      highlight: '#e0f2fe',
+      shadow: '#0c4a6e'
+    });
+    // Restart animation loop
+    context.rafId = window.requestAnimationFrame((time) => animateFrame(context, time));
+  };
+
+  renderer.domElement.addEventListener('webglcontextlost', onContextLost);
+  renderer.domElement.addEventListener('webglcontextrestored', onContextRestored);
+  context.cleanupHandlers.push(() => {
+    renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
+    renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
+  });
 
   return context;
 }
@@ -1332,6 +1389,7 @@ export function GameBoard({
   hasPendingMove = false,
   hasTurnCoach = false,
   boardAttentionPulse = false,
+  hasLiveChannel,
   onBallClick,
   onDiceRoll,
   diceAvailable
@@ -1669,6 +1727,18 @@ export function GameBoard({
               </p>
             </div>
           ) : null}
+
+          {sceneRef.current?.contextLost ? (
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 backdrop-blur-sm">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-amber-400/60 bg-black/40">
+                <span className="text-2xl" aria-hidden="true">⚡</span>
+              </div>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-100">
+                Tablero reactivándose…
+              </p>
+              <p className="text-xs text-white/60">El contexto gráfico se recuperó. Continúa jugando.</p>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -1687,6 +1757,22 @@ export function GameBoard({
             aria-live="polite"
           >
             <div className="flex flex-wrap items-center gap-1.5">
+              {/* Connection status dot — green = live SSE, yellow = polling, grey = disconnected */}
+              {hasLiveChannel !== undefined ? (
+                <span
+                  title={
+                    hasLiveChannel ? 'Conexión en tiempo real activa' : 'Sincronizando…'
+                  }
+                  className={[
+                    'inline-block h-2 w-2 flex-shrink-0 rounded-full align-middle transition-colors duration-500',
+                    hasLiveChannel
+                      ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
+                      : 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]'
+                  ].join(' ')}
+                  role="status"
+                  aria-label={hasLiveChannel ? 'Conexión en tiempo real activa' : 'Sincronizando'}
+                />
+              ) : null}
               <span
                 className={[
                   'rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em]',

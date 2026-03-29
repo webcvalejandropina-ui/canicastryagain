@@ -2408,6 +2408,7 @@ export function HomePage(): React.ReactElement {
                   hasPendingMove={!!pendingMove}
                   hasTurnCoach={showTurnCoach}
                   boardAttentionPulse={boardAttentionPulse}
+                  hasLiveChannel={hasLiveChannel}
                   onBallClick={handleBallClick}
                   onDiceRoll={handleUseDice3D}
                   diceAvailable={!!game.yourDiceAvailable && canInteract}

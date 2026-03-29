@@ -20,6 +20,7 @@ type Props = {
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onDiceRoll?: () => Promise<DiceResult | null>;
   diceAvailable?: boolean;
+  lastDiceResult?: DiceResult | null;
 };
 
 type BoardDensity = 'normal' | 'compact' | 'dense';
@@ -1387,6 +1388,89 @@ function LegacyBoardGrid({
   );
 }
 
+const DICE_POWER_META: Record<string, {
+  label: string;
+  bg: string;
+  border: string;
+  text: string;
+  icon: string;
+  iconBg: string;
+}> = {
+  bomba: {
+    label: 'Bomba',
+    bg: 'bg-red-500/90',
+    border: 'border-red-400/60',
+    text: 'text-white',
+    icon: '💣',
+    iconBg: 'bg-red-600'
+  },
+  rayo: {
+    label: 'Rayo',
+    bg: 'bg-yellow-500/90',
+    border: 'border-yellow-400/60',
+    text: 'text-yellow-950',
+    icon: '⚡',
+    iconBg: 'bg-yellow-600'
+  },
+  diagonal: {
+    label: 'Diagonal',
+    bg: 'bg-purple-500/90',
+    border: 'border-purple-400/60',
+    text: 'text-white',
+    icon: '⚔️',
+    iconBg: 'bg-purple-600'
+  },
+  resurreccion: {
+    label: 'Resurrección',
+    bg: 'bg-emerald-500/90',
+    border: 'border-emerald-400/60',
+    text: 'text-white',
+    icon: '✨',
+    iconBg: 'bg-emerald-600'
+  }
+};
+
+function DiceResultBanner({ power }: { power: string }): React.ReactElement {
+  const meta = DICE_POWER_META[power] ?? {
+    label: 'Poder especial',
+    bg: 'bg-amber-500/90',
+    border: 'border-amber-400/60',
+    text: 'text-white',
+    icon: '🎲',
+    iconBg: 'bg-amber-600'
+  };
+
+  return (
+    <div
+      className={[
+        'dice-result-overlay rounded-2xl border-2 border-white/20',
+        'px-6 py-4 shadow-2xl backdrop-blur-xl',
+        meta.bg,
+        meta.border
+      ].join(' ')}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className={[
+            'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl text-2xl',
+            meta.iconBg
+          ].join(' ')}
+        >
+          {meta.icon}
+        </div>
+        <div>
+          <p className={['text-[10px] font-black uppercase tracking-[0.2em]', meta.text, 'opacity-80'].join(' ')}>
+            Dado especial usado
+          </p>
+          <p className={['text-xl font-black tracking-tight', meta.text].join(' ')}>
+            {meta.label}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function GameBoard({
   game,
   selectedRowIndex,
@@ -1400,7 +1484,8 @@ export function GameBoard({
   hasLiveChannel,
   onBallClick,
   onDiceRoll,
-  diceAvailable
+  diceAvailable,
+  lastDiceResult
 }: Props): React.ReactElement {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<SceneContext | null>(null);
@@ -1411,6 +1496,9 @@ export function GameBoard({
   const [renderMode, setRenderMode] = useState<'loading' | 'three' | 'fallback'>('loading');
   const [isRollingDice, setIsRollingDice] = useState(false);
   const [diceChipAnim, setDiceChipAnim] = useState<'ready' | 'spent' | null>(null);
+  const [diceResultOverlay, setDiceResultOverlay] = useState<DiceResult | null>(null);
+  const diceResultTimerRef = useRef<number | null>(null);
+  const prevDiceResultRef = useRef<DiceResult | null>(null);
 
   const statusLabel = useMemo(() => {
     if (renderMode === 'loading') return 'Inicializando tablero 3D...';
@@ -1465,6 +1553,23 @@ export function GameBoard({
       return () => clearTimeout(timer);
     }
   }, [diceAvailable]);
+
+  // Show dice result overlay when a new dice result arrives
+  useEffect(() => {
+    if (!lastDiceResult) return;
+    // Avoid re-triggering for the same result object reference
+    if (prevDiceResultRef.current === lastDiceResult) return;
+    prevDiceResultRef.current = lastDiceResult;
+
+    if (diceResultTimerRef.current) {
+      window.clearTimeout(diceResultTimerRef.current);
+    }
+    setDiceResultOverlay(lastDiceResult);
+    diceResultTimerRef.current = window.setTimeout(() => {
+      setDiceResultOverlay(null);
+      diceResultTimerRef.current = null;
+    }, 2800);
+  }, [lastDiceResult]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1598,6 +1703,10 @@ export function GameBoard({
       cancelled = true;
       destroyScene(sceneRef.current);
       sceneRef.current = null;
+      if (diceResultTimerRef.current) {
+        window.clearTimeout(diceResultTimerRef.current);
+        diceResultTimerRef.current = null;
+      }
     };
   }, []);
 
@@ -1763,6 +1872,17 @@ export function GameBoard({
                 Tablero reactivándose…
               </p>
               <p className="text-xs text-white/60">El contexto gráfico se recuperó. Continúa jugando.</p>
+            </div>
+          ) : null}
+
+          {/* Dice result overlay — appears centered over the 3D canvas */}
+          {diceResultOverlay ? (
+            <div
+              className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+              aria-live="assertive"
+              role="status"
+            >
+              <DiceResultBanner power={diceResultOverlay.power} />
             </div>
           ) : null}
         </div>

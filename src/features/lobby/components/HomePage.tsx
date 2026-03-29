@@ -9,6 +9,7 @@ import { validateMove } from '@/features/game/lib/validateMove';
 import { RankingTable } from '@/features/ranking/components/RankingTable';
 import { useRankings } from '@/features/ranking/hooks/useRankings';
 import { usePlayerIdentity } from '@/features/session/hooks/usePlayerIdentity';
+import type { DiceResult } from '@/features/game/types';
 import { PasswordModal } from '@/features/lobby/components/PasswordModal';
 import { DeleteAccountModal } from '@/features/lobby/components/DeleteAccountModal';
 import { AdminPanel } from '@/features/admin/components/AdminPanel';
@@ -767,6 +768,7 @@ export function HomePage(): React.ReactElement {
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
   const [boardAttentionPulse, setBoardAttentionPulse] = useState(false);
   const [yourTurnGlow, setYourTurnGlow] = useState(false);
+  const [lastDiceResult, setLastDiceResult] = useState<DiceResult | null>(null);
 
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
@@ -1071,6 +1073,7 @@ export function HomePage(): React.ReactElement {
       const dice = await sendDice();
       if (dice) {
         showTemporaryMessage(`Dado especial: ${formatDiceEffectSummary(dice.power, dice.affected.length)}`);
+        setLastDiceResult(dice);
         return dice;
       }
     } catch {
@@ -2467,6 +2470,7 @@ export function HomePage(): React.ReactElement {
                   onBallClick={handleBallClick}
                   onDiceRoll={handleUseDice3D}
                   diceAvailable={!!game.yourDiceAvailable && canInteract}
+                  lastDiceResult={lastDiceResult}
                 />
               </section>
             ) : null}

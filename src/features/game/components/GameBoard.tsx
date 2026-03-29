@@ -812,41 +812,141 @@ function animateFrame(context: SceneContext, timeMs: number): void {
   context.rafId = window.requestAnimationFrame((nextTime) => animateFrame(context, nextTime));
 }
 
+/** Draw a filled circle on ctx at (cx,cy) with radius r and color. */
+function drawCircle(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, color: string): void {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/**
+ * Draw dice face symbols using pure canvas 2D API — no emoji / system fonts.
+ * This guarantees consistent rendering on every device and browser.
+ *
+ * Face index → symbol:
+ *   0 💣 bomb   → overlapping dark circles + spark lines
+ *   1 ⚡ bolt   → lightning bolt polygon
+ *   2 ✨ spark  → 4-point star + 8 rays
+ *   3 🛡️ shield → shield outline with inner cross
+ *   4 🎲 die    → classic 5-pip pattern
+ *   5 ❓ rand   → large "?" with dot
+ */
+function drawDiceFace(ctx: CanvasRenderingContext2D, faceIndex: number, s: number): void {
+  const cx = s / 2;
+  const cy = s / 2;
+  const sc = s / 256; // scale factor (base design is 256×256)
+
+  switch (faceIndex) {
+    case 0: { // bomb: dark circles + yellow spark lines + highlight
+      ctx.fillStyle = '#1a1a2e';
+      ([[cx, cy, 52], [cx - 18, cy - 18, 28], [cx + 20, cy - 12, 20]] as [number,number,number][]).forEach(([x, y, r]) => {
+        ctx.beginPath(); ctx.arc(x, y, r * sc, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 5 * sc; ctx.lineCap = 'round';
+      ([[cx, cy - 68, cx, cy - 52], [cx - 60, cy - 10, cx - 47, cy - 18], [cx + 60, cy - 10, cx + 47, cy - 18]] as [number,number,number,number][]).forEach(([x1, y1, x2, y2]) => {
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      });
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.beginPath(); ctx.arc(cx - 14, cy - 14, 14 * sc, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 1: { // lightning bolt
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(cx + 18 * sc, cy - 80 * sc); ctx.lineTo(cx - 18 * sc, cy + 4 * sc);
+      ctx.lineTo(cx + 4 * sc, cy + 4 * sc);  ctx.lineTo(cx - 14 * sc, cy + 80 * sc);
+      ctx.lineTo(cx + 22 * sc, cy - 4 * sc); ctx.lineTo(cx - 2 * sc, cy - 4 * sc);
+      ctx.closePath(); ctx.fill();
+      // depth shadow
+      ctx.globalAlpha = 0.25; ctx.fillStyle = '#7c2d12';
+      ctx.beginPath();
+      ctx.moveTo(cx + 22 * sc, cy - 80 * sc); ctx.lineTo(cx - 14 * sc, cy + 4 * sc);
+      ctx.lineTo(cx + 8 * sc, cy + 4 * sc);  ctx.lineTo(cx - 10 * sc, cy + 80 * sc);
+      ctx.lineTo(cx + 26 * sc, cy - 4 * sc); ctx.lineTo(cx + 2 * sc, cy - 4 * sc);
+      ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1;
+      break;
+    }
+    case 2: { // spark star + 8 rays
+      const outerR = 62 * sc, innerR = 28 * sc;
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const r = i % 2 === 0 ? outerR : innerR;
+        const angle = (i * Math.PI) / 4 - Math.PI / 2;
+        const px = cx + Math.cos(angle) * r, py = cy + Math.sin(angle) * r;
+        if (i === 0) { ctx.moveTo(px, py); } else { ctx.lineTo(px, py); }
+      }
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 4 * sc; ctx.lineCap = 'round';
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle) * 72 * sc, cy + Math.sin(angle) * 72 * sc);
+        ctx.lineTo(cx + Math.cos(angle) * 100 * sc, cy + Math.sin(angle) * 100 * sc);
+        ctx.stroke();
+      }
+      drawCircle(ctx, cx, cy, 12 * sc, '#ffffff');
+      break;
+    }
+    case 3: { // shield with inner cross
+      const pad = 40 * sc;
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 10 * sc;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx, pad); ctx.lineTo(cx - 55 * sc, cy - 30 * sc);
+      ctx.lineTo(cx - 55 * sc, cy + 20 * sc);
+      ctx.quadraticCurveTo(cx - 55 * sc, cy + 65 * sc, cx, cy + 80 * sc);
+      ctx.quadraticCurveTo(cx + 55 * sc, cy + 65 * sc, cx + 55 * sc, cy + 20 * sc);
+      ctx.lineTo(cx + 55 * sc, cy - 30 * sc); ctx.closePath(); ctx.stroke();
+      ctx.lineWidth = 8 * sc;
+      ctx.beginPath(); ctx.moveTo(cx, cy - 28 * sc); ctx.lineTo(cx, cy + 42 * sc);
+      ctx.moveTo(cx - 30 * sc, cy + 8 * sc); ctx.lineTo(cx + 30 * sc, cy + 8 * sc);
+      ctx.stroke();
+      break;
+    }
+    case 4: { // classic die — 5 pips
+      const pipR = 16 * sc;
+      const pips: [number,number][] = [[cx, cy], [cx - 36*sc, cy - 36*sc], [cx + 36*sc, cy - 36*sc], [cx - 36*sc, cy + 36*sc], [cx + 36*sc, cy + 36*sc]];
+      pips.forEach(([px, py]) => drawCircle(ctx, px, py, pipR, '#ffffff'));
+      break;
+    }
+    case 5: { // large "?" + dot below (bezier paths, no font)
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 14 * sc; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx, cy - 24 * sc, 30 * sc, Math.PI * 0.9, Math.PI * 2.1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy + 6 * sc); ctx.lineTo(cx, cy + 22 * sc); ctx.stroke();
+      drawCircle(ctx, cx, cy + 52 * sc, 12 * sc, '#ffffff');
+      // shadow
+      ctx.globalAlpha = 0.2; ctx.strokeStyle = '#000000';
+      ctx.beginPath(); ctx.arc(cx + 4 * sc, cy - 20 * sc, 30 * sc, Math.PI * 0.9, Math.PI * 2.1); ctx.stroke();
+      ctx.globalAlpha = 1;
+      break;
+    }
+  }
+}
+
 function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any } {
   const diceGroup = new THREE.Group();
   const size = 0.55;
 
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d')!;
-
-  const faces: Array<{ bg: string; symbol: string; color: string }> = [
-    { bg: '#f59e0b', symbol: '\u{1F4A3}', color: '#fff' },
-    { bg: '#ef4444', symbol: '\u26A1', color: '#fff' },
-    { bg: '#8b5cf6', symbol: '\u2728', color: '#fef08a' },
-    { bg: '#10b981', symbol: '\u{1F6E1}', color: '#fff' },
-    { bg: '#f97316', symbol: '\u{1F3B2}', color: '#fff' },
-    { bg: '#ec4899', symbol: '?', color: '#fff' }
+  const faces: Array<{ bg: string }> = [
+    { bg: '#f59e0b' }, // 0: bomb
+    { bg: '#ef4444' }, // 1: bolt
+    { bg: '#8b5cf6' }, // 2: spark
+    { bg: '#10b981' }, // 3: shield
+    { bg: '#f97316' }, // 4: die pips
+    { bg: '#ec4899' }  // 5: question
   ];
 
-  const textures = faces.map((f) => {
+  const textures = faces.map((f, faceIndex) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 256;
+    const ctx = canvas.getContext('2d')!;
     ctx.fillStyle = f.bg;
     ctx.fillRect(0, 0, 256, 256);
-    ctx.fillStyle = f.color;
-    ctx.font = 'bold 120px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(f.symbol, 128, 128);
-    const tex = new THREE.CanvasTexture(canvas.cloneNode(true) as HTMLCanvasElement);
-    const cloneCtx = (tex.image as HTMLCanvasElement).getContext('2d')!;
-    cloneCtx.fillStyle = f.bg;
-    cloneCtx.fillRect(0, 0, 256, 256);
-    cloneCtx.fillStyle = f.color;
-    cloneCtx.font = 'bold 120px sans-serif';
-    cloneCtx.textAlign = 'center';
-    cloneCtx.textBaseline = 'middle';
-    cloneCtx.fillText(f.symbol, 128, 128);
+    drawDiceFace(ctx, faceIndex, 256);
+    const tex = new THREE.CanvasTexture(canvas);
     tex.needsUpdate = true;
     return tex;
   });
@@ -1571,11 +1671,11 @@ export function GameBoard({
             </p>
             {selectedCount > 0 ? (
               <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
-                Toca fuera del bloque para ampliarlo si sigue contiguo; toca un extremo para recortar.
+                Toca más canicas de la misma fila para ampliar; toca un extremo para reducir la selección.
               </p>
             ) : canInteract ? (
               <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
-                El HUD se actualiza al tocar una fila, así no tienes que bajar para comprobar la selección.
+                Puedes tocar cualquier canica contigua en la misma fila para ampliar o reducir la selección.
               </p>
             ) : null}
           </div>
@@ -1592,9 +1692,7 @@ export function GameBoard({
               aria-label={isRollingDice ? 'Lanzando dado especial' : 'Usar dado especial'}
               className="inline-flex min-h-11 items-center gap-2 rounded-full border border-amber-300/45 bg-black/60 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-amber-100 shadow-lg shadow-amber-950/30 backdrop-blur transition hover:border-amber-200/70 hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              <span className="text-base leading-none" aria-hidden>
-                {isRollingDice ? '🎲' : '✨'}
-              </span>
+              <span aria-hidden="true" className="text-base leading-none" />
               <span>{isRollingDice ? 'Lanzando...' : 'Dado x1'}</span>
             </button>
             <p className="rounded-full bg-black/45 px-2.5 py-1 text-right text-[10px] font-semibold leading-tight text-white/80 backdrop-blur">

@@ -1388,12 +1388,42 @@ function LegacyBoardGrid({
   );
 }
 
+// Inline SVG icons — replaces emoji for WCAG consistency (same style as GameInfoPanel)
+const DICE_POWER_ICONS: Record<string, React.ReactElement> = {
+  bomba: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="14" r="8" fill="#374151" stroke="#9ca3af" strokeWidth="1.5"/>
+      <circle cx="8" cy="11" r="1.5" fill="#9ca3af"/>
+      <circle cx="14" cy="9" r="1" fill="#9ca3af"/>
+      <rect x="10.5" y="3" width="3" height="5" rx="1.5" fill="#6b7280"/>
+      <path d="M12 3 Q14 1 15.5 2" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+    </svg>
+  ),
+  rayo: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+    </svg>
+  ),
+  diagonal: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 6l4 4M10 4l6 6M18 6l-4 4" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M6 18l4-4M10 20l6-6M18 18l-4-4" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  ),
+  resurreccion: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3v3M5.64 5.64l2.12 2.12M3 12h3M5.64 18.36l2.12-2.12M12 21v-3M18.36 18.36l-2.12-2.12M21 12h-3M18.36 5.64l-2.12 2.12" stroke="#34d399" strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="12" cy="12" r="4" fill="#10b981" stroke="#34d399" strokeWidth="1.5"/>
+    </svg>
+  )
+};
+
 const DICE_POWER_META: Record<string, {
   label: string;
   bg: string;
   border: string;
   text: string;
-  icon: string;
+  icon: React.ReactElement;
   iconBg: string;
 }> = {
   bomba: {
@@ -1401,7 +1431,7 @@ const DICE_POWER_META: Record<string, {
     bg: 'bg-red-500/90',
     border: 'border-red-400/60',
     text: 'text-white',
-    icon: '💣',
+    icon: DICE_POWER_ICONS.bomba,
     iconBg: 'bg-red-600'
   },
   rayo: {
@@ -1409,7 +1439,7 @@ const DICE_POWER_META: Record<string, {
     bg: 'bg-yellow-500/90',
     border: 'border-yellow-400/60',
     text: 'text-yellow-950',
-    icon: '⚡',
+    icon: DICE_POWER_ICONS.rayo,
     iconBg: 'bg-yellow-600'
   },
   diagonal: {
@@ -1417,7 +1447,7 @@ const DICE_POWER_META: Record<string, {
     bg: 'bg-purple-500/90',
     border: 'border-purple-400/60',
     text: 'text-white',
-    icon: '⚔️',
+    icon: DICE_POWER_ICONS.diagonal,
     iconBg: 'bg-purple-600'
   },
   resurreccion: {
@@ -1425,7 +1455,7 @@ const DICE_POWER_META: Record<string, {
     bg: 'bg-emerald-500/90',
     border: 'border-emerald-400/60',
     text: 'text-white',
-    icon: '✨',
+    icon: DICE_POWER_ICONS.resurreccion,
     iconBg: 'bg-emerald-600'
   }
 };
@@ -1875,7 +1905,9 @@ export function GameBoard({
           {sceneRef.current?.contextLost ? (
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 backdrop-blur-sm">
               <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-amber-400/60 bg-black/40">
-                <span className="text-2xl" aria-hidden="true">⚡</span>
+                <svg aria-hidden="true" className="h-7 w-7 text-amber-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+                </svg>
               </div>
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-amber-100">
                 Tablero reactivándose…
@@ -1959,7 +1991,14 @@ export function GameBoard({
                       anim
                     ].filter(Boolean).join(' ')}
                   >
-                    {diceAvailable ? '✨ Dado listo' : 'Dado gastado'}
+                    {diceAvailable ? (
+                      <>
+                        <svg aria-hidden="true" className="inline h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 2L9.5 9.5L2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5L12 2z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+                        </svg>
+                        {' Dado listo'}
+                      </>
+                    ) : 'Dado gastado'}
                   </span>
                 );
               })() : null}

@@ -483,7 +483,8 @@ function VictoryOverlay({
   rivalName,
   shareOrigin,
   onToast,
-  onExit
+  onExit,
+  onNewGame
 }: {
   isWin: boolean;
   winnerName: string;
@@ -492,6 +493,7 @@ function VictoryOverlay({
   shareOrigin: string;
   onToast: (text: string) => void;
   onExit: () => void;
+  onNewGame?: () => void;
 }): React.ReactElement {
   const confettiRef = useRef<HTMLDivElement>(null);
   const [showContent, setShowContent] = useState(false);
@@ -702,6 +704,18 @@ function VictoryOverlay({
             <IconHome className="h-4 w-4 shrink-0" />
             <span>Volver al lobby</span>
           </button>
+          {onNewGame ? (
+            <button
+              type="button"
+              onClick={onNewGame}
+              aria-label="Nueva partida"
+              title="Nueva partida"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-leaf/40 bg-leaf/20 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-leaf transition-all hover:border-leaf hover:bg-leaf/30 active:scale-[0.97] dark:text-leaf-soft dark:border-leaf-soft/40 dark:bg-leaf-soft/15 dark:hover:bg-leaf-soft/25"
+            >
+              <IconPlus className="h-4 w-4 shrink-0" />
+              <span>Nueva partida</span>
+            </button>
+          ) : null}
         </div>
       </div>
     </div>
@@ -2799,6 +2813,18 @@ export function HomePage(): React.ReactElement {
             setSharedCode('');
             setSharedInviteToken('');
             setJoinCode('');
+          }}
+          onNewGame={() => {
+            clearGame();
+            clearError();
+            setPendingMove(null);
+            setShowGameMenu(false);
+            setShowKeyRulesInMenu(false);
+            setGameGuideCollapsed(false);
+            setSharedCode('');
+            setSharedInviteToken('');
+            setJoinCode('');
+            void createNewGame({ playerName, numRows: normalizedRowsInput });
           }}
         />
       ) : null}

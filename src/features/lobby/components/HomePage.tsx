@@ -2414,7 +2414,7 @@ export function HomePage(): React.ReactElement {
                             ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300'
                             : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60 dice-spent-chip line-through'
                         ].join(' ')}>
-                          {game.yourDiceAvailable ? <><span aria-hidden="true" className="mr-0.5">✨</span> Dado listo</> : 'Dado gastado'}
+                          {game.yourDiceAvailable ? <><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-3 w-3 mr-0.5" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L9.5 9.5L2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5L12 2z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/></svg> Dado listo</> : 'Dado gastado'}
                         </span>
                         <span className="rounded-full border border-brown/15 bg-sand/55 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
                           {latestMoveSummary}
@@ -2529,7 +2529,7 @@ export function HomePage(): React.ReactElement {
                       ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300'
                       : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60'
                   ].join(' ')}>
-                    {game?.yourDiceAvailable ? <><span aria-hidden="true" className="mr-0.5">✨</span> Dado listo</> : 'Dado gastado'}
+                    {game?.yourDiceAvailable ? <><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-3 w-3 mr-0.5" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L9.5 9.5L2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5L12 2z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/></svg> Dado listo</> : 'Dado gastado'}
                   </span>
                 </div>
                 <p className="mt-2 text-sm font-bold leading-snug text-[#4a3f32] dark:text-dark-text">

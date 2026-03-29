@@ -385,6 +385,20 @@ function IconCheck({ className }: { className?: string }): React.ReactElement {
   );
 }
 
+function IconHandshake({ className }: { className?: string }): React.ReactElement {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} aria-hidden="true">
+      <path d="M8 6.5 2.5 12 8 14" />
+      <path d="M16 6.5l5.5 5.5-5.5 2" />
+      <path d="M2.5 12 8 17" />
+      <path d="M16 17l5.5-5" />
+      <path d="M12 3.5C9 3.5 7.5 5 7.5 7c0 1 .5 2 1.5 2.5L7 12l2.5 1L12 9l1.5 4.5h4L19.5 10c1-.5 1.5-1.5 1.5-2.5 0-2-1.5-3.5-4.5-3.5" />
+      <path d="M7 17l-1.5 3.5h4L7 17z" />
+      <path d="M17 17l1.5 3.5h-4L17 17z" />
+    </svg>
+  );
+}
+
 function IconHistory({ className }: { className?: string }): React.ReactElement {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden="true">
@@ -627,20 +641,18 @@ function VictoryOverlay({
             role="status"
             aria-live="polite"
           >
-            <span aria-hidden="true">{isWin ? '🏆' : '👤'}</span>
+            <span aria-hidden="true">{isWin ? <IconTrophy className="h-3.5 w-3.5" /> : <IconUser className="h-3.5 w-3.5" />}</span>
             <span>{winnerName}</span>
           </div>
         ) : null}
 
         {isWin ? (
           <div className="victory-trophy-glow mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full sm:h-28 sm:w-28">
-            <span className="text-5xl sm:text-6xl">🏆</span>
+            <IconTrophy className="h-14 w-14 sm:h-16 sm:w-16" aria-hidden="true" />
           </div>
         ) : (
           <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full border border-primary/25 bg-primary/10 sm:h-28 sm:w-28">
-            <span className="text-5xl sm:text-6xl" role="img" aria-label="apretón de manos">
-              🤝
-            </span>
+            <IconHandshake className="h-14 w-14 sm:h-16 sm:w-16" aria-hidden="true" />
           </div>
         )}
 
@@ -657,7 +669,7 @@ function VictoryOverlay({
           {winnerName ? (
             <>
               <span className={isWin ? 'font-bold text-primary' : 'font-bold text-primary/90'}>{winnerName}</span>
-              {isWin ? ' se lleva la victoria. ¡A celebrar con deportividad! 🏆' : ' jugó genial. Chapeau y hasta la revancha.'}
+              {isWin ? ' se lleva la victoria. ¡A celebrar con deportividad!' : ' jugó genial. Chapeau y hasta la revancha.'}
             </>
           ) : (
             'La sesión terminó (abandono o desconexión). Sin culpas: se puede volver a intentar cuando quieras.'
@@ -2238,7 +2250,7 @@ export function HomePage(): React.ReactElement {
                   <article id="ranking" className="overflow-hidden rounded-2xl border border-primary/10 bg-white/70 p-5 backdrop-blur dark:border-white/10 dark:bg-dark-card/80 md:p-6">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">🏆</span>
+                        <IconTrophy className="h-5 w-5 text-primary" aria-hidden="true" />
                         <h3 className="text-sm font-black uppercase tracking-wider text-[#4a3f32] dark:text-dark-text">Top 10</h3>
                       </div>
                       <button

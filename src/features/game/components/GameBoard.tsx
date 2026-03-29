@@ -1728,6 +1728,10 @@ export function GameBoard({
 
           const hit = pickMarble(context);
           if (!hit || !hit.clickable) return;
+          // Haptic feedback on ball tap (mirrors the pendingMove vibration in HomePage)
+          if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(18);
+          }
           onBallClickRef.current(hit.rowIndex, hit.ballIndex);
         };
 

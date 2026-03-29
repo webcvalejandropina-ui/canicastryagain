@@ -505,7 +505,8 @@ body {
   .board-skeleton-ball,
   .toast-slide-down,
   .connection-dot-live,
-  .dice-spent-chip {
+  .dice-spent-chip,
+  .dice-result-pop {
     animation: none !important;
     transform: none !important;
   }

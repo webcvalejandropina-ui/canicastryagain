@@ -1822,11 +1822,14 @@ export function GameBoard({
                   ? (diceChipAnim === 'ready' ? 'dice-ready-pop' : '')
                   : (diceChipAnim === 'spent' ? 'dice-spent-chip' : '');
                 return (
-                  <span className={[
-                    'rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
-                    base,
-                    anim
-                  ].filter(Boolean).join(' ')}>
+                  <span
+                    aria-label={diceAvailable ? 'Dado especial disponible' : 'Dado especial ya usado'}
+                    className={[
+                      'rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
+                      base,
+                      anim
+                    ].filter(Boolean).join(' ')}
+                  >
                     {diceAvailable ? '✨ Dado listo' : 'Dado gastado'}
                   </span>
                 );

@@ -15,6 +15,7 @@ type Props = {
   hasPendingMove?: boolean;
   hasTurnCoach?: boolean;
   boardAttentionPulse?: boolean;
+  yourTurnGlow?: boolean;
   hasLiveChannel?: boolean;
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onDiceRoll?: () => Promise<DiceResult | null>;
@@ -1389,6 +1390,7 @@ export function GameBoard({
   hasPendingMove = false,
   hasTurnCoach = false,
   boardAttentionPulse = false,
+  yourTurnGlow = false,
   hasLiveChannel,
   onBallClick,
   onDiceRoll,
@@ -1685,6 +1687,7 @@ export function GameBoard({
       className={[
         'relative flex flex-1 scroll-mt-24 flex-col bg-background-dark dark:bg-dark-bg min-h-0 transition-[padding,box-shadow,border-color] duration-200',
         boardAttentionPulse ? 'board-attention-pulse' : '',
+        yourTurnGlow ? 'board-your-turn-glow' : '',
         boardBottomInsetClass
       ].join(' ')}
       style={{ touchAction: 'manipulation' }}

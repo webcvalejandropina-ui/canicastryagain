@@ -1,7 +1,16 @@
-import { GameState } from '@/features/game/types';
+import { DiceResult, GameState } from '@/features/game/types';
 
 type Props = {
   game: GameState;
+  yourDiceAvailable: boolean;
+  lastDiceResult?: DiceResult | null;
+};
+
+const DICE_POWER_LABELS: Record<string, string> = {
+  bomba: 'Bomba',
+  rayo: 'Rayo',
+  diagonal: 'Diagonal',
+  resurreccion: 'Resurrección'
 };
 
 function playerCardClass(isYou: boolean, isActiveTurn: boolean): string {
@@ -14,7 +23,7 @@ function playerCardClass(isYou: boolean, isActiveTurn: boolean): string {
     .join(' ');
 }
 
-export function GameInfoPanel({ game }: Props): React.ReactElement {
+export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult }: Props): React.ReactElement {
   const player1Name = game.player1?.name ?? 'Esperando...';
   const player2Name = game.player2?.name ?? 'Esperando...';
 
@@ -91,6 +100,39 @@ export function GameInfoPanel({ game }: Props): React.ReactElement {
           </p>
         </div>
       </div>
+
+      {game.status === 'playing' ? (
+        <div className="mt-3 flex items-center justify-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 px-4 py-3">
+          <div className="text-center">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Tu dado especial</p>
+            {yourDiceAvailable ? (
+              <p className="mt-1 flex items-center justify-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                <span aria-hidden="true">✨</span> Disponible
+              </p>
+            ) : lastDiceResult ? (
+              <p className="dice-result-pop mt-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                {DICE_POWER_LABELS[lastDiceResult.power] ?? lastDiceResult.power}
+              </p>
+            ) : (
+              <p className="mt-1 text-sm font-semibold text-brown/50 dark:text-dark-muted">— Gastado</p>
+            )}
+          </div>
+          <div className="h-8 w-px bg-amber-500/20" />
+          <div className="text-center">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Dado del rival</p>
+            {(() => {
+              const rivalDiceMove = [...game.moveHistory].reverse().find((m) => m.fromDice && m.player !== game.yourPlayerNumber);
+              return rivalDiceMove ? (
+                <p className="mt-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                  {DICE_POWER_LABELS[rivalDiceMove.dicePower ?? ''] ?? rivalDiceMove.dicePower ?? '—'}
+                </p>
+              ) : (
+                <p className="mt-1 text-sm font-semibold text-brown/50 dark:text-dark-muted">Sin uso</p>
+              );
+            })()}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

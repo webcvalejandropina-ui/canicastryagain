@@ -508,7 +508,9 @@ body {
   .toast-slide-down,
   .connection-dot-live,
   .dice-spent-chip,
-  .dice-result-pop {
+  .dice-result-pop,
+  .dice-ready-pop,
+  .board-your-turn-glow {
     animation: none !important;
     transform: none !important;
   }

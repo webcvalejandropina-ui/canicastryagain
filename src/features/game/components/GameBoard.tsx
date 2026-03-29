@@ -1203,6 +1203,8 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     // Re-initialise the scene objects that were lost
     context.activeTexture?.dispose?.();
     context.removedTexture?.dispose?.();
+    context.removedP1Texture?.dispose?.();
+    context.removedP2Texture?.dispose?.();
     context.removedTexture = createMarbleTexture(THREE, {
       base: '#64748b',
       veins: '#94a3b8',
@@ -1215,6 +1217,10 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
       highlight: '#e0f2fe',
       shadow: '#0c4a6e'
     });
+    // removedP1Texture / removedP2Texture are recreated lazily by updateBoard;
+    // nullify them so the next updateBoard call detects they need re-creation.
+    context.removedP1Texture = null;
+    context.removedP2Texture = null;
     // Restart animation loop
     context.rafId = window.requestAnimationFrame((time) => animateFrame(context, time));
   };

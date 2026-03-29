@@ -18,7 +18,7 @@ export function GameControls({
   onCancel
 }: Props): React.ReactElement {
   const buttonBase =
-    'inline-flex h-12 items-center justify-center rounded-xl px-4 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40';
+    'inline-flex h-12 items-center justify-center rounded-xl px-4 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.97]';
 
   return (
     <section className="glass-panel rounded-2xl p-4 md:p-5" role="group" aria-label="Controles de selección">

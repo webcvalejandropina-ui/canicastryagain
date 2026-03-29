@@ -613,6 +613,22 @@ function VictoryOverlay({
           transform: showContent ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.9)'
         }}
       >
+        {winnerName ? (
+          <div
+            className={[
+              'mx-auto mb-3 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black uppercase tracking-[0.16em]',
+              isWin
+                ? 'border-primary/40 bg-primary/20 text-primary shadow-[0_0_12px_rgba(212,175,55,0.25)]'
+                : 'border-white/20 bg-white/10 text-white/80'
+            ].join(' ')}
+            role="status"
+            aria-live="polite"
+          >
+            <span aria-hidden="true">{isWin ? '🏆' : '👤'}</span>
+            <span>{winnerName}</span>
+          </div>
+        ) : null}
+
         {isWin ? (
           <div className="victory-trophy-glow mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full sm:h-28 sm:w-28">
             <span className="text-5xl sm:text-6xl">🏆</span>
@@ -662,6 +678,7 @@ function VictoryOverlay({
         <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
           <button
             type="button"
+            autoFocus
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"

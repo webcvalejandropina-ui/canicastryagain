@@ -4,6 +4,7 @@ type Props = {
   game: GameState;
   yourDiceAvailable: boolean;
   lastDiceResult?: DiceResult | null;
+  onNewGame?: () => void;
 };
 
 const DICE_POWER_LABELS: Record<string, string> = {
@@ -23,7 +24,7 @@ function playerCardClass(isYou: boolean, isActiveTurn: boolean): string {
     .join(' ');
 }
 
-export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult }: Props): React.ReactElement {
+export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGame }: Props): React.ReactElement {
   const player1Name = game.player1?.name ?? 'Esperando...';
   const player2Name = game.player2?.name ?? 'Esperando...';
 
@@ -70,10 +71,41 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult }: Props
         </article>
       </div>
 
-      <div className="mt-4 rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-center">
-        <p className="text-sm font-bold uppercase tracking-[0.15em] text-primary">Estado de turno</p>
-        <p className="mt-1 text-base font-semibold text-brown dark:text-dark-text md:text-lg">{turnText}</p>
-      </div>
+      {game.status === 'finished' ? (
+        <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-4 text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary/70">Resultado</p>
+          {game.winner ? (
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <span className="text-2xl">{game.winner === game.yourPlayerNumber ? '🏆' : '👤'}</span>
+              <p className="text-lg font-bold text-brown dark:text-dark-text">
+                {game.winner === 1 ? player1Name : player2Name}
+              </p>
+            </div>
+          ) : null}
+          <p className="mt-1 text-sm font-semibold text-primary">
+            {game.winner
+              ? game.winner === game.yourPlayerNumber
+                ? '¡Victoria! 🎉'
+                : 'Derrota. ¡Ánimo, la revancha está cerca!'
+              : 'Partida terminada sin ganador'}
+          </p>
+          {onNewGame ? (
+            <button
+              type="button"
+              onClick={onNewGame}
+              className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/20 px-5 py-2 text-xs font-black uppercase tracking-[0.14em] text-primary shadow-sm transition hover:bg-primary/30 active:scale-[0.97]"
+            >
+              <span aria-hidden="true">🍍</span>
+              Nueva partida
+            </button>
+          ) : null}
+        </div>
+      ) : (
+        <div className="mt-4 rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.15em] text-primary">Estado de turno</p>
+          <p className="mt-1 text-base font-semibold text-brown dark:text-dark-text md:text-lg">{turnText}</p>
+        </div>
+      )}
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">

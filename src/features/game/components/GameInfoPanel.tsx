@@ -8,10 +8,17 @@ type Props = {
 };
 
 const DICE_POWER_LABELS: Record<string, string> = {
-  bomba: 'Bomba',
-  rayo: 'Rayo',
-  diagonal: 'Diagonal',
-  resurreccion: 'Resurrección'
+  bomba: '💣',
+  rayo: '⚡',
+  diagonal: '⚔️',
+  resurreccion: '✨'
+};
+
+const DICE_POWER_COLORS: Record<string, string> = {
+  bomba: 'text-red-500',
+  rayo: 'text-yellow-500',
+  diagonal: 'text-purple-500',
+  resurreccion: 'text-emerald-500'
 };
 
 function playerCardClass(isYou: boolean, isActiveTurn: boolean): string {
@@ -165,6 +172,42 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
           </div>
         </div>
       ) : null}
+
+      {game.moveHistory.length > 0 && game.status !== 'finished' && (
+        <div className="mt-3 rounded-xl border border-brown/15 bg-sand/30 p-3 dark:border-white/8 dark:bg-dark-surface/60">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-brown/60 dark:text-dark-muted">
+            Historial
+          </p>
+          <div className="flex flex-col gap-1.5 max-h-28 overflow-y-auto">
+            {game.moveHistory.slice(-10).map((move, i) => {
+              const isYou = move.player === game.yourPlayerNumber;
+              const moveNum = Math.max(0, game.moveHistory.length - 10) + i + 1;
+              const actorLabel = isYou ? 'Tú' : `J${move.player}`;
+              const actorClass = isYou
+                ? 'shrink-0 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold text-primary'
+                : 'shrink-0 rounded-full bg-slate-500/15 px-1.5 py-0.5 text-[9px] font-bold text-slate-500';
+
+              const detail = move.fromDice ? (
+                <span className={`text-[10px] font-semibold ${DICE_POWER_COLORS[move.dicePower ?? ''] ?? 'text-amber-500'}`}>
+                  {DICE_POWER_LABELS[move.dicePower ?? ''] ?? move.dicePower}
+                </span>
+              ) : (
+                <span className="text-[10px] text-brown/70 dark:text-dark-muted">
+                  −{move.count} <span className="text-[9px]">fila {move.rowIndex + 1}</span>
+                </span>
+              );
+
+              return (
+                <div key={`${moveNum}-${i}`} className="flex items-center gap-2 text-[11px]">
+                  <span className={actorClass}>{actorLabel}</span>
+                  <span className="text-[9px] text-slate-400/70 dark:text-slate-500">#{moveNum}</span>
+                  {detail}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

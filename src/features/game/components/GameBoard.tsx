@@ -1460,13 +1460,24 @@ const DICE_POWER_META: Record<string, {
   }
 };
 
+// Fallback SVG die icon — used when the dice power is unknown or not yet revealed.
+// Matches the style of DICE_POWER_ICONS (canvas 2D, no emoji, WCAG-compliant).
+const FALLBACK_DICE_ICON: React.ReactElement = (
+  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="#f59e0b" stroke="#fbbf24" strokeWidth="1.5"/>
+    <circle cx="8" cy="8" r="1.5" fill="#fef3c7"/>
+    <circle cx="12" cy="12" r="1.5" fill="#fef3c7"/>
+    <circle cx="16" cy="16" r="1.5" fill="#fef3c7"/>
+  </svg>
+);
+
 function DiceResultBanner({ power }: { power: string }): React.ReactElement {
   const meta = DICE_POWER_META[power] ?? {
     label: 'Poder especial',
     bg: 'bg-amber-500/90',
     border: 'border-amber-400/60',
     text: 'text-white',
-    icon: '🎲',
+    icon: FALLBACK_DICE_ICON,
     iconBg: 'bg-amber-600'
   };
 

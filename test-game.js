@@ -1,8 +1,8 @@
 const WebSocket = require('ws');
 
-// Allow override via env: WS_URL=ws://localhost:3456 node test-game.js
-// Default matches the local dev server port (node server.js → port 3456)
-const WS_URL = process.env.WS_URL || 'ws://localhost:3456';
+// Allow override via env: WS_URL=ws://localhost:4321 node test-game.js
+// Default matches the server.js PORT (process.env.PORT || 3000 → 4321 in production)
+const WS_URL = process.env.WS_URL || 'ws://localhost:4321';
 
 // Simular dos jugadores
 let player1 = null;

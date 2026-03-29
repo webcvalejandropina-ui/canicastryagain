@@ -1487,6 +1487,7 @@ export function GameBoard({
         boardAttentionPulse ? 'board-attention-pulse' : '',
         boardBottomInsetClass
       ].join(' ')}
+      style={{ touchAction: 'manipulation' }}
     >
       {renderMode === 'fallback' ? (
         <LegacyBoardGrid
@@ -1504,8 +1505,26 @@ export function GameBoard({
             className="board-canvas-enter relative min-h-[300px] flex-1 w-full overflow-hidden"
           />
           {renderMode === 'loading' ? (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-semibold text-brown/90 dark:text-dark-muted">
-              Cargando motor de canicas 3D...
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-4">
+              <div className="board-skeleton-rows flex flex-col items-center gap-2.5">
+                {Array.from({ length: Math.min(game.numRows, 8) }, (_, i) => {
+                  const rowLen = game.rows[i]?.length ?? Math.min(i + 3, 10);
+                  return (
+                    <div key={`skel-row-${i}`} className="flex items-center gap-2">
+                      {Array.from({ length: rowLen }, (_, j) => (
+                        <div
+                          key={`skel-ball-${j}`}
+                          className="board-skeleton-ball h-5 w-5 rounded-full md:h-6 md:w-6"
+                          style={{ animationDelay: `${(i * rowLen + j) * 60}ms` }}
+                        />
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brown/60 dark:text-dark-muted/70">
+                Preparando tablero 3D…
+              </p>
             </div>
           ) : null}
         </div>

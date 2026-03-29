@@ -364,6 +364,34 @@ body {
   animation: boardAttentionPulse 900ms cubic-bezier(0.2, 0.7, 0, 1) 1;
 }
 
+@keyframes boardSkeletonPulse {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+}
+
+.board-skeleton-ball {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(14, 165, 233, 0.35));
+  animation: boardSkeletonPulse 1.6s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@media (prefers-color-scheme: dark) {
+  .board-skeleton-ball {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(14, 165, 233, 0.25));
+  }
+}
+
+.board-skeleton-rows {
+  mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at center, black 50%, transparent 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marble-idle-float,
   .marble-selected-pulse,
@@ -377,12 +405,17 @@ body {
   .selection-sheet-enter,
   .turn-coach-enter,
   .turn-spotlight-enter,
-  .board-attention-pulse {
+  .board-attention-pulse,
+  .board-skeleton-ball {
     animation: none !important;
     transform: none !important;
   }
 
   .victory-text-shimmer {
     -webkit-text-fill-color: #5C8D3A;
+  }
+
+  .board-skeleton-ball {
+    opacity: 0.3;
   }
 }

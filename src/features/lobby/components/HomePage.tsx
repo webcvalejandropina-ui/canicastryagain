@@ -780,6 +780,7 @@ export function HomePage(): React.ReactElement {
   const gameMenuCloseButtonRef = useRef<HTMLButtonElement | null>(null);
   const gameMenuPanelRef = useRef<HTMLDivElement | null>(null);
   const previousCanInteractRef = useRef(false);
+  const newGameInFlightRef = useRef(false);
   const gameFeedbackRef = useRef<{
     gameId: string;
     moveCount: number;
@@ -2392,8 +2393,13 @@ export function HomePage(): React.ReactElement {
                         <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-primary">
                           Max {turnLimit}
                         </span>
-                        <span className="rounded-full border border-brown/15 bg-sand/55 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
-                          {game.yourDiceAvailable ? 'Dado listo' : 'Dado gastado'}
+                        <span className={[
+                          'rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]',
+                          game.yourDiceAvailable
+                            ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300'
+                            : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60 dice-spent-chip line-through'
+                        ].join(' ')}>
+                          {game.yourDiceAvailable ? '✨ Dado listo' : 'Dado gastado'}
                         </span>
                         <span className="rounded-full border border-brown/15 bg-sand/55 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
                           {latestMoveSummary}
@@ -2501,8 +2507,13 @@ export function HomePage(): React.ReactElement {
                   <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-primary">
                     Max {turnLimit}
                   </span>
-                  <span className="rounded-full border border-brown/15 bg-sand/55 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
-                    {game?.yourDiceAvailable ? 'Dado listo' : 'Sin dado'}
+                  <span className={[
+                    'rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
+                    game?.yourDiceAvailable
+                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300'
+                      : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60'
+                  ].join(' ')}>
+                    {game?.yourDiceAvailable ? '✨ Dado listo' : 'Dado gastado'}
                   </span>
                 </div>
                 <p className="mt-2 text-sm font-bold leading-snug text-[#4a3f32] dark:text-dark-text">
@@ -2815,6 +2826,8 @@ export function HomePage(): React.ReactElement {
             setJoinCode('');
           }}
           onNewGame={() => {
+            if (newGameInFlightRef.current) return;
+            newGameInFlightRef.current = true;
             clearGame();
             clearError();
             setPendingMove(null);
@@ -2824,7 +2837,9 @@ export function HomePage(): React.ReactElement {
             setSharedCode('');
             setSharedInviteToken('');
             setJoinCode('');
-            void createNewGame({ playerName, numRows: normalizedRowsInput });
+            void createNewGame({ playerName, numRows: normalizedRowsInput }).finally(() => {
+              newGameInFlightRef.current = false;
+            });
           }}
         />
       ) : null}

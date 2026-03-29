@@ -116,7 +116,7 @@ function getDensity(numRows: number): BoardDensity {
 }
 
 function marbleSizeClass(density: BoardDensity): string {
-  if (density === 'dense') return 'h-4 w-4 md:h-5 md:w-5';
+  if (density === 'dense') return 'h-5 w-5 md:h-5 md:w-5';
   if (density === 'compact') return 'h-5 w-5 md:h-6 md:w-6';
   return 'h-6 w-6 md:h-7 md:w-7';
 }
@@ -1769,7 +1769,7 @@ export function GameBoard({
                   className={[
                     'inline-block h-2 w-2 flex-shrink-0 rounded-full align-middle transition-colors duration-500',
                     hasLiveChannel
-                      ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
+                      ? 'connection-dot-live'
                       : 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]'
                   ].join(' ')}
                   role="status"
@@ -1792,8 +1792,13 @@ export function GameBoard({
                 max {turnLimit}
               </span>
               {canInteract ? (
-                <span className="rounded-full border border-brown/15 bg-sand/55 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
-                  {diceAvailable ? 'dado listo' : 'sin dado'}
+                <span className={[
+                  'rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
+                  diceAvailable
+                    ? 'border-amber-400/40 bg-amber-50/70 text-amber-600 dark:border-amber-400/35 dark:bg-amber-400/10 dark:text-amber-300'
+                    : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60'
+                ].join(' ')}>
+                  {diceAvailable ? '✨ dado listo' : 'dado gastado'}
                 </span>
               ) : null}
             </div>

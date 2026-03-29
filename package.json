@@ -13,7 +13,7 @@
     "dev:docker:down": "docker compose -f docker-compose.dev.yml down",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src --ext .ts,.tsx --fix",
     "test:runtime": "node scripts/test-runtime-guard.mjs --mode=all",
     "test:runtime:prod": "node scripts/test-runtime-guard.mjs --mode=prod",
     "test:runtime:dev": "node scripts/test-runtime-guard.mjs --mode=dev",

@@ -66,7 +66,6 @@ export class CreateGameUseCase {
     let attempts = 0;
     while (attempts < 30) {
       const candidate = generateRandomGameCode();
-      // eslint-disable-next-line no-await-in-loop
       const existing = await this.gameRepository.getByCode(candidate);
       if (!existing) {
         return candidate;

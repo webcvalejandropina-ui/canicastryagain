@@ -402,6 +402,34 @@ body {
   animation: diceResultPop 320ms cubic-bezier(0.2, 0.7, 0, 1) both;
 }
 
+@keyframes connectionDotPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0);
+    opacity: 0.88;
+  }
+}
+
+.connection-dot-live {
+  background-color: #34d399;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.7);
+  animation: connectionDotPulse 2.4s ease-in-out infinite;
+  transition: background-color 0.5s ease;
+}
+
+@keyframes diceSpentPop {
+  0% { opacity: 0.6; transform: scale(0.92); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 0.72; transform: scale(1); }
+}
+
+.dice-spent-chip {
+  animation: diceSpentPop 300ms cubic-bezier(0.2, 0.7, 0, 1) both;
+}
+
 @keyframes boardSkeletonPulse {
   0%, 100% {
     opacity: 0.18;
@@ -465,7 +493,9 @@ body {
   .turn-spotlight-enter,
   .board-attention-pulse,
   .board-skeleton-ball,
-  .toast-slide-down {
+  .toast-slide-down,
+  .connection-dot-live,
+  .dice-spent-chip {
     animation: none !important;
     transform: none !important;
   }

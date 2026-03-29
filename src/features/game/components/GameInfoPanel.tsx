@@ -144,7 +144,15 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
               onClick={onNewGame}
               className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/20 px-5 py-2 text-xs font-black uppercase tracking-[0.14em] text-primary shadow-sm transition hover:bg-primary/30 active:scale-[0.97]"
             >
-              <span aria-hidden="true">🍍</span>
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="12" cy="16" rx="6" ry="7" fill="#f4c542" stroke="#d4a82e" strokeWidth="1.25"/>
+                <path d="M8 14c0-2 1.5-3.5 4-3.5s4 1.5 4 3.5" stroke="#d4a82e" strokeWidth="1.25" strokeLinecap="round"/>
+                <path d="M7 14c0-3 2-5 5-5s5 2 5 5" stroke="#d4a82e" strokeWidth="1.25" strokeLinecap="round"/>
+                <path d="M9 9.5c0-1.5 1.5-3 3-3s3 1.5 3 3" stroke="#5c8d3a" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M10 8.5Q11 6 12 7Q13 5 14 7" stroke="#5c8d3a" strokeWidth="1.25" strokeLinecap="round" fill="none"/>
+                <path d="M6 12c-1.5-0.5-2.5-2-2-3.5" stroke="#5c8d3a" strokeWidth="1.25" strokeLinecap="round" fill="none"/>
+                <path d="M18 12c1.5-0.5 2.5-2 2-3.5" stroke="#5c8d3a" strokeWidth="1.25" strokeLinecap="round" fill="none"/>
+              </svg>
               Nueva partida
             </button>
           ) : null}

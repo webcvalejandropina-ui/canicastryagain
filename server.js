@@ -271,12 +271,19 @@ wss.on('connection', (ws, req) => {
         console.error('WebSocket error:', error);
     });
     
-    // Enviar estado inicial
-    send(ws, {
-        type: 'connected',
-        playerId: playerId,
-        rankings: getRankingsArray()
-    });
+    // Enviar estado inicial tras un pequeño retraso para garantizar que el cliente
+    // ha registrado su listener on('message') antes de recibir este mensaje.
+    // Esto evita una race condition donde el servidor envía antes de que el cliente
+    // esté listo para escuchar.
+    setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+            send(ws, {
+                type: 'connected',
+                playerId: playerId,
+                rankings: getRankingsArray()
+            });
+        }
+    }, 15);
 });
 
 function handleMessage(ws, playerId, data) {

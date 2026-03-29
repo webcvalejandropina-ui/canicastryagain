@@ -88,7 +88,16 @@ function validateMove(game, rowIndex, removeCount) {
     if (removeCount > game.rows[rowIndex]) {
         return { valid: false, reason: 'No hay suficientes canicas en esa fila' };
     }
-    
+
+    // Validar límite de turno (misère: el máximo aumenta cada jugada)
+    const turnLimit = game.moveHistory.length + 1;
+    if (removeCount > turnLimit) {
+        return {
+            valid: false,
+            reason: `En el turno ${turnLimit} solo puedes quitar hasta ${turnLimit} canica${turnLimit > 1 ? 's' : ''}`
+        };
+    }
+
     // Validar restricción de fila bloqueada
     // EXCEPCIÓN: Si es la única canica que queda en todo el tablero, se puede tomar (fin del juego)
     const totalBalls = game.rows.reduce((sum, count) => sum + count, 0);

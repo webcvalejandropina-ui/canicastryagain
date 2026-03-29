@@ -1524,7 +1524,16 @@ export function GameBoard({
       ? selectedEndIndex - selectedStartIndex + 1
       : 0;
   const remainingSelectionCapacity = Math.max(0, turnLimit - selectedCount);
-  const boardHudTitle = selectedCount > 0 ? `Fila ${selectedRowIndex! + 1}` : canInteract ? 'Tu turno' : 'Esperando';
+
+  const currentTurnPlayerName = game.currentTurn === 1
+    ? (game.player1?.name ?? 'Jugador 1')
+    : (game.player2?.name ?? 'Jugador 2');
+
+  const boardHudTitle = selectedCount > 0
+    ? `Fila ${selectedRowIndex! + 1}`
+    : canInteract
+      ? 'Tu turno'
+      : `Esperando · ${currentTurnPlayerName}`;
   const boardHudBody = selectedCount > 0
     ? `${selectedCount}/${turnLimit} seleccionadas · restan ${remainingSelectionCapacity}`
     : canInteract

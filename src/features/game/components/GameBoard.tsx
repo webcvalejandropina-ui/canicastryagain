@@ -1523,10 +1523,12 @@ export function GameBoard({
   const onDiceRollRef = useRef(onDiceRoll);
   const prevRowsRef = useRef<number[][] | null>(null);
   const prevDiceAvailableRef = useRef<boolean | undefined>(undefined);
+  const prevCanInteractRef = useRef<boolean | undefined>(undefined);
   const [renderMode, setRenderMode] = useState<'loading' | 'three' | 'fallback'>('loading');
   const [isRollingDice, setIsRollingDice] = useState(false);
   const [diceChipAnim, setDiceChipAnim] = useState<'ready' | 'spent' | null>(null);
   const [diceResultOverlay, setDiceResultOverlay] = useState<DiceResult | null>(null);
+  const [turnBadgeAnim, setTurnBadgeAnim] = useState<'pulse' | null>(null);
   const diceResultTimerRef = useRef<number | null>(null);
   const prevDiceResultRef = useRef<DiceResult | null>(null);
 
@@ -1592,6 +1594,22 @@ export function GameBoard({
       return () => clearTimeout(timer);
     }
   }, [diceAvailable]);
+
+  // Pulse the turn badge when the user receives the turn (false → true)
+  useEffect(() => {
+    const prev = prevCanInteractRef.current;
+    if (prev === undefined) {
+      prevCanInteractRef.current = canInteract;
+      return;
+    }
+    if (!prev && canInteract) {
+      setTurnBadgeAnim('pulse');
+      const timer = setTimeout(() => setTurnBadgeAnim(null), 1800);
+      prevCanInteractRef.current = canInteract;
+      return () => clearTimeout(timer);
+    }
+    prevCanInteractRef.current = canInteract;
+  }, [canInteract]);
 
   // Show dice result overlay when a new dice result arrives
   useEffect(() => {
@@ -1967,7 +1985,8 @@ export function GameBoard({
                     ? 'bg-primary/15 text-primary'
                     : canInteract
                       ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-slate-500/10 text-slate-500 dark:text-slate-400'
+                      : 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
+                  turnBadgeAnim === 'pulse' ? 'turn-badge-pulse' : ''
                 ].join(' ')}
               >
                 {boardHudTitle}

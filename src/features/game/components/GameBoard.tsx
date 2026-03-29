@@ -1401,8 +1401,10 @@ export function GameBoard({
   const onBallClickRef = useRef(onBallClick);
   const onDiceRollRef = useRef(onDiceRoll);
   const prevRowsRef = useRef<number[][] | null>(null);
+  const prevDiceAvailableRef = useRef<boolean | undefined>(undefined);
   const [renderMode, setRenderMode] = useState<'loading' | 'three' | 'fallback'>('loading');
   const [isRollingDice, setIsRollingDice] = useState(false);
+  const [diceChipAnim, setDiceChipAnim] = useState<'ready' | 'spent' | null>(null);
 
   const statusLabel = useMemo(() => {
     if (renderMode === 'loading') return 'Inicializando tablero 3D...';
@@ -1442,6 +1444,21 @@ export function GameBoard({
   useEffect(() => {
     onDiceRollRef.current = onDiceRoll;
   }, [onDiceRoll]);
+
+  // Animate dice chip on state transitions (available ↔ spent)
+  useEffect(() => {
+    const prev = prevDiceAvailableRef.current;
+    if (prev === undefined) {
+      prevDiceAvailableRef.current = diceAvailable;
+      return;
+    }
+    if (prev !== diceAvailable) {
+      setDiceChipAnim(diceAvailable ? 'ready' : 'spent');
+      const timer = setTimeout(() => setDiceChipAnim(null), 500);
+      prevDiceAvailableRef.current = diceAvailable;
+      return () => clearTimeout(timer);
+    }
+  }, [diceAvailable]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1791,16 +1808,23 @@ export function GameBoard({
               <span className="rounded-full border border-brown/15 bg-sand/55 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
                 max {turnLimit}
               </span>
-              {canInteract ? (
-                <span className={[
-                  'rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
-                  diceAvailable
-                    ? 'border-amber-400/40 bg-amber-50/70 text-amber-600 dark:border-amber-400/35 dark:bg-amber-400/10 dark:text-amber-300'
-                    : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60'
-                ].join(' ')}>
-                  {diceAvailable ? '✨ dado listo' : 'dado gastado'}
-                </span>
-              ) : null}
+              {canInteract ? (() => {
+                const base = diceAvailable
+                  ? 'border-amber-400/40 bg-amber-50/70 text-amber-600 dark:border-amber-400/35 dark:bg-amber-400/10 dark:text-amber-300'
+                  : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60';
+                const anim = diceAvailable
+                  ? (diceChipAnim === 'ready' ? 'dice-ready-pop' : '')
+                  : (diceChipAnim === 'spent' ? 'dice-spent-chip' : '');
+                return (
+                  <span className={[
+                    'rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
+                    base,
+                    anim
+                  ].filter(Boolean).join(' ')}>
+                    {diceAvailable ? '✨ Dado listo' : 'Dado gastado'}
+                  </span>
+                );
+              })() : null}
             </div>
             <p className="mt-2 text-[11px] font-semibold leading-snug text-inherit">
               {boardHudBody}

@@ -32,9 +32,10 @@ export function GameControls({
             <button
               id="decrease-btn"
               type="button"
+              aria-label="Quitar una canica"
               onClick={onDecrease}
               disabled={!canInteract || !hasSelection}
-              className="h-10 w-10 rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary disabled:opacity-40"
             >
               −
             </button>
@@ -42,6 +43,7 @@ export function GameControls({
             <span
               id="quantity-display"
               aria-live="polite"
+              aria-label={`Cantidad seleccionada: ${selectedCount}`}
               className="mx-4 min-w-10 text-center text-2xl font-bold tracking-tight text-white"
             >
               {selectedCount}
@@ -50,9 +52,10 @@ export function GameControls({
             <button
               id="increase-btn"
               type="button"
+              aria-label="Añadir una canica"
               onClick={onIncrease}
               disabled={!canInteract || !hasSelection}
-              className="h-10 w-10 rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary disabled:opacity-40"
             >
               +
             </button>

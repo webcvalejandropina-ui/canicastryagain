@@ -83,7 +83,18 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary/70">Resultado</p>
           {game.winner ? (
             <div className="mt-2 flex items-center justify-center gap-2">
-              <span className="text-2xl">{game.winner === game.yourPlayerNumber ? '🏆' : '👤'}</span>
+              {game.winner === game.yourPlayerNumber ? (
+                <svg aria-hidden="true" className="h-7 w-7 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+                  <rect x="9" y="16" width="6" height="3" rx="0.5" fill="#f59e0b"/>
+                  <rect x="7" y="18.5" width="10" height="2" rx="0.5" fill="#d97706"/>
+                </svg>
+              ) : (
+                <svg aria-hidden="true" className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="8" r="4" stroke="#94a3b8" strokeWidth="1.75" fill="none"/>
+                  <path d="M4 20C4 16.686 7.582 14 12 14C16.418 14 20 16.686 20 20" stroke="#94a3b8" strokeWidth="1.75" strokeLinecap="round"/>
+                </svg>
+              )}
               <p className="text-lg font-bold text-brown dark:text-dark-text">
                 {game.winner === 1 ? player1Name : player2Name}
               </p>
@@ -92,7 +103,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
           <p className="mt-1 text-sm font-semibold text-primary">
             {game.winner
               ? game.winner === game.yourPlayerNumber
-                ? '¡Victoria! 🎉'
+                ? '¡Victoria!'
                 : 'Derrota. ¡Ánimo, la revancha está cerca!'
               : 'Partida terminada sin ganador'}
           </p>

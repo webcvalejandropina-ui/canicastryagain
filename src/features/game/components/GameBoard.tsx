@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 
 import { DiceResult, GameState } from '@/features/game/types';
 
@@ -926,6 +927,47 @@ function drawDiceFace(ctx: CanvasRenderingContext2D, faceIndex: number, s: numbe
   }
 }
 
+/**
+ * Returns a data-URL of a 48×48 canvas drawing the given dice face symbol.
+ * Face indices match drawDiceFace: 0=bomb, 1=bolt, 2=spark, 3=shield, 4=die-pips, 5=question.
+ * Used to render the dice button icon in the HUD without any external emoji/font.
+ */
+function getDiceFaceDataUrl(faceIndex: number): string {
+  const size = 48;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='; // 1×1 transparent GIF fallback
+
+  // Background — same palette as the 3D dice cube faces
+  const bgColors = ['#f59e0b', '#ef4444', '#8b5cf6', '#10b981', '#f97316', '#ec4899'];
+  ctx.fillStyle = bgColors[faceIndex % bgColors.length];
+  ctx.fillRect(0, 0, size, size);
+
+  // Rounded rect clip (die-like shape)
+  const r = 8;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(size - r, 0);
+  ctx.quadraticCurveTo(size, 0, size, r);
+  ctx.lineTo(size, size - r);
+  ctx.quadraticCurveTo(size, size, size - r, size);
+  ctx.lineTo(r, size);
+  ctx.quadraticCurveTo(0, size, 0, size - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.clip();
+
+  // Draw the face symbol using the same pure-canvas function
+  drawDiceFace(ctx, faceIndex, size);
+
+  ctx.restore();
+  return canvas.toDataURL('image/png');
+}
+
 function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any } {
   const diceGroup = new THREE.Group();
   const size = 0.55;
@@ -1692,7 +1734,19 @@ export function GameBoard({
               aria-label={isRollingDice ? 'Lanzando dado especial' : 'Usar dado especial'}
               className="inline-flex min-h-11 items-center gap-2 rounded-full border border-amber-300/45 bg-black/60 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-amber-100 shadow-lg shadow-amber-950/30 backdrop-blur transition hover:border-amber-200/70 hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              <span aria-hidden="true" className="text-base leading-none" />
+              {isRollingDice ? (
+                <span aria-hidden="true" className="text-base leading-none animate-spin">⟳</span>
+              ) : (
+                <Image
+                  aria-hidden="true"
+                  src={getDiceFaceDataUrl(4)}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="rounded-sm"
+                  unoptimized
+                />
+              )}
               <span>{isRollingDice ? 'Lanzando...' : 'Dado x1'}</span>
             </button>
             <p className="rounded-full bg-black/45 px-2.5 py-1 text-right text-[10px] font-semibold leading-tight text-white/80 backdrop-blur">

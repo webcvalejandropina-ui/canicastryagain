@@ -666,32 +666,49 @@ function validateMove(rowIndex, removeCount) {
 }
 
 function makeMove(rowIndex, removeCount) {
-    GameState.rows[rowIndex] -= removeCount;
-    
-    GameState.moveHistory.push({
-        player: GameState.playerTurn,
-        rowIndex: rowIndex,
-        count: removeCount
-    });
-    
-    const totalBalls = GameState.rows.reduce((sum, count) => sum + count, 0);
-    
-    if (totalBalls === 0) {
-        endGame(GameState.playerTurn, true);
-        return;
+    // Animate balls before updating state
+    const board = document.getElementById('board');
+    if (board && board.children[rowIndex]) {
+        const rowEl = board.children[rowIndex];
+        const currentCount = GameState.rows[rowIndex];
+        // The last `removeCount` balls in the row are the ones being taken
+        const ballsToRemove = Array.from(rowEl.children).slice(currentCount - removeCount, currentCount);
+        ballsToRemove.forEach(ball => ball.classList.add('removing'));
     }
-    
-    GameState.lastTouchedRowIndex = rowIndex;
-    GameState.playerTurn = GameState.playerTurn === 1 ? 2 : 1;
-    GameState.selectedRowIndex = null;
-    GameState.selectedCount = 0;
-    
-    renderBoard();
-    updateUI();
-    
+
+    // Short delay so animation starts before DOM changes
     setTimeout(() => {
+        GameState.rows[rowIndex] -= removeCount;
+
+        GameState.moveHistory.push({
+            player: GameState.playerTurn,
+            rowIndex: rowIndex,
+            count: removeCount
+        });
+
+        const totalBalls = GameState.rows.reduce((sum, count) => sum + count, 0);
+
+        if (totalBalls === 0) {
+            endGame(GameState.playerTurn, true);
+            return;
+        }
+
+        GameState.lastTouchedRowIndex = rowIndex;
+        GameState.playerTurn = GameState.playerTurn === 1 ? 2 : 1;
+        GameState.selectedRowIndex = null;
+        GameState.selectedCount = 0;
+
         renderBoard();
-    }, 500);
+        updateUI();
+
+        // Flash the board subtly on turn change
+        const boardEl = document.getElementById('board');
+        if (boardEl) {
+            boardEl.classList.remove('flash-turn');
+            void boardEl.offsetWidth; // force reflow to restart animation
+            boardEl.classList.add('flash-turn');
+        }
+    }, 60);
 }
 
 function endGame(losingPlayer, isMisere) {

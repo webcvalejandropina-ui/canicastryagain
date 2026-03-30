@@ -589,6 +589,37 @@ main {
     transform: rotate(-35deg);
 }
 
+/* Ball removal animation */
+@keyframes ball-pop-out {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    40% {
+        transform: scale(1.25);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.ball.removing {
+    animation: ball-pop-out 280ms ease-in forwards;
+    pointer-events: none;
+}
+
+/* Turn change flash on the board */
+@keyframes board-flash {
+    0%, 100% { background-color: transparent; }
+    30% { background-color: rgba(74, 144, 226, 0.08); }
+}
+
+.board.flash-turn {
+    animation: board-flash 500ms ease-out;
+}
+
 .move-history,
 .rankings-section {
     padding: 16px;

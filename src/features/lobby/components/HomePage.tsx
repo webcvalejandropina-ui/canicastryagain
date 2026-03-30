@@ -234,17 +234,26 @@ function formatLatestMoveSummary(game: NonNullable<ReturnType<typeof useRemoteGa
   return `${actorName ?? `J${latestMove.player}`} quitó ${latestMove.count} en fila ${latestMove.rowIndex + 1}`;
 }
 
+// ⚠️ These values MUST stay in sync with ScoringRules.ts (win rate diff = rivalWr - playerWr):
+// diff ≥+30 → +15 / -2   |   diff +15..+29 → +13 / -4
+// diff +5..+14  → +12 / -5   |   diff -5..+5 → +10 / -6
+// diff -15..-5  → +8 / -8   |   diff -30..-15 → +7 / -10
+// diff < -30    → +5 / -12   |   abandon → -18
 const scoringRulesRows = [
   { label: 'Victoria ante rival mucho mejor', pts: '+15' },
   { label: 'Victoria ante rival mejor', pts: '+13' },
+  { label: 'Victoria ante rival algo mejor', pts: '+12' },
   { label: 'Victoria ante rival similar', pts: '+10' },
   { label: 'Victoria ante rival peor', pts: '+8' },
-  { label: 'Victoria ante rival mucho peor', pts: '+5' },
+  { label: 'Victoria ante rival mucho peor', pts: '+7' },
+  { label: 'Victoria ante rival muy muy peor', pts: '+5' },
   { label: 'Derrota ante rival mucho mejor', pts: '-2' },
   { label: 'Derrota ante rival mejor', pts: '-4' },
+  { label: 'Derrota ante rival algo mejor', pts: '-5' },
   { label: 'Derrota ante rival similar', pts: '-6' },
-  { label: 'Derrota ante rival peor', pts: '-10' },
-  { label: 'Derrota ante rival mucho peor', pts: '-12' },
+  { label: 'Derrota ante rival peor', pts: '-8' },
+  { label: 'Derrota ante rival mucho peor', pts: '-10' },
+  { label: 'Derrota ante rival muy muy peor', pts: '-12' },
   { label: 'Abandono', pts: '-18' }
 ];
 

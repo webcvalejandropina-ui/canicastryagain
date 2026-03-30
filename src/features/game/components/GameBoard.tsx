@@ -2170,7 +2170,7 @@ export function GameBoard({
           {/* Dice result overlay — appears centered over the 3D canvas */}
           {diceResultOverlay ? (
             <div
-              className="dice-result-overlay absolute inset-0 z-20 flex items-center justify-center"
+              className="dice-result-overlay dice-result-pop absolute inset-0 z-20 flex items-center justify-center"
               aria-live="assertive"
               role="status"
               onClick={dismissDiceResult}

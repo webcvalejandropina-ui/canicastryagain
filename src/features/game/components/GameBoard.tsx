@@ -1982,7 +1982,7 @@ export function GameBoard({
           {/* Dice result overlay — appears centered over the 3D canvas */}
           {diceResultOverlay ? (
             <div
-              className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+              className="dice-result-overlay pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
               aria-live="assertive"
               role="status"
             >

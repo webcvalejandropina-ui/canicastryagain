@@ -1546,18 +1546,18 @@ function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () 
   return (
     <div
       className={[
-        'dice-result-overlay rounded-2xl border-2 border-white/20',
-        'px-5 py-3 shadow-2xl backdrop-blur-xl',
+        'dice-result-overlay pointer-events-auto rounded-2xl border-2 border-white/20',
+        'px-5 py-3 shadow-2xl backdrop-blur-xl cursor-pointer',
         meta.bg,
         meta.border
       ].join(' ')}
+      onClick={onDismiss}
+      onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onDismiss?.(); }}
       style={{ touchAction: 'manipulation' }}
     >
       {/* Tap/click anywhere on banner to dismiss — critical for mobile UX */}
       <div
-        className="flex cursor-pointer items-center gap-3"
-        onClick={onDismiss}
-        onTouchEnd={(e) => { e.preventDefault(); onDismiss?.(); }}
+        className="flex items-center gap-3"
       >
         <div
           className={[
@@ -1585,7 +1585,7 @@ function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () 
           aria-label="Cerrar resultado del dado"
           onClick={(e) => { e.stopPropagation(); onDismiss?.(); }}
           className={[
-            'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full',
+            'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full pointer-events-auto',
             'border border-white/25 bg-black/20 text-white/80',
             'transition hover:border-white/50 hover:bg-black/35 active:scale-90',
             'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60'
@@ -2069,9 +2069,10 @@ export function GameBoard({
           {/* Dice result overlay — appears centered over the 3D canvas */}
           {diceResultOverlay ? (
             <div
-              className="dice-result-overlay pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+              className="dice-result-overlay absolute inset-0 z-20 flex items-center justify-center"
               aria-live="assertive"
               role="status"
+              onClick={dismissDiceResult}
             >
               <DiceResultBanner power={diceResultOverlay.power} onDismiss={dismissDiceResult} />
             </div>

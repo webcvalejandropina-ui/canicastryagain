@@ -1523,44 +1523,48 @@ export function HomePage(): React.ReactElement {
         return;
       }
 
-      setPendingMove((previous) => {
-        if (!previous || previous.rowIndex !== rowIndex) {
-          return { rowIndex, startIndex: ballIndex, endIndex: ballIndex };
-        }
-
-        const isInsideBlock = ballIndex >= previous.startIndex && ballIndex <= previous.endIndex;
-
+      // Same-row click: handle edge-cases BEFORE setPendingMove so feedback fires even
+      // when the resulting state is unchanged (React skips re-render when state doesn't change).
+      if (pendingMove && pendingMove.rowIndex === rowIndex) {
+        const isInsideBlock = ballIndex >= pendingMove.startIndex && ballIndex <= pendingMove.endIndex;
         if (isInsideBlock) {
-          // Click dentro del bloque: quitar del extremo si es el borde
-          if (ballIndex === previous.startIndex) {
-            const newStart = previous.startIndex + 1;
-            if (newStart > previous.endIndex) return null;
-            return { rowIndex, startIndex: newStart, endIndex: previous.endIndex };
+          if (ballIndex === pendingMove.startIndex) {
+            const newStart = pendingMove.startIndex + 1;
+            if (newStart <= pendingMove.endIndex) {
+              setPendingMove({ rowIndex, startIndex: newStart, endIndex: pendingMove.endIndex });
+            } else {
+              setPendingMove(null);
+            }
+          } else if (ballIndex === pendingMove.endIndex) {
+            const newEnd = pendingMove.endIndex - 1;
+            if (newEnd >= pendingMove.startIndex) {
+              setPendingMove({ rowIndex, startIndex: pendingMove.startIndex, endIndex: newEnd });
+            } else {
+              setPendingMove(null);
+            }
+          } else {
+            // Middle of block — state unchanged, show message at top level so React re-renders
+            showTemporaryMessage('Toca un extremo del bloque para quitar una canica, o otra fila para empezar de nuevo.');
           }
-          if (ballIndex === previous.endIndex) {
-            const newEnd = previous.endIndex - 1;
-            if (newEnd < previous.startIndex) return null;
-            return { rowIndex, startIndex: previous.startIndex, endIndex: newEnd };
-          }
-          // Click en el medio del bloque: no cambiar selección
-          showTemporaryMessage('Toca un extremo del bloque para quitar una canica, o otra fila para empezar de nuevo.');
-          return previous;
+          return;
         }
-
-        // Click fuera del bloque: extender selección (debe ser contiguo)
-        const nextStart = Math.min(previous.startIndex, ballIndex);
-        const nextEnd = Math.max(previous.endIndex, ballIndex);
+        // Extend selection (outside block, same row)
+        const nextStart = Math.min(pendingMove.startIndex, ballIndex);
+        const nextEnd = Math.max(pendingMove.endIndex, ballIndex);
         const nextCount = nextEnd - nextStart + 1;
         const nextValidation = validateMove(game, rowIndex, nextStart, nextCount);
         if (!nextValidation.valid) {
           showTemporaryMessage(nextValidation.reason ?? 'Jugada inválida');
-          return previous;
+          return;
         }
+        setPendingMove({ rowIndex, startIndex: nextStart, endIndex: nextEnd });
+        return;
+      }
 
-        return { rowIndex, startIndex: nextStart, endIndex: nextEnd };
-      });
+      // Different row (or no pending move): start fresh selection
+      setPendingMove({ rowIndex, startIndex: ballIndex, endIndex: ballIndex });
     },
-    [game, canInteract, isBusy, showTemporaryMessage]
+    [game, canInteract, isBusy, pendingMove, showTemporaryMessage]
   );
 
   const applyPendingMove = useCallback(

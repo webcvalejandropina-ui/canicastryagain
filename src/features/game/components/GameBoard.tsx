@@ -84,6 +84,7 @@ type SceneContext = {
   canvas: HTMLCanvasElement;
   diceMesh: any | null;
   diceGroup: any | null;
+  diceTextures: any[];
   diceSpinning: boolean;
   diceSpinT: number;
   onDiceClickCb: (() => void) | null;
@@ -1007,7 +1008,7 @@ function getDiceFaceDataUrl(faceIndex: number): string {
   return dataUrl;
 }
 
-function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any } {
+function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any; diceTextures: any[] } {
   const diceGroup = new THREE.Group();
   const size = 0.55;
 
@@ -1063,7 +1064,7 @@ function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any }
   diceGroup.add(glow);
 
   scene.add(diceGroup);
-  return { diceGroup, diceMesh };
+  return { diceGroup, diceMesh, diceTextures: textures };
 }
 
 function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | null {
@@ -1145,6 +1146,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     canvas: renderer.domElement,
     diceMesh: null,
     diceGroup: null,
+    diceTextures: [],
     diceSpinning: false,
     diceSpinT: 0,
     onDiceClickCb: null,
@@ -1236,6 +1238,10 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     context.removedTexture?.dispose?.();
     context.removedP1Texture?.dispose?.();
     context.removedP2Texture?.dispose?.();
+    // Dice textures were invalidated by the lost context — clear references so they
+    // are re-created (and their materials re-populated) the next time the dice appears.
+    context.diceTextures.forEach((tex) => tex.dispose());
+    context.diceTextures = [];
     context.removedTexture = createMarbleTexture(THREE, {
       base: '#64748b',
       veins: '#94a3b8',
@@ -1304,6 +1310,9 @@ function destroyScene(context: SceneContext | null): void {
     disposeObject3D(context.diceGroup);
     context.scene.remove(context.diceGroup);
   }
+  // Dispose dice canvas textures tracked separately from disposeObject3D
+  context.diceTextures.forEach((tex) => tex.dispose());
+  context.diceTextures = [];
   context.activeTexture?.dispose?.();
   context.removedTexture?.dispose?.();
   context.removedP1Texture?.dispose?.();
@@ -1932,7 +1941,7 @@ export function GameBoard({
     if (!context) return;
 
     if (showDiceAction && !context.diceGroup) {
-      const { diceGroup, diceMesh } = createDice3D(context.THREE, context.scene);
+      const { diceGroup, diceMesh, diceTextures } = createDice3D(context.THREE, context.scene);
 
       const cam = context.camera;
       const fovRad = (cam.fov * Math.PI) / 180;
@@ -1946,9 +1955,13 @@ export function GameBoard({
       diceGroup.userData.baseY = diceY;
       context.diceGroup = diceGroup;
       context.diceMesh = diceMesh;
+      context.diceTextures = diceTextures;
       context.diceSpinning = false;
       context.diceSpinT = 0;
     } else if (!showDiceAction && context.diceGroup) {
+      // Dispose dice canvas textures before removing — prevents GPU memory leak
+      context.diceTextures.forEach((tex) => tex.dispose());
+      context.diceTextures = [];
       context.scene.remove(context.diceGroup);
       context.diceGroup = null;
       context.diceMesh = null;

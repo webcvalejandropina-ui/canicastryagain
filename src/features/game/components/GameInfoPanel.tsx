@@ -104,6 +104,9 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
     (sum, row) => sum + row.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
     0
   );
+  // Initial ball count for a triangular board: sum of 1..numRows = numRows*(numRows+1)/2
+  const initialBalls = (game.numRows * (game.numRows + 1)) / 2;
+  const ballProgress = initialBalls > 0 ? (totalBalls / initialBalls) * 100 : 100;
   const turnLimit = game.moveHistory.length + 1;
   const takenRows = new Set(game.moveHistory.map((move) => move.rowIndex)).size;
 
@@ -196,6 +199,21 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
         <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Canicas restantes</p>
           <p className="mt-1 text-2xl font-bold text-brown dark:text-dark-text">{totalBalls}</p>
+          {/* Progress bar: visualises how many balls remain vs the starting total */}
+          <div
+            className="mt-2 h-2 w-full overflow-hidden rounded-full bg-brown/15 dark:bg-white/10"
+            role="progressbar"
+            aria-valuenow={totalBalls}
+            aria-valuemin={0}
+            aria-valuemax={initialBalls}
+            aria-label={`${totalBalls} de ${initialBalls} canicas restantes`}
+          >
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-leaf to-primary transition-all duration-500 ease-out"
+              style={{ width: `${ballProgress}%` }}
+            />
+          </div>
+          <p className="mt-1 text-[9px] text-brown/50 dark:text-dark-muted">{initialBalls} inicial</p>
         </div>
         <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Límite de turno</p>

@@ -444,7 +444,7 @@ function Brand(): React.ReactElement {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2.5">
       <div className="flex items-center gap-2.5">
-        <span className="text-2xl" role="img" aria-label="piña">🍍</span>
+        <span className="text-2xl" aria-label="piña">🍍</span>
         <h2 className="text-lg font-black uppercase tracking-tight text-[#4a3f32] dark:text-dark-text sm:text-xl">
           Canicas<span className="ml-1 font-black text-primary">Try Again</span>
         </h2>

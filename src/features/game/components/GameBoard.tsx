@@ -1501,7 +1501,7 @@ const FALLBACK_DICE_ICON: React.ReactElement = (
   </svg>
 );
 
-function DiceResultBanner({ power }: { power: string }): React.ReactElement {
+function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () => void }): React.ReactElement {
   const meta = DICE_POWER_META[power] ?? {
     label: 'Poder especial',
     bg: 'bg-amber-500/90',
@@ -1515,12 +1515,19 @@ function DiceResultBanner({ power }: { power: string }): React.ReactElement {
     <div
       className={[
         'dice-result-overlay rounded-2xl border-2 border-white/20',
-        'px-6 py-4 shadow-2xl backdrop-blur-xl',
+        'px-5 py-3 shadow-2xl backdrop-blur-xl',
         meta.bg,
         meta.border
       ].join(' ')}
+      style={{ touchAction: 'manipulation' }}
     >
-      <div className="flex items-center gap-3">
+      {/* Tap/click anywhere on banner to dismiss — critical for mobile UX */}
+      { }
+      <div
+        className="flex cursor-pointer items-center gap-3"
+        onClick={onDismiss}
+        onTouchEnd={(e) => { e.preventDefault(); onDismiss?.(); }}
+      >
         <div
           className={[
             'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl text-2xl',
@@ -1529,14 +1536,34 @@ function DiceResultBanner({ power }: { power: string }): React.ReactElement {
         >
           {meta.icon}
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className={['text-[10px] font-black uppercase tracking-[0.2em]', meta.text, 'opacity-80'].join(' ')}>
             Dado especial usado
           </p>
           <p className={['text-xl font-black tracking-tight', meta.text].join(' ')}>
             {meta.label}
           </p>
+          {/* Accessible dismiss hint — sr-only on desktop, visible on mobile */}
+          <p className="mt-1 text-[10px] font-semibold leading-tight text-white/70 sm:sr-only">
+            Toca para cerrar
+          </p>
         </div>
+        {/* Visible dismiss button — always visible for discoverability */}
+        <button
+          type="button"
+          aria-label="Cerrar resultado del dado"
+          onClick={(e) => { e.stopPropagation(); onDismiss?.(); }}
+          className={[
+            'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full',
+            'border border-white/25 bg-black/20 text-white/80',
+            'transition hover:border-white/50 hover:bg-black/35 active:scale-90',
+            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60'
+          ].join(' ')}
+          style={{ touchAction: 'manipulation' }}
+        >
+          {/* × icon drawn with CSS to avoid emoji */}
+          <span aria-hidden="true" className="flex h-4 w-4 items-center justify-center text-lg font-bold leading-none">×</span>
+        </button>
       </div>
     </div>
   );
@@ -1668,6 +1695,30 @@ export function GameBoard({
       diceResultTimerRef.current = null;
     }, 2800);
   }, [lastDiceResult]);
+
+  // Allow ESC to dismiss the dice result overlay immediately
+  /** Dismiss the dice result overlay — clears timer and clears state. */
+  const dismissDiceResult = (): void => {
+    if (diceResultTimerRef.current) {
+      window.clearTimeout(diceResultTimerRef.current);
+      diceResultTimerRef.current = null;
+    }
+    setDiceResultOverlay(null);
+  };
+
+  useEffect(() => {
+    if (!diceResultOverlay) return;
+
+    const handleKey = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        dismissDiceResult();
+      }
+    };
+
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [diceResultOverlay]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1939,6 +1990,7 @@ export function GameBoard({
         <div className="relative flex flex-1 flex-col">
           <div
             ref={mountRef}
+            aria-hidden="true"
             className="board-canvas-enter relative min-h-[300px] flex-1 w-full overflow-hidden"
           />
           {renderMode === 'loading' ? (
@@ -1986,7 +2038,7 @@ export function GameBoard({
               aria-live="assertive"
               role="status"
             >
-              <DiceResultBanner power={diceResultOverlay.power} />
+              <DiceResultBanner power={diceResultOverlay.power} onDismiss={dismissDiceResult} />
             </div>
           ) : null}
         </div>

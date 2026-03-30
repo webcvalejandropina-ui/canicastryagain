@@ -16,7 +16,6 @@ type Props = {
   hasPendingMove?: boolean;
   hasTurnCoach?: boolean;
   boardAttentionPulse?: boolean;
-  yourTurnGlow?: boolean;
   hasLiveChannel?: boolean;
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onDiceRoll?: () => Promise<DiceResult | null>;
@@ -1651,6 +1650,8 @@ export function GameBoard({
   const [renderMode, setRenderMode] = useState<'loading' | 'three' | 'fallback'>('loading');
   const [isRollingDice, setIsRollingDice] = useState(false);
   const [diceChipAnim, setDiceChipAnim] = useState<'ready' | 'spent' | null>(null);
+  const [diceResultArrived, setDiceResultArrived] = useState(false);
+  const diceResultArrivedTimerRef = useRef<number | null>(null);
   const [diceResultOverlay, setDiceResultOverlay] = useState<DiceResult | null>(null);
   const [turnBadgeAnim, setTurnBadgeAnim] = useState<'pulse' | null>(null);
   const [boardGlowActive, setBoardGlowActive] = useState(false);
@@ -1758,7 +1759,7 @@ export function GameBoard({
     prevCanInteractRef.current = canInteract;
   }, [canInteract]);
 
-  // Show dice result overlay when a new dice result arrives
+  // Show dice result overlay AND pulse the HUD chip when a new dice result arrives
   useEffect(() => {
     if (!lastDiceResult) return;
     // Avoid re-triggering for the same result object reference
@@ -1773,6 +1774,23 @@ export function GameBoard({
       setDiceResultOverlay(null);
       diceResultTimerRef.current = null;
     }, 2800);
+
+    // Also pulse the HUD dice chip so the result is visible even after the overlay dismisses
+    if (diceResultArrivedTimerRef.current) {
+      window.clearTimeout(diceResultArrivedTimerRef.current);
+    }
+    setDiceResultArrived(true);
+    diceResultArrivedTimerRef.current = window.setTimeout(() => {
+      setDiceResultArrived(false);
+      diceResultArrivedTimerRef.current = null;
+    }, 700);
+
+    return () => {
+      if (diceResultArrivedTimerRef.current) {
+        window.clearTimeout(diceResultArrivedTimerRef.current);
+        diceResultArrivedTimerRef.current = null;
+      }
+    };
   }, [lastDiceResult]);
 
   // Allow ESC to dismiss the dice result overlay immediately
@@ -1783,6 +1801,12 @@ export function GameBoard({
       diceResultTimerRef.current = null;
     }
     setDiceResultOverlay(null);
+    // Also clear the chip pulse animation since user has acknowledged the result
+    if (diceResultArrivedTimerRef.current) {
+      window.clearTimeout(diceResultArrivedTimerRef.current);
+      diceResultArrivedTimerRef.current = null;
+    }
+    setDiceResultArrived(false);
   };
 
   useEffect(() => {
@@ -1942,6 +1966,10 @@ export function GameBoard({
       if (boardGlowTimeoutRef.current !== null) {
         window.clearTimeout(boardGlowTimeoutRef.current);
         boardGlowTimeoutRef.current = null;
+      }
+      if (diceResultArrivedTimerRef.current) {
+        window.clearTimeout(diceResultArrivedTimerRef.current);
+        diceResultArrivedTimerRef.current = null;
       }
     };
   }, []);
@@ -2200,7 +2228,8 @@ export function GameBoard({
                   : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60';
                 const anim = diceAvailable
                   ? (diceChipAnim === 'ready' ? 'dice-ready-pop' : '')
-                  : (diceChipAnim === 'spent' ? 'dice-spent-chip' : '');
+                  : (diceChipAnim === 'spent' ? 'dice-spent-chip' : '')
+                  || (diceResultArrived && lastDiceResult ? 'dice-result-arrived' : '');
                 return (
                   <span
                     aria-label={diceAvailable ? 'Dado especial disponible' : 'Dado especial ya usado'}

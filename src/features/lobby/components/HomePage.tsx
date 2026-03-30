@@ -779,14 +779,12 @@ export function HomePage(): React.ReactElement {
   const [turnBannerKey, setTurnBannerKey] = useState(0);
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
   const [boardAttentionPulse, setBoardAttentionPulse] = useState(false);
-  const [yourTurnGlow, setYourTurnGlow] = useState(false);
   const [lastDiceResult, setLastDiceResult] = useState<DiceResult | null>(null);
 
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
   const turnSpotlightTimerRef = useRef<number | null>(null);
   const boardAttentionTimerRef = useRef<number | null>(null);
-  const yourTurnGlowTimerRef = useRef<number | null>(null);
   const moveInFlightRef = useRef(false);
   const pendingActionBarRef = useRef<HTMLDivElement | null>(null);
   const applyMoveButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -1190,11 +1188,6 @@ export function HomePage(): React.ReactElement {
         window.clearTimeout(turnSpotlightTimerRef.current);
         turnSpotlightTimerRef.current = null;
       }
-      if (yourTurnGlowTimerRef.current) {
-        window.clearTimeout(yourTurnGlowTimerRef.current);
-        yourTurnGlowTimerRef.current = null;
-      }
-      setYourTurnGlow(false);
       return;
     }
 
@@ -1211,16 +1204,11 @@ export function HomePage(): React.ReactElement {
         setShowTurnSpotlight(false);
         turnSpotlightTimerRef.current = null;
       }, 2400);
+    }
 
-      // Board emerald glow: plays once when it becomes the user's turn
-      if (yourTurnGlowTimerRef.current) {
-        window.clearTimeout(yourTurnGlowTimerRef.current);
-      }
-      setYourTurnGlow(true);
-      yourTurnGlowTimerRef.current = window.setTimeout(() => {
-        setYourTurnGlow(false);
-        yourTurnGlowTimerRef.current = null;
-      }, 1200);
+    // Clear stale selection when turn changes away from this player
+    if (!canInteract && pendingMove) {
+      setPendingMove(null);
     }
 
     previousCanInteractRef.current = canInteract;
@@ -2481,7 +2469,6 @@ export function HomePage(): React.ReactElement {
                   hasPendingMove={!!pendingMove}
                   hasTurnCoach={showTurnCoach}
                   boardAttentionPulse={boardAttentionPulse}
-                  yourTurnGlow={yourTurnGlow}
                   hasLiveChannel={hasLiveChannel}
                   onBallClick={handleBallClick}
                   onDiceRoll={handleUseDice3D}

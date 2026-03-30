@@ -1206,13 +1206,17 @@ export function HomePage(): React.ReactElement {
       }, 2400);
     }
 
-    // Clear stale selection when turn changes away from this player
-    if (!canInteract && pendingMove) {
-      setPendingMove(null);
-    }
-
     previousCanInteractRef.current = canInteract;
   }, [game, canInteract]);
+
+  // Clears pendingMove when it becomes stale (player loses their turn).
+  // In its own hook so deps ([canInteract, pendingMove]) accurately reflect
+  // the values it reads — avoids the exhaustive-deps lint warning.
+  useEffect(() => {
+    if (canInteract || !pendingMove) return;
+    setPendingMove(null);
+     
+  }, [canInteract, pendingMove]);
 
   useEffect(() => {
     if (!game) {

@@ -119,9 +119,11 @@ function getDensity(numRows: number): BoardDensity {
 }
 
 function marbleSizeClass(density: BoardDensity): string {
-  if (density === 'dense') return 'h-5 w-5 md:h-5 md:w-5';
-  if (density === 'compact') return 'h-5 w-5 md:h-6 md:w-6';
-  return 'h-6 w-6 md:h-7 md:w-7';
+  // Mobile: minimum 36px touch target (WCAG 44px ideal, 36px practical for dense boards).
+  // Desktop: keep compact to leave room for wide boards.
+  if (density === 'dense') return 'h-9 w-9 md:h-5 md:w-5';
+  if (density === 'compact') return 'h-9 w-9 md:h-6 md:w-6';
+  return 'h-9 w-9 md:h-7 md:w-7';
 }
 
 function activeMarbleClass({

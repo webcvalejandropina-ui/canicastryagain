@@ -2114,6 +2114,37 @@ export function GameBoard({
                         </svg>
                         {' Dado listo'}
                       </>
+                    ) : lastDiceResult ? (
+                      <>
+                        {/* Compact inline SVGs matching DICE_POWER_META colours, sized for the chip */}
+                        {lastDiceResult.power === 'bomba' && (
+                          <svg aria-hidden="true" className="inline h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="14" r="7" fill="#374151" stroke="#9ca3af" strokeWidth="1.5"/>
+                            <circle cx="8.5" cy="11.5" r="1.25" fill="#9ca3af"/>
+                            <circle cx="14" cy="9.5" r="0.9" fill="#9ca3af"/>
+                            <rect x="10.5" y="3.5" width="3" height="4" rx="1.5" fill="#6b7280"/>
+                            <path d="M12 3.5 Q14 1.5 15.5 2.5" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                          </svg>
+                        )}
+                        {lastDiceResult.power === 'rayo' && (
+                          <svg aria-hidden="true" className="inline h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                        {lastDiceResult.power === 'diagonal' && (
+                          <svg aria-hidden="true" className="inline h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 6l4 4M10 4l6 6M18 6l-4 4" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round"/>
+                            <path d="M6 18l4-4M10 20l6-6M18 18l-4-4" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                        )}
+                        {lastDiceResult.power === 'resurreccion' && (
+                          <svg aria-hidden="true" className="inline h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3v3M5.64 5.64l2.12 2.12M3 12h3M5.64 18.36l2.12-2.12M12 21v-3M18.36 18.36l-2.12-2.12M21 12h-3M18.36 5.64l-2.12 2.12" stroke="#34d399" strokeWidth="2" strokeLinecap="round"/>
+                            <circle cx="12" cy="12" r="3.5" fill="#10b981" stroke="#34d399" strokeWidth="1.5"/>
+                          </svg>
+                        )}
+                        {' '}{DICE_POWER_META[lastDiceResult.power]?.label ?? lastDiceResult.power}
+                      </>
                     ) : 'Dado gastado'}
                   </span>
                 );

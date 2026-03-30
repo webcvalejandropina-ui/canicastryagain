@@ -2037,14 +2037,29 @@ export function GameBoard({
       style={{ touchAction: 'manipulation' }}
     >
       {renderMode === 'fallback' ? (
-        <LegacyBoardGrid
-          game={game}
-          selectedRowIndex={selectedRowIndex}
-          selectedStartIndex={selectedStartIndex}
-          selectedEndIndex={selectedEndIndex}
-          canInteract={canInteract}
-          onBallClick={onBallClick}
-        />
+        <div className="relative flex flex-1 flex-col min-h-0">
+          <div className="relative flex flex-1 flex-col min-h-0">
+            <LegacyBoardGrid
+              game={game}
+              selectedRowIndex={selectedRowIndex}
+              selectedStartIndex={selectedStartIndex}
+              selectedEndIndex={selectedEndIndex}
+              canInteract={canInteract}
+              onBallClick={onBallClick}
+            />
+          </div>
+          {/* Dice result overlay — also shown on 2D fallback board */}
+          {diceResultOverlay ? (
+            <div
+              className="dice-result-overlay absolute inset-0 z-20 flex items-center justify-center"
+              aria-live="assertive"
+              role="status"
+              onClick={dismissDiceResult}
+            >
+              <DiceResultBanner power={diceResultOverlay.power} onDismiss={dismissDiceResult} />
+            </div>
+          ) : null}
+        </div>
       ) : (
         <div className="relative flex flex-1 flex-col">
           <div

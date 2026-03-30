@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+
 import { DiceResult, GameState } from '@/features/game/types';
 
 type Props = {
@@ -68,6 +70,26 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
 
   const turnName = game.currentTurn === 1 ? player1Name : player2Name;
   const isMyTurn = game.yourPlayerNumber === game.currentTurn;
+
+  // Animate the turn-status box when the turn changes to "you"
+  const [turnPulse, setTurnPulse] = useState(false);
+  const prevCanInteractRef = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (game.status !== 'playing') return;
+    const prev = prevCanInteractRef.current;
+    if (prev === null || prev === isMyTurn) {
+      prevCanInteractRef.current = isMyTurn;
+      return;
+    }
+    if (!prev && isMyTurn) {
+      // Turn just switched to us — fire the pulse
+      setTurnPulse(true);
+      const t = setTimeout(() => setTurnPulse(false), 1800);
+      prevCanInteractRef.current = isMyTurn;
+      return () => clearTimeout(t);
+    }
+    prevCanInteractRef.current = isMyTurn;
+  }, [isMyTurn, game.status]);
 
   const turnText =
     game.status === 'waiting'
@@ -158,7 +180,13 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
           ) : null}
         </div>
       ) : (
-        <div className="mt-4 rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-center">
+        <div
+          className={[
+            'mt-4 rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-center',
+            'transition-all duration-200',
+            turnPulse ? 'turn-info-pulse' : ''
+          ].join(' ')}
+        >
           <p className="text-sm font-bold uppercase tracking-[0.15em] text-primary">Estado de turno</p>
           <p className="mt-1 text-base font-semibold text-brown dark:text-dark-text md:text-lg">{turnText}</p>
         </div>

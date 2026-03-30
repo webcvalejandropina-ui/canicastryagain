@@ -568,7 +568,8 @@ body {
   .dice-ready-pop,
   .dice-result-arrived,
   .board-your-turn-glow,
-  .board-finished-banner {
+  .board-finished-banner,
+  .animate-spin {
     animation: none !important;
     transform: none !important;
   }

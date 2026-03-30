@@ -240,20 +240,20 @@ function formatLatestMoveSummary(game: NonNullable<ReturnType<typeof useRemoteGa
 // diff -15..-5  → +8 / -8   |   diff -30..-15 → +7 / -10
 // diff < -30    → +5 / -12   |   abandon → -18
 const scoringRulesRows = [
-  { label: 'Victoria ante rival mucho mejor', pts: '+15' },
-  { label: 'Victoria ante rival mejor', pts: '+13' },
-  { label: 'Victoria ante rival algo mejor', pts: '+12' },
-  { label: 'Victoria ante rival similar', pts: '+10' },
-  { label: 'Victoria ante rival peor', pts: '+8' },
-  { label: 'Victoria ante rival mucho peor', pts: '+7' },
-  { label: 'Victoria ante rival muy muy peor', pts: '+5' },
-  { label: 'Derrota ante rival mucho mejor', pts: '-2' },
-  { label: 'Derrota ante rival mejor', pts: '-4' },
-  { label: 'Derrota ante rival algo mejor', pts: '-5' },
-  { label: 'Derrota ante rival similar', pts: '-6' },
-  { label: 'Derrota ante rival peor', pts: '-8' },
-  { label: 'Derrota ante rival mucho peor', pts: '-10' },
-  { label: 'Derrota ante rival muy muy peor', pts: '-12' },
+  { label: 'Ganaste vs rival mucho peor', pts: '+15' },
+  { label: 'Ganaste vs rival peor', pts: '+13' },
+  { label: 'Ganaste vs rival algo peor', pts: '+12' },
+  { label: 'Ganaste vs rival similar', pts: '+10' },
+  { label: 'Ganaste vs rival algo mejor', pts: '+8' },
+  { label: 'Ganaste vs rival mejor', pts: '+7' },
+  { label: 'Ganaste vs rival mucho mejor', pts: '+5' },
+  { label: 'Perdiste vs rival mucho peor', pts: '-2' },
+  { label: 'Perdiste vs rival peor', pts: '-4' },
+  { label: 'Perdiste vs rival algo peor', pts: '-5' },
+  { label: 'Perdiste vs rival similar', pts: '-6' },
+  { label: 'Perdiste vs rival algo mejor', pts: '-8' },
+  { label: 'Perdiste vs rival mejor', pts: '-10' },
+  { label: 'Perdiste vs rival mucho mejor', pts: '-12' },
   { label: 'Abandono', pts: '-18' }
 ];
 

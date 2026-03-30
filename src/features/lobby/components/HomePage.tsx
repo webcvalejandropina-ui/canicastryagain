@@ -849,7 +849,7 @@ export function HomePage(): React.ReactElement {
   const turnBannerText = useMemo(() => {
     if (!game || game.status !== 'playing') return '';
     if (pendingMove) {
-      return `Fila ${pendingMove.rowIndex + 1} · ${pendingMove.endIndex - pendingMove.startIndex + 1} canica${pendingMove.endIndex - pendingMove.startIndex === 0 ? '' : 's'} lista${pendingMove.endIndex - pendingMove.startIndex === 0 ? '' : 's'} para aplicar.`;
+      return `Fila ${pendingMove.rowIndex + 1} · ${pendingMove.endIndex - pendingMove.startIndex + 1} canica${pendingMove.endIndex - pendingMove.startIndex > 0 ? 's' : ''} lista${pendingMove.endIndex - pendingMove.startIndex > 0 ? 's' : ''} para aplicar.`;
     }
     if (canInteract) {
       return `Tu turno: hasta ${turnLimit} canica${turnLimit > 1 ? 's' : ''} seguidas en una sola fila.`;

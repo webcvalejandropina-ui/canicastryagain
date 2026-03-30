@@ -1628,11 +1628,21 @@ export function HomePage(): React.ReactElement {
         event.preventDefault();
         void applyPendingMove();
       }
+
+      // Space: trigger dice roll (only when it's your turn, dice is available, no pending move, and not busy)
+      if (event.key === ' ' && canInteract && game?.yourDiceAvailable && !pendingMove && !isBusy) {
+        const target = event.target as HTMLElement | null;
+        const tagName = target?.tagName;
+        if (tagName === 'BUTTON' || tagName === 'INPUT' || tagName === 'TEXTAREA') return;
+
+        event.preventDefault();
+        void handleUseDice3D();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isGameMode, showGameMenu, pendingMove, canInteract, isBusy, clearPendingMove, applyPendingMove]);
+  }, [isGameMode, showGameMenu, pendingMove, canInteract, isBusy, clearPendingMove, applyPendingMove, handleUseDice3D, game]);
 
   const handleCopyCode = useCallback(async () => {
     if (!game?.gameCode) return;
@@ -2643,7 +2653,9 @@ export function HomePage(): React.ReactElement {
               </div>
             </div>
             <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8c7d6b] dark:text-dark-muted">
-              Tip: Enter aplica · Escape cancela.
+              {game?.yourDiceAvailable
+                ? 'Espacio: dado · Enter: aplica · Escape: cancela.'
+                : 'Enter: aplica · Escape: cancela.'}
             </p>
           </div>
         </div>

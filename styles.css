@@ -993,3 +993,111 @@ main {
         scroll-behavior: auto !important;
     }
 }
+
+/* ── Dice Result Overlay ─────────────────────────────────────────── */
+.dice-result-overlay {
+  pointer-events: auto;
+}
+
+@keyframes dice-result-pop {
+  0%   { opacity: 0; transform: scale(0.6) translateY(10px); }
+  60%  { opacity: 1; transform: scale(1.06) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0); }
+}
+.dice-result-pop {
+  animation: dice-result-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Dice Chip Animations ────────────────────────────────────────── */
+@keyframes dice-ready-pop {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+  40%  { transform: scale(1.25); box-shadow: 0 0 0 6px rgba(251,191,36,0.5); }
+  100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+}
+.dice-ready-pop { animation: dice-ready-pop 0.5s ease-out both; }
+
+@keyframes dice-spent-chip {
+  0%   { transform: scale(1);    opacity: 1; }
+  30%  { transform: scale(0.88); opacity: 0.6; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.dice-spent-chip { animation: dice-spent-chip 0.45s ease-in-out both; }
+
+@keyframes dice-result-arrived {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+  50%  { transform: scale(1.2);  box-shadow: 0 0 0 5px rgba(251,191,36,0.55); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+}
+.dice-result-arrived { animation: dice-result-arrived 0.7s ease-out both; }
+
+/* ── Turn Badge Pulse ────────────────────────────────────────────── */
+@keyframes turn-badge-pulse {
+  0%   { transform: scale(1);    opacity: 1; }
+  25%  { transform: scale(1.18); opacity: 1; }
+  50%  { transform: scale(1);    opacity: 0.85; }
+  75%  { transform: scale(1.1);  opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.turn-badge-pulse { animation: turn-badge-pulse 1.8s ease-in-out both; }
+
+/* ── Board Glow (your turn) ─────────────────────────────────────── */
+@keyframes board-your-turn-glow {
+  0%   { box-shadow: inset 0 0 0   0px rgba(16,185, 29,0); }
+  30%  { box-shadow: inset 0 0 28px 6px rgba(16,185, 29,0.45), 0 0 12px 2px rgba(16,185, 29,0.2); }
+  65%  { box-shadow: inset 0 0 14px 3px rgba(16,185, 29,0.25), 0 0 6px  1px rgba(16,185, 29,0.1); }
+  100% { box-shadow: inset 0 0 0   0px rgba(16,185, 29,0); }
+}
+.board-your-turn-glow {
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+}
+
+/* ── Board Attention Pulse ──────────────────────────────────────── */
+@keyframes board-attention-pulse {
+  0%, 100% { box-shadow: inset 0 0 0   0px rgba(251,191,36,0); }
+  50%       { box-shadow: inset 0 0 20px 5px rgba(251,191,36,0.3); }
+}
+.board-attention-pulse {
+  animation: board-attention-pulse 2s ease-in-out infinite;
+}
+
+/* ── Connection Dot Live ─────────────────────────────────────────── */
+@keyframes connection-dot-live {
+  0%, 100% { background-color: #22c55e; box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  50%       { background-color: #86efac; box-shadow: 0 0 0 4px rgba(34,197,94,0.4); }
+}
+.connection-dot-live {
+  animation: connection-dot-live 2s ease-in-out infinite;
+}
+
+/* ── 3D Canvas Entrance ──────────────────────────────────────────── */
+@keyframes board-canvas-enter {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.board-canvas-enter { animation: board-canvas-enter 0.5s ease-out both; }
+
+/* ── Skeleton Loading ───────────────────────────────────────────── */
+@keyframes skeleton-ball-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+.board-skeleton-ball {
+  background: linear-gradient(
+    90deg,
+    rgba(180,150,120,0.18) 0%,
+    rgba(180,150,120,0.35) 50%,
+    rgba(180,150,120,0.18) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-ball-shimmer 1.6s ease-in-out infinite;
+  will-change: background-position;
+}
+
+/* ── Legend Entrance ─────────────────────────────────────────────── */
+@keyframes board-legend-enter {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.board-legend-enter { animation: board-legend-enter 0.35s ease-out both; }

@@ -2173,8 +2173,10 @@ export function GameBoard({
           {diceResultOverlay ? (
             <div
               className="dice-result-overlay dice-result-pop absolute inset-0 z-20 flex items-center justify-center"
+              role="alert"
               aria-live="assertive"
-              role="status"
+              aria-atomic="true"
+              aria-label={`Resultado del dado: ${DICE_POWER_META[diceResultOverlay.power]?.label ?? diceResultOverlay.power}. Toca o haz clic para cerrar.`}
               onClick={dismissDiceResult}
             >
               <DiceResultBanner power={diceResultOverlay.power} onDismiss={dismissDiceResult} />

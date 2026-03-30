@@ -48,9 +48,11 @@ export function GameControls({
               aria-disabled={!canInteract || !hasSelection}
               onClick={onDecrease}
               disabled={!canInteract || !hasSelection}
-              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
             >
-              −
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-6 w-6" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor" />
+              </svg>
             </button>
 
             {/* Visible quantity display — no htmlFor since the parent has role="spinbutton" */}
@@ -68,9 +70,12 @@ export function GameControls({
               aria-disabled={!canInteract || !hasSelection}
               onClick={onIncrease}
               disabled={!canInteract || !hasSelection}
-              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
             >
-              +
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-6 w-6" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="4" width="2" height="16" rx="1" fill="currentColor" />
+                <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor" />
+              </svg>
             </button>
           </div>
           <p className="mt-1.5 text-xs text-slate-500" id="quantity-instructions">

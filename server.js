@@ -256,9 +256,14 @@ wss.on('connection', (ws, req) => {
     let currentGameId = null;
     let playerName = null;
     
+    ws.isAlive = true;
     players.set(playerId, { ws, gameId: null, name: null });
     
     socketLog(`Cliente conectado: ${playerId}`);
+    
+    ws.on('pong', () => {
+        ws.isAlive = true;
+    });
     
     ws.on('message', (message) => {
         try {
@@ -635,3 +640,20 @@ setInterval(() => {
         }
     }
 }, 60 * 60 * 1000);
+
+// ============================================
+// WEBSOCKET HEARTBEAT — mantiene conexiones vivas ante NAT/proxies
+// ============================================
+const HEARTBEAT_INTERVAL_MS = 25_000; // 25s: bajo el umbral típico de timeout de 30s
+
+setInterval(() => {
+    wss.clients.forEach((ws) => {
+        if (!ws.isAlive) {
+            socketLog(`Heartbeat: desconectando cliente sin respuesta (${ws._socket?.remoteAddress ?? 'unknown'})`);
+            ws.terminate();
+            return;
+        }
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, HEARTBEAT_INTERVAL_MS);

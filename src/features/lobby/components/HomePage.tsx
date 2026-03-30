@@ -2645,6 +2645,7 @@ export function HomePage(): React.ReactElement {
                   type="button"
                   onClick={clearPendingMove}
                   disabled={isBusy}
+                  aria-label="Cancelar selección de canicas"
                   className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d4cbbf] bg-white/80 px-4 text-xs font-black uppercase tracking-wider text-[#4a3f32] transition-all hover:border-rose-400 hover:text-rose-500 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:bg-dark-surface dark:text-dark-text dark:hover:border-rose-400"
                 >
                   Cancelar
@@ -2654,6 +2655,7 @@ export function HomePage(): React.ReactElement {
                   type="button"
                   onClick={() => void applyPendingMove()}
                   disabled={!canInteract || isBusy}
+                  aria-label={pendingRowLabel !== null ? `Aplicar jugada: fila ${pendingRowLabel}, ${pendingRemoveCount} canica${pendingRemoveCount === 1 ? '' : 's'}` : 'Aplicar jugada'}
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-black uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45 dark:focus-visible:ring-offset-[#1c1912]"
                 >
                   <IconCheck className="h-4 w-4 shrink-0" />

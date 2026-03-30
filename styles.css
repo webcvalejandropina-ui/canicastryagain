@@ -967,6 +967,24 @@ main {
     }
 }
 
+/* Board finished state — dims the 2D board when game is over */
+.board-finished-fade {
+    opacity: 0.82;
+}
+
+/* Trophy bounce animation for the winner banner on the 2D board */
+@keyframes trophyBounce {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    30%       { transform: translateY(-6px) rotate(5deg); }
+    60%       { transform: translateY(-3px) rotate(-3deg); }
+    80%       { transform: translateY(-1px) rotate(1deg); }
+}
+
+.animate-trophy-bounce {
+    animation: trophyBounce 1.4s ease-in-out;
+    transform-origin: bottom center;
+}
+
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;

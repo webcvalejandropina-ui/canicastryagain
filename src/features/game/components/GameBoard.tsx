@@ -1340,8 +1340,32 @@ function LegacyBoardGrid({
   const p1Initial = (game.player1?.name?.[0] ?? 'J').toUpperCase();
   const p2Initial = (game.player2?.name?.[0] ?? 'J').toUpperCase();
 
+  const winnerName = game.winner
+    ? game.winner === 1
+      ? game.player1?.name ?? 'Jugador 1'
+      : game.player2?.name ?? 'Jugador 2'
+    : null;
+  const isYouWinner = game.winner === game.yourPlayerNumber;
+
   return (
-    <div className="space-y-2.5">
+    <div className={game.status === 'finished' ? 'board-finished-fade space-y-2.5' : 'space-y-2.5'}>
+      {game.status === 'finished' && winnerName ? (
+        <div className="board-finished-banner mb-3 flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-center">
+          <svg aria-hidden="true" className="h-5 w-5 shrink-0 animate-trophy-bounce text-amber-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+            <rect x="9" y="16" width="6" height="3" rx="0.5" fill="#f59e0b"/>
+            <rect x="7" y="18.5" width="10" height="2" rx="0.5" fill="#d97706"/>
+          </svg>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black uppercase tracking-[0.16em] text-primary/70">
+              {isYouWinner ? '¡Victoria!' : 'Fin de partida'}
+            </span>
+            <span className="text-sm font-bold text-brown dark:text-dark-text">
+              {winnerName}
+            </span>
+          </div>
+        </div>
+      ) : null}
       {game.rows.map((rowCells, rowIndex) => {
         const rowTotal = rowCells.length;
         const remainingCount = rowCells.filter((cell) => cell === 1).length;

@@ -1671,8 +1671,12 @@ export function GameBoard({
       const count = selectedEndIndex - selectedStartIndex + 1;
       return `Fila ${selectedRowIndex + 1} · quitar ${count}`;
     }
-    return canInteract ? 'Click/Tap para elegir cantidad en la fila' : 'Esperando tu turno';
-  }, [renderMode, canInteract, selectedRowIndex, selectedStartIndex, selectedEndIndex]);
+    return canInteract
+      ? diceAvailable
+        ? 'Tienes dado especial — lánzalo o selecciona canicas'
+        : 'Click/Tap para elegir cantidad en la fila'
+      : 'Esperando tu turno';
+  }, [renderMode, canInteract, diceAvailable, selectedRowIndex, selectedStartIndex, selectedEndIndex]);
 
   const turnLimit = game.moveHistory.length + 1;
   const selectedCount =
@@ -1696,7 +1700,9 @@ export function GameBoard({
   const boardHudBody = selectedCount > 0
     ? `${selectedCount}/${turnLimit} seleccionadas · restan ${remainingSelectionCapacity}`
     : canInteract
-      ? `Hasta ${turnLimit} seguida${turnLimit === 1 ? '' : 's'} en una fila`
+      ? diceAvailable
+        ? `Usa el dado (arriba a la derecha) o toca canicas — hasta ${turnLimit} seguida${turnLimit === 1 ? '' : 's'} contiguas`
+        : `Toca canicas contiguas en una fila — hasta ${turnLimit}`
       : 'Esperando jugada rival';
 
   useEffect(() => {
@@ -2291,7 +2297,9 @@ export function GameBoard({
               </p>
             ) : canInteract ? (
               <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
-                Puedes tocar cualquier canica contigua en la misma fila para ampliar o reducir la selección.
+                {diceAvailable
+                  ? 'El dado está listo — úsalo primero o selecciona canicas directamente.'
+                  : 'Toca una canica para empezar a seleccionar; puedes ampliar o reducir tocando extremos.'}
               </p>
             ) : null}
           </div>

@@ -158,6 +158,11 @@ function activeMarbleClass({
   const cursorClass =
     isRemoved || isDisabled ? 'cursor-default' : 'cursor-pointer hover:brightness-110 active:brightness-125';
 
+  // Focus ring — explicit focus-visible for keyboard navigation (a11y)
+  const focusClass = isRemoved || isDisabled
+    ? ''
+    : 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent';
+
   return [
     marbleSizeClass(density),
     'rounded-full border transition-all duration-150',
@@ -165,7 +170,8 @@ function activeMarbleClass({
     'will-change-transform',
     animationClass,
     appearance,
-    cursorClass
+    cursorClass,
+    focusClass
   ]
     .filter(Boolean)
     .join(' ');
@@ -1531,7 +1537,6 @@ function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () 
       style={{ touchAction: 'manipulation' }}
     >
       {/* Tap/click anywhere on banner to dismiss — critical for mobile UX */}
-      { }
       <div
         className="flex cursor-pointer items-center gap-3"
         onClick={onDismiss}

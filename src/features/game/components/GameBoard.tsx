@@ -240,7 +240,8 @@ function createMarbleTexture(
 function createRemovedMarbleTexture(
   THREE: any,
   initial: string,
-  colors: { base: string; highlight: string; shadow: string }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _colors: { base: string; highlight: string; shadow: string }
 ): any {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
@@ -248,40 +249,50 @@ function createRemovedMarbleTexture(
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
+  // Dark background — clearly "dead"
   const baseGradient = ctx.createRadialGradient(90, 80, 24, 130, 130, 165);
-  baseGradient.addColorStop(0, colors.highlight);
-  baseGradient.addColorStop(0.5, colors.base);
-  baseGradient.addColorStop(1, colors.shadow);
+  baseGradient.addColorStop(0, '#374151');
+  baseGradient.addColorStop(0.5, '#1f2937');
+  baseGradient.addColorStop(1, '#111827');
   ctx.fillStyle = baseGradient;
   ctx.fillRect(0, 0, 256, 256);
 
-  ctx.lineWidth = 5;
-  ctx.strokeStyle = colors.shadow;
-  ctx.globalAlpha = 0.25;
-  for (let i = 0; i < 8; i += 1) {
-    const sx = Math.random() * 256;
-    const sy = Math.random() * 256;
-    const ex = Math.random() * 256;
-    const ey = Math.random() * 256;
+  // Diagonal cross-hatch pattern to show "removed"
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.lineWidth = 1;
+  for (let i = -256; i < 512; i += 16) {
     ctx.beginPath();
-    ctx.moveTo(sx, sy);
-    ctx.quadraticCurveTo(
-      (sx + ex) / 2 + (Math.random() * 60 - 30),
-      (sy + ey) / 2 + (Math.random() * 60 - 30),
-      ex, ey
-    );
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + 256, 256);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(i + 256, 0);
+    ctx.lineTo(i, 256);
     ctx.stroke();
   }
-  ctx.globalAlpha = 1;
 
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-  ctx.font = 'bold 130px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0,0,0,0.3)';
-  ctx.shadowBlur = 6;
-  ctx.fillText(initial.toUpperCase(), 128, 138);
+  // Big bold X mark — unmistakable "removed" indicator
+  ctx.lineWidth = 22;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#ef4444';
+  ctx.shadowColor = 'rgba(239, 68, 68, 0.6)';
+  ctx.shadowBlur = 12;
+  ctx.beginPath();
+  ctx.moveTo(52, 52);
+  ctx.lineTo(204, 204);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(204, 52);
+  ctx.lineTo(52, 204);
+  ctx.stroke();
   ctx.shadowBlur = 0;
+
+  // Small player initial at bottom for reference
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.font = 'bold 36px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(initial.toUpperCase(), 128, 248);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;

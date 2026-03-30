@@ -206,7 +206,6 @@ export class Game {
     // Solo marcar la fila como "tocada por el rival" si se VACIÓ (quedan 0 canicas).
     // Esto permite la estrategia misère: si el rival solo "tocó" sin vaciar, puedes completar la fila.
     const marblesAfter = marblesBefore - input.removeCount;
-    console.log(`[DEBUG] makeMove: player=${playerNumber} row=${input.rowIndex} removeCount=${input.removeCount} marblesBefore=${marblesBefore} marblesAfter=${marblesAfter} lastTouchedRowIndex set to ${marblesAfter === 0 ? input.rowIndex : null}`);
     this.state.lastTouchedRowIndex = marblesAfter === 0 ? input.rowIndex : null;
     this.state.currentTurn = this.state.currentTurn === 1 ? 2 : 1;
     this.state.forcedRowIndex = null;

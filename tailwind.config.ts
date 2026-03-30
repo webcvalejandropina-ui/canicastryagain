@@ -35,6 +35,16 @@ const config: Config = {
         xl: '1.5rem',
         full: '9999px'
       },
+      animation: {
+        'trophy-bounce': 'trophyBounce 1.2s cubic-bezier(0.2, 0.7, 0.3, 1.4) infinite'
+      },
+      keyframes: {
+        trophyBounce: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '40%': { transform: 'translateY(-6px) rotate(-4deg)' },
+          '70%': { transform: 'translateY(-2px) rotate(2deg)' }
+        }
+      },
       boxShadow: {
         glow: '0 0 60px rgba(244, 197, 66, 0.18)',
         'glow-warm': '0 0 48px rgba(244, 197, 66, 0.12)',

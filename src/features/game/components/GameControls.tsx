@@ -18,7 +18,7 @@ export function GameControls({
   onCancel
 }: Props): React.ReactElement {
   const buttonBase =
-    'inline-flex h-12 items-center justify-center rounded-xl px-4 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.97]';
+    'inline-flex h-12 items-center justify-center rounded-xl px-4 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.95]';
 
   return (
     <section className="glass-panel rounded-2xl p-4 md:p-5" role="group" aria-label="Controles de selección">
@@ -35,7 +35,7 @@ export function GameControls({
               aria-label="Quitar una canica"
               onClick={onDecrease}
               disabled={!canInteract || !hasSelection}
-              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
             >
               −
             </button>
@@ -55,7 +55,7 @@ export function GameControls({
               aria-label="Añadir una canica"
               onClick={onIncrease}
               disabled={!canInteract || !hasSelection}
-              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-2xl font-light text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
             >
               +
             </button>
@@ -69,7 +69,7 @@ export function GameControls({
             type="button"
             onClick={onConfirm}
             disabled={!canInteract || !hasSelection}
-            className={`${buttonBase} bg-primary text-background-dark hover:brightness-110`}
+            className={`${buttonBase} bg-primary text-background-dark hover:brightness-110 active:scale-[0.96]`}
           >
             Confirmar jugada
           </button>
@@ -79,7 +79,7 @@ export function GameControls({
             type="button"
             onClick={onCancel}
             disabled={!hasSelection}
-            className={`${buttonBase} border border-white/10 bg-white/[0.04] text-slate-200 hover:border-white/20 hover:bg-white/[0.08]`}
+            className={`${buttonBase} border border-white/10 bg-white/[0.04] text-slate-200 hover:border-white/20 hover:bg-white/[0.08] active:scale-[0.96]`}
           >
             Cancelar
           </button>

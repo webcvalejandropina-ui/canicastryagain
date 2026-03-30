@@ -494,6 +494,21 @@ body {
   will-change: transform, opacity;
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(140, 98, 57, 0.3);
+  border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 98, 57, 0.5);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marble-idle-float,
   .marble-selected-pulse,

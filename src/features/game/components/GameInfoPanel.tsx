@@ -228,7 +228,10 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-brown/60 dark:text-dark-muted">
             Historial
           </p>
-          <div className="flex flex-col gap-1.5 max-h-28 overflow-y-auto">
+          <div
+            className="flex flex-col gap-1.5 max-h-28 overflow-y-auto custom-scrollbar"
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(140,98,57,0.3) rgba(0,0,0,0.05)' }}
+          >
             {game.moveHistory.slice(-10).map((move, i) => {
               const isYou = move.player === game.yourPlayerNumber;
               const moveNum = Math.max(0, game.moveHistory.length - 10) + i + 1;

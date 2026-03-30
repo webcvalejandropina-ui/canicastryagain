@@ -98,6 +98,7 @@ type SceneContext = {
   boardWidth: number;
   baseCameraZ: number;
   contextLost: boolean;
+  reducedMotion: boolean;
 };
 
 let threeModuleCache: typeof import('three') | null = null;
@@ -678,12 +679,21 @@ function animateFrame(context: SceneContext, timeMs: number): void {
   const dt = Math.min(rawDt, 0.05);
   context.lastFrameTime = timeMs;
 
-  const targetX = context.pointerY * 0.1;
-  const targetY = context.pointerX * 0.12 + Math.sin(t * 0.3) * 0.03;
-  const targetZ = Math.sin(t * 0.25) * 0.015;
-  context.boardPivot.rotation.x += (targetX - context.boardPivot.rotation.x) * 0.04;
-  context.boardPivot.rotation.y += (targetY - context.boardPivot.rotation.y) * 0.04;
-  context.boardPivot.rotation.z += (targetZ - context.boardPivot.rotation.z) * 0.03;
+  const rm = context.reducedMotion;
+
+  // Board tilt: disable when reduced-motion is preferred (keeps still for users with vestibular disorders)
+  if (!rm) {
+    const targetX = context.pointerY * 0.1;
+    const targetY = context.pointerX * 0.12 + Math.sin(t * 0.3) * 0.03;
+    const targetZ = Math.sin(t * 0.25) * 0.015;
+    context.boardPivot.rotation.x += (targetX - context.boardPivot.rotation.x) * 0.04;
+    context.boardPivot.rotation.y += (targetY - context.boardPivot.rotation.y) * 0.04;
+    context.boardPivot.rotation.z += (targetZ - context.boardPivot.rotation.z) * 0.03;
+  } else {
+    context.boardPivot.rotation.x += (0 - context.boardPivot.rotation.x) * 0.04;
+    context.boardPivot.rotation.y += (0 - context.boardPivot.rotation.y) * 0.04;
+    context.boardPivot.rotation.z += (0 - context.boardPivot.rotation.z) * 0.03;
+  }
 
   for (const marble of context.marbles) {
     if (marble.dying) {
@@ -734,26 +744,33 @@ function animateFrame(context: SceneContext, timeMs: number): void {
     }
 
     if (marble.active) {
-      const verticalOscillation = Math.sin(t * marble.bobSpeed + marble.phase) * marble.bobAmplitude;
+      // Bobbing is disabled when reduced-motion is preferred to prevent vestibular issues
+      const verticalOscillation = rm ? 0 : Math.sin(t * marble.bobSpeed + marble.phase) * marble.bobAmplitude;
       marble.mesh.position.y = THREE.MathUtils.lerp(marble.mesh.position.y, marble.baseY + verticalOscillation, 0.08);
       const selMul = marble.selected ? 5.0 : 1;
       marble.mesh.rotation.x += marble.rotationSpeedX * selMul;
       marble.mesh.rotation.y += marble.rotationSpeedY * selMul;
     } else {
-      marble.mesh.position.y = THREE.MathUtils.lerp(marble.mesh.position.y, marble.baseY, 0.15);
-      marble.mesh.rotation.y += 0.012;
-      marble.mesh.rotation.x += 0.004;
+      marble.mesh.position.y = THREE.MathUtils.lerp(marble.mesh.position.y, marble.baseY, rm ? 1 : 0.15);
+      marble.mesh.rotation.y += rm ? 0 : 0.012;
+      marble.mesh.rotation.x += rm ? 0 : 0.004;
     }
 
     if (marble.selected) {
-      const pulse = Math.sin(t * 4 + marble.phase);
-      const baseScale = 1.06 + pulse * 0.02;
-      const squash = Math.sin(t * 2.5 + marble.phase) * 0.025;
+      // Squash/pulse animation disabled when reduced-motion is preferred (still shows selection via color)
+      const pulse = rm ? 0 : Math.sin(t * 4 + marble.phase);
+      const baseScale = rm ? 1.06 : 1.06 + pulse * 0.02;
+      const squash = rm ? 0 : Math.sin(t * 2.5 + marble.phase) * 0.025;
       marble.mesh.scale.x = THREE.MathUtils.lerp(marble.mesh.scale.x, baseScale + squash, 0.1);
       marble.mesh.scale.y = THREE.MathUtils.lerp(marble.mesh.scale.y, baseScale - squash, 0.1);
       marble.mesh.scale.z = THREE.MathUtils.lerp(marble.mesh.scale.z, baseScale + squash * 0.5, 0.1);
       if (marble.mesh.material) {
-        marble.mesh.material.emissiveIntensity = 0.5 + Math.sin(t * 3 + marble.phase) * 0.12;
+        // Emissive glow stays on (no oscillation) when reduced-motion preferred
+        marble.mesh.material.emissiveIntensity = THREE.MathUtils.lerp(
+          marble.mesh.material.emissiveIntensity,
+          rm ? 0.6 : 0.5 + Math.sin(t * 3 + marble.phase) * 0.12,
+          0.1
+        );
       }
     } else {
       marble.mesh.scale.x = THREE.MathUtils.lerp(marble.mesh.scale.x, 1, 0.08);
@@ -764,16 +781,18 @@ function animateFrame(context: SceneContext, timeMs: number): void {
 
   if (context.diceGroup) {
     if (context.diceSpinning) {
+      // Dice roll spin is always shown (it's a transient action, not continuous ambient motion)
       context.diceSpinT += dt;
       context.diceGroup.rotation.x += 8 * dt;
       context.diceGroup.rotation.y += 12 * dt;
       context.diceGroup.rotation.z += 5 * dt;
-      const bounce = Math.abs(Math.sin(context.diceSpinT * 6)) * 0.4;
+      const bounce = rm ? 0 : Math.abs(Math.sin(context.diceSpinT * 6)) * 0.4;
       context.diceGroup.position.y = THREE.MathUtils.lerp(context.diceGroup.position.y, context.diceGroup.userData.baseY + bounce, 0.3);
     } else {
-      context.diceGroup.rotation.x += 0.005;
-      context.diceGroup.rotation.y += 0.008;
-      const hover = Math.sin(t * 1.5) * 0.12;
+      // Idle hover bounce disabled when reduced-motion is preferred
+      context.diceGroup.rotation.x += rm ? 0 : 0.005;
+      context.diceGroup.rotation.y += rm ? 0 : 0.008;
+      const hover = rm ? 0 : Math.sin(t * 1.5) * 0.12;
       context.diceGroup.position.y = THREE.MathUtils.lerp(context.diceGroup.position.y, context.diceGroup.userData.baseY + hover, 0.08);
     }
   }
@@ -1139,7 +1158,8 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     lastFrameTime: 0,
     boardWidth: 0,
     baseCameraZ: 0,
-    contextLost: false
+    contextLost: false,
+    reducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
   };
 
   const updatePointerFromEvent = (event: PointerEvent): void => {
@@ -1188,6 +1208,16 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   context.cleanupHandlers.push(() => renderer.domElement.removeEventListener('pointermove', onPointerMove));
   context.cleanupHandlers.push(() => renderer.domElement.removeEventListener('pointerleave', onPointerLeave));
   context.cleanupHandlers.push(() => window.removeEventListener('resize', onResize));
+
+  // Listen for reduced-motion preference changes so the 3D scene updates live
+  const reducedMotionMql = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const onReducedMotionChange = (): void => {
+    context.reducedMotion = reducedMotionMql?.matches ?? false;
+  };
+  reducedMotionMql?.addEventListener?.('change', onReducedMotionChange);
+  context.cleanupHandlers.push(() => {
+    reducedMotionMql?.removeEventListener?.('change', onReducedMotionChange);
+  });
 
   // WebGL context loss / restore — critical for mobile stability
   const onContextLost = (event: Event): void => {

@@ -2552,7 +2552,15 @@ export function HomePage(): React.ReactElement {
                     aria-label="Ir al tablero"
                     title="Ir al tablero"
                   >
-                    <span aria-hidden>🎯</span>
+                    {/* Target/crosshair SVG — replaces 🎯 emoji for WCAG consistency */}
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.75"/>
+                      <circle cx="12" cy="12" r="3.5" fill="currentColor"/>
+                      <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                      <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                      <line x1="2" y1="12" x2="6" y2="12" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                      <line x1="18" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                    </svg>
                     <span>Tablero</span>
                   </button>
                   {game?.yourDiceAvailable ? (
@@ -2566,7 +2574,10 @@ export function HomePage(): React.ReactElement {
                       aria-label="Lanzar dado especial"
                       title="Lanzar dado especial"
                     >
-                      <span aria-hidden="true">✨</span>
+                      {/* Star/spark SVG — replaces ✨ emoji for WCAG consistency */}
+                      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L9.5 9.5L2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5L12 2z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+                      </svg>
                       <span>Dado</span>
                     </button>
                   ) : null}

@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import Image from 'next/image';
 
 import { DiceResult, GameState } from '@/features/game/types';
@@ -1633,7 +1634,7 @@ export function GameBoard({
   hasPendingMove = false,
   hasTurnCoach = false,
   boardAttentionPulse = false,
-  yourTurnGlow = false,
+  // yourTurnGlow removed — board glow is now retriggerable per turn via boardGlowActive state
   hasLiveChannel,
   onBallClick,
   onDiceRoll,
@@ -1652,8 +1653,10 @@ export function GameBoard({
   const [diceChipAnim, setDiceChipAnim] = useState<'ready' | 'spent' | null>(null);
   const [diceResultOverlay, setDiceResultOverlay] = useState<DiceResult | null>(null);
   const [turnBadgeAnim, setTurnBadgeAnim] = useState<'pulse' | null>(null);
+  const [boardGlowActive, setBoardGlowActive] = useState(false);
   const diceResultTimerRef = useRef<number | null>(null);
   const prevDiceResultRef = useRef<DiceResult | null>(null);
+  const boardGlowTimeoutRef = useRef<number | null>(null);
 
   const statusLabel = useMemo(() => {
     if (renderMode === 'loading') return 'Inicializando tablero 3D...';
@@ -1718,7 +1721,9 @@ export function GameBoard({
     }
   }, [diceAvailable]);
 
-  // Pulse the turn badge when the user receives the turn (false → true)
+  // Pulse the turn badge AND retrigger the board glow when the user receives the turn (false → true).
+  // board-your-turn-glow has animation-fill-mode:both so it only plays on first application —
+  // we force a restart by briefly removing the class then adding it back via setTimeout(0).
   useEffect(() => {
     const prev = prevCanInteractRef.current;
     if (prev === undefined) {
@@ -1727,9 +1732,28 @@ export function GameBoard({
     }
     if (!prev && canInteract) {
       setTurnBadgeAnim('pulse');
-      const timer = setTimeout(() => setTurnBadgeAnim(null), 1800);
+      const badgeTimer = setTimeout(() => setTurnBadgeAnim(null), 1800);
+
+      // Retrigger board glow every turn, not just the first one.
+      // flushSync breaks React 18 automatic batching so each state update is a separate render.
+      if (boardGlowTimeoutRef.current !== null) clearTimeout(boardGlowTimeoutRef.current);
+      flushSync(() => setBoardGlowActive(false));
+      boardGlowTimeoutRef.current = window.setTimeout(() => {
+        flushSync(() => setBoardGlowActive(true));
+        boardGlowTimeoutRef.current = window.setTimeout(() => {
+          flushSync(() => setBoardGlowActive(false));
+          boardGlowTimeoutRef.current = null;
+        }, 1200);
+      }, 20);
+
       prevCanInteractRef.current = canInteract;
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(badgeTimer);
+        if (boardGlowTimeoutRef.current !== null) {
+          clearTimeout(boardGlowTimeoutRef.current);
+          boardGlowTimeoutRef.current = null;
+        }
+      };
     }
     prevCanInteractRef.current = canInteract;
   }, [canInteract]);
@@ -1915,6 +1939,10 @@ export function GameBoard({
         window.clearTimeout(diceResultTimerRef.current);
         diceResultTimerRef.current = null;
       }
+      if (boardGlowTimeoutRef.current !== null) {
+        window.clearTimeout(boardGlowTimeoutRef.current);
+        boardGlowTimeoutRef.current = null;
+      }
     };
   }, []);
 
@@ -2031,7 +2059,7 @@ export function GameBoard({
       className={[
         'relative flex flex-1 scroll-mt-24 flex-col bg-background-dark dark:bg-dark-bg min-h-0 transition-[padding,box-shadow,border-color] duration-200',
         boardAttentionPulse ? 'board-attention-pulse' : '',
-        yourTurnGlow ? 'board-your-turn-glow' : '',
+        boardGlowActive ? 'board-your-turn-glow' : '',
         boardBottomInsetClass
       ].join(' ')}
       style={{ touchAction: 'manipulation' }}

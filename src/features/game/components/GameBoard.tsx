@@ -1356,13 +1356,30 @@ function LegacyBoardGrid({
             role="row"
             aria-label={`Fila ${rowIndex + 1} con ${remainingCount} canicas`}
             className={[
-              'flex justify-center py-1.5 px-4 transition-all overflow-x-auto',
+              'flex items-center gap-2 py-1.5 px-4 transition-all overflow-x-auto',
               isSelectedRow ? 'scale-[1.01]' : '',
               isBlocked ? 'brightness-105' : ''
             ]
               .filter(Boolean)
               .join(' ')}
           >
+            {/* Row number badge — helps players orient on larger boards and communicate with rivals */}
+            <span
+              aria-hidden="true"
+              className={[
+                'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full',
+                'text-[10px] font-bold leading-none select-none',
+                'border transition-all duration-150',
+                density === 'dense' ? 'h-5 w-5 text-[9px]' : density === 'compact' ? 'h-5 w-5 text-[9px]' : '',
+                isSelectedRow
+                  ? 'border-primary/60 bg-primary/20 text-primary shadow-sm'
+                  : isBlocked
+                    ? 'border-red-400/50 bg-red-400/15 text-red-400'
+                    : 'border-brown/25 bg-sand/60 text-brown/70 dark:border-white/20 dark:bg-dark-surface dark:text-dark-muted'
+              ].join(' ')}
+            >
+              {rowIndex + 1}
+            </span>
             <div className="inline-flex min-h-7 items-center justify-center gap-1.5 px-3 w-max">
               {Array.from({ length: rowTotal }, (_, ballIndex) => {
                 const isRemoved = rowCells[ballIndex] !== 1;
@@ -1557,9 +1574,9 @@ function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () 
           <p className={['text-xl font-black tracking-tight', meta.text].join(' ')}>
             {meta.label}
           </p>
-          {/* Accessible dismiss hint — sr-only on desktop, visible on mobile */}
-          <p className="mt-1 text-[10px] font-semibold leading-tight text-white/70 sm:sr-only">
-            Toca para cerrar
+          {/* Accessible dismiss hint — always visible for discoverability on all devices */}
+          <p className="mt-1 text-[10px] font-semibold leading-tight text-white/70">
+            Toca o haz clic para cerrar
           </p>
         </div>
         {/* Visible dismiss button — always visible for discoverability */}

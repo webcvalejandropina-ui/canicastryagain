@@ -177,6 +177,7 @@ export class Game {
     this.validateMove(input.rowIndex, input.startIndex, input.removeCount);
 
     const row = this.state.rows[input.rowIndex];
+    const marblesBefore = row.filter((c) => c === 1).length;
     for (let offset = 0; offset < input.removeCount; offset += 1) {
       const cellIndex = input.startIndex + offset;
       row[cellIndex] = 0;
@@ -202,7 +203,11 @@ export class Game {
       return { gameOver: true, winner: this.state.winner };
     }
 
-    this.state.lastTouchedRowIndex = input.rowIndex;
+    // Solo marcar la fila como "tocada por el rival" si se VACIÓ (quedan 0 canicas).
+    // Esto permite la estrategia misère: si el rival solo "tocó" sin vaciar, puedes completar la fila.
+    const marblesAfter = marblesBefore - input.removeCount;
+    console.log(`[DEBUG] makeMove: player=${playerNumber} row=${input.rowIndex} removeCount=${input.removeCount} marblesBefore=${marblesBefore} marblesAfter=${marblesAfter} lastTouchedRowIndex set to ${marblesAfter === 0 ? input.rowIndex : null}`);
+    this.state.lastTouchedRowIndex = marblesAfter === 0 ? input.rowIndex : null;
     this.state.currentTurn = this.state.currentTurn === 1 ? 2 : 1;
     this.state.forcedRowIndex = null;
     this.state.turnDieValue = null;
@@ -456,6 +461,21 @@ export class Game {
       }
     }
 
+    // Regla de fila bloqueada (misère): no puedes vaciar una fila que el rival tocó en el turno anterior.
+    // EXCEPCIÓN: si es la última canica del tablero, sí se puede (el que la toma pierde).
+    const rowRemainingAfterMove = row.filter((c) => c === 1).length - removeCount;
+    const totalBalls = this.state.rows.reduce(
+      (sum, r) => sum + r.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
+      0
+    );
+    const isLastBall = totalBalls === removeCount && rowRemainingAfterMove === 0;
+    if (this.state.lastTouchedRowIndex === rowIndex && rowRemainingAfterMove === 0 && !isLastBall) {
+      throw new AppError(
+        `No puedes vaciar la fila ${rowIndex + 1} porque el rival la tocó en el turno anterior. Debes dejar al menos 1 canica.`,
+        400,
+        'ROW_BLOCKED'
+      );
+    }
   }
 
   private touch(): void {

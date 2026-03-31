@@ -2020,3 +2020,56 @@ html.dark .turn-info-pulse {
   to   { opacity: 1; }
 }
 .drawer-backdrop-in { animation: drawer-backdrop-in 0.25s ease both; }
+
+/* ════════════════════════════════════════════════════════════════
+   MEJORAS ITERACIÓN - Mobile dark mode, enhanced removed balls
+   Nota: los selectores .game-info / #modal-restart-btn / #turn-text
+   fueron eliminados — no existen en el DOM (dead code).
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Enhanced dark mode for mobile ──────────────────────────────── */
+@media (max-width: 768px) and (prefers-color-scheme: dark) {
+    :root {
+        --bg-page: #080c10;
+        --bg-surface: #0d1520;
+        --bg-surface-soft: #0a1218;
+        --bg-surface-contrast: #111d28;
+    }
+
+    body {
+        background: linear-gradient(160deg, #060a10 0%, #080c14 50%, #060a10 100%) !important;
+    }
+
+    /* Player cards in GameInfoPanel: dark surface on mobile dark mode */
+    .player-card {
+        background: linear-gradient(175deg, #111d28 0%, #0d1520 100%) !important;
+        border-color: #1a2a3a !important;
+    }
+}
+
+/* ── Victory overlay: bigger touch targets on mobile ─────────────── */
+@media (max-width: 640px) {
+    /* "Nueva partida" button — more prominent on small screens */
+    .victory-new-game-btn {
+        min-height: 56px !important;
+        font-size: 1rem !important;
+        padding: 0 28px !important;
+        border-radius: 16px !important;
+        box-shadow:
+            0 6px 24px rgba(52, 211, 153, 0.55),
+            0 0 20px rgba(52, 211, 153, 0.25) !important;
+    }
+
+    /* "Volver al lobby" button — balanced secondary style */
+    .victory-exit-btn {
+        min-height: 48px !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* "Compartir y retar" — compact on mobile */
+    .victory-share-btn {
+        min-height: 48px !important;
+        font-size: 0.85rem !important;
+        padding: 0 20px !important;
+    }
+}

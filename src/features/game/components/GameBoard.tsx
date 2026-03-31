@@ -1414,7 +1414,7 @@ function LegacyBoardGrid({
             className={[
               'flex items-center gap-2 py-1.5 px-4 transition-all overflow-x-auto',
               isSelectedRow ? 'scale-[1.01]' : '',
-              isBlocked ? 'brightness-105' : '',
+              isBlocked ? 'blocked brightness-105' : '',
               blockedShakeRow === rowIndex ? 'blocked-shake' : ''
             ]
               .filter(Boolean)

@@ -538,7 +538,7 @@ main {
     }
 }
 
-.row.blocked {
+[role="row"].blocked {
     animation: blocked-row-pulse 1.8s ease-in-out infinite;
 }
 

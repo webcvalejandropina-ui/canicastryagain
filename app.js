@@ -760,20 +760,27 @@ function handleInfoToggle() {
 }
 
 function applyCardsVisibility() {
-    const gameInfo = document.querySelector('.game-info');
+    const playersInfo = document.getElementById('players-info');
+    const statsEl = document.querySelector('.game-info .stats');
     const moveHistory = document.querySelector('.move-history');
     const btn = document.getElementById('info-toggle-btn');
     
-    if (!gameInfo || !moveHistory || !btn) return;
+    if (!btn) return;
     
     if (GameState.cardsVisible) {
-        gameInfo.classList.remove('hidden-cards');
-        moveHistory.classList.remove('hidden-cards');
-        btn.textContent = '🙈 Ocultar Info';
+        // Show extra info
+        if (playersInfo) playersInfo.style.display = '';
+        if (statsEl) statsEl.style.display = '';
+        if (moveHistory) moveHistory.classList.remove('hidden-cards');
+        btn.textContent = '🙈 Ocultar';
+        btn.classList.remove('info-collapsed');
     } else {
-        gameInfo.classList.add('hidden-cards');
-        moveHistory.classList.add('hidden-cards');
+        // Hide extra info — turn indicator always stays visible via its own structure
+        if (playersInfo) playersInfo.style.display = 'none';
+        if (statsEl) statsEl.style.display = 'none';
+        if (moveHistory) moveHistory.classList.add('hidden-cards');
         btn.textContent = '👁️ Info';
+        btn.classList.add('info-collapsed');
     }
 }
 

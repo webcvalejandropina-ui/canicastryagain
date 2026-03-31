@@ -601,10 +601,10 @@ main {
 .ball.removed-ball,
 .ball.blocked-ball {
     background:
-        radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.34) 0 18%, transparent 30%),
-        linear-gradient(170deg, #8b9aaa 0%, #607487 58%, #425568 100%) !important;
-    border-color: #b9c6d3 !important;
-    opacity: 0.6;
+        radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.2) 0 18%, transparent 30%),
+        linear-gradient(170deg, #9ca3af 0%, #6b7280 58%, #4b5563 100%) !important;
+    border-color: #d1d5db !important;
+    opacity: 0.75;
     position: relative;
 }
 
@@ -612,20 +612,25 @@ main {
     pointer-events: none;
     cursor: default;
     position: relative;
+    /* Strong inner shadow to make it look "sunken/inactive" */
+    box-shadow:
+        inset 0 3px 8px rgba(0, 0, 0, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Red X over removed balls for clear visual distinction */
+/* Thick red X over removed balls for clear visual distinction */
 .ball.removed-ball::before,
 .ball.removed-ball::after {
     content: '';
     position: absolute;
-    width: 72%;
-    height: 3px;
-    background: #e02525;
-    border-radius: 2px;
+    width: 78%;
+    height: 4px;
+    background: #dc2626;
+    border-radius: 3px;
     top: 50%;
     left: 50%;
     transform-origin: center;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.5);
 }
 
 .ball.removed-ball::before {
@@ -951,50 +956,84 @@ main {
 
 /* Game over modal restart button - high visibility */
 #modal-restart-btn {
-    background: linear-gradient(145deg, #0e7a3a 0%, #0a5c2c 100%) !important;
+    background: linear-gradient(145deg, #16a34a 0%, #15803d 50%, #166534 100%) !important;
     color: #ffffff !important;
-    font-size: 1.05rem !important;
-    font-weight: 800 !important;
-    border: 2px solid #25c55e !important;
-    box-shadow: 0 4px 16px rgba(14, 122, 58, 0.35) !important;
-    letter-spacing: 0.02em;
-    min-height: 52px;
+    font-size: 1.1rem !important;
+    font-weight: 900 !important;
+    border: 3px solid #4ade80 !important;
+    border-radius: 14px !important;
+    box-shadow:
+        0 4px 20px rgba(21, 128, 61, 0.5),
+        0 0 0 1px rgba(74, 222, 128, 0.2) inset !important;
+    letter-spacing: 0.03em;
+    min-height: 56px;
+    padding: 0 28px !important;
+    text-transform: uppercase;
 }
 
 #modal-restart-btn:hover:not(:disabled) {
-    background: linear-gradient(145deg, #10a344 0%, #0e7a3a 100%) !important;
-    box-shadow: 0 6px 20px rgba(14, 122, 58, 0.45) !important;
-    transform: translateY(-1px);
+    background: linear-gradient(145deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
+    box-shadow:
+        0 6px 28px rgba(21, 128, 61, 0.6),
+        0 0 0 2px rgba(74, 222, 128, 0.35) inset !important;
+    transform: translateY(-2px);
 }
 
 #modal-restart-btn:active:not(:disabled) {
     transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(21, 128, 61, 0.4) !important;
 }
 
 /* Game over modal message text */
 #modal-message {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: var(--ink-700);
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.5;
+}
+
+/* Modal title for game over - make it bold and colored */
+#modal-title {
+    font-size: clamp(1.5rem, 5vw, 2.2rem) !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.02em;
 }
 
 /* ── Info cards toggle (hide during gameplay on mobile) ─────────── */
 #info-toggle-btn {
-    background: linear-gradient(145deg, #4a5568 0%, #2d3748 100%) !important;
-    font-size: 0.82rem !important;
-    min-height: 36px !important;
-    padding: 0 12px !important;
-    border: 1px solid #4a5568 !important;
+    background: linear-gradient(145deg, #4a90e2 0%, #2d6dc2 100%) !important;
+    color: #fff !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    min-height: 40px !important;
+    padding: 0 18px !important;
+    border: 2px solid #60aaff !important;
+    border-radius: 22px !important;
+    box-shadow: 0 3px 12px rgba(74, 144, 226, 0.35) !important;
+    transition: all 0.2s ease !important;
 }
 
 #info-toggle-btn:hover:not(:disabled) {
-    background: linear-gradient(145deg, #5a6578 0%, #3d4758 100%) !important;
+    background: linear-gradient(145deg, #60aaff 0%, #4a90e2 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(74, 144, 226, 0.45) !important;
 }
 
-.game-info.hidden-cards,
-.selection-controls.hidden-cards {
-    display: none !important;
+#info-toggle-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Collapsed state - show a pill badge style */
+#info-toggle-btn.info-collapsed {
+    background: linear-gradient(145deg, #d0dcea 0%, #b8c9e0 100%) !important;
+    color: #2d6dc2 !important;
+    border-color: #a0bce0 !important;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15) !important;
+}
+
+#info-toggle-btn.info-collapsed:hover:not(:disabled) {
+    background: linear-gradient(145deg, #c0d0e8 0%, #a8b8d8 100%) !important;
+    color: #1a5ab8 !important;
 }
 
 /* ── Dark Mode ─────────────────────────────────────────────────── */
@@ -1231,21 +1270,38 @@ main {
     }
 
     #info-toggle-btn {
-        background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%) !important;
-        border-color: #4a5568 !important;
+        background: linear-gradient(145deg, #1e3a5f 0%, #0f2a4a 100%) !important;
+        border-color: #2a5a8a !important;
+        color: #93c5fd !important;
     }
 
     #info-toggle-btn:hover:not(:disabled) {
-        background: linear-gradient(145deg, #3d4758 0%, #2a3040 100%) !important;
+        background: linear-gradient(145deg, #2a4a70 0%, #1a3a5a 100%) !important;
+    }
+
+    #info-toggle-btn.info-collapsed {
+        background: linear-gradient(145deg, #2a3a50 0%, #1a2a40 100%) !important;
+        border-color: #3a4a60 !important;
+        color: var(--ink-500) !important;
     }
 
     /* Ball colors in dark mode */
     .ball.removed-ball,
     .ball.blocked-ball {
         background:
-            radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.2) 0 18%, transparent 30%),
-            linear-gradient(170deg, #4a5568 0%, #2d3748 58%, #1a202c 100%) !important;
-        border-color: #4a5568 !important;
+            radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.15) 0 18%, transparent 30%),
+            linear-gradient(170deg, #6b7280 0%, #4b5563 58%, #374151 100%) !important;
+        border-color: #9ca3af !important;
+        box-shadow:
+            inset 0 3px 8px rgba(0, 0, 0, 0.5),
+            0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Dark mode: keep the red X clearly visible on removed balls */
+    .ball.removed-ball::before,
+    .ball.removed-ball::after {
+        background: #f87171 !important;
+        box-shadow: 0 1px 4px rgba(248, 113, 113, 0.6) !important;
     }
 
     /* Game over modal overlay */
@@ -1255,6 +1311,86 @@ main {
 
     #modal-title {
         color: var(--ink-900);
+    }
+
+    /* Dark mode game-over button */
+    #modal-restart-btn {
+        background: linear-gradient(145deg, #166534 0%, #14532d 100%) !important;
+        border-color: #4ade80 !important;
+        color: #ffffff !important;
+    }
+
+    #modal-restart-btn:hover:not(:disabled) {
+        background: linear-gradient(145deg, #15803d 0%, #166534 100%) !important;
+    }
+
+    /* ── Mobile dark mode fixes ─────────────────────────────────── */
+    .selection-controls {
+        background: rgba(22, 32, 50, 0.97) !important;
+        backdrop-filter: blur(8px);
+    }
+
+    .selection-controls label {
+        color: var(--ink-700) !important;
+    }
+
+    .quantity-buttons {
+        background: #162032 !important;
+        border-color: #2a3a50 !important;
+    }
+
+    #quantity-display {
+        color: #7ab8f5 !important;
+    }
+
+    .action-buttons button {
+        background: linear-gradient(145deg, #1a3a5a 0%, #0f2a4a 100%) !important;
+        border-color: #2a5a8a !important;
+        color: #7ab8f5 !important;
+    }
+
+    .action-buttons button:not(:disabled):hover {
+        background: linear-gradient(145deg, #1a4a6a 0%, #0f3a5a 100%) !important;
+    }
+
+    /* Modal mobile dark mode */
+    @media (max-width: 768px) {
+        .modal-content {
+            background: #1a2636 !important;
+            border-color: #2a3a50 !important;
+        }
+
+        .modal-content h2 {
+            color: var(--ink-900) !important;
+        }
+
+        .modal-content p,
+        .modal-content label {
+            color: var(--ink-700) !important;
+        }
+
+        #info-toggle-btn {
+            background: linear-gradient(145deg, #1a3a5a 0%, #0f2a4a 100%) !important;
+            border-color: #2a5a8a !important;
+            color: #7ab8f5 !important;
+        }
+
+        #info-toggle-btn.info-collapsed {
+            background: linear-gradient(145deg, #2a3a50 0%, #1a2a40 100%) !important;
+            border-color: #3a4a60 !important;
+            color: var(--ink-500) !important;
+        }
+
+        /* Mobile game-over button dark mode */
+        #modal-restart-btn {
+            background: linear-gradient(145deg, #166534 0%, #14532d 100%) !important;
+            border-color: #4ade80 !important;
+            color: #ffffff !important;
+        }
+
+        #modal-restart-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #15803d 0%, #166534 100%) !important;
+        }
     }
 }
 

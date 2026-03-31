@@ -1805,3 +1805,52 @@ html.dark .turn-info-pulse {
     transform: translateY(105vh) translateX(var(--drift, 0px)) rotate(var(--rotation, 360deg));
   }
 }
+
+/* ── Turn Banner (mobile coach banner) ─────────────────────────── */
+@keyframes turn-banner-enter {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.turn-banner-enter { animation: turn-banner-enter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* ── Turn Spotlight (your-turn toast banner) ───────────────────── */
+@keyframes turn-spotlight-enter {
+  from { opacity: 0; transform: translateY(-16px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+.turn-spotlight-enter { animation: turn-spotlight-enter 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+
+/* ── Turn Coach Bar (bottom mobile bar) ────────────────────────── */
+@keyframes turn-coach-enter {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.turn-coach-enter { animation: turn-coach-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ── Selection Action Sheet (bottom apply/cancel bar) ─────────── */
+@keyframes selection-sheet-enter {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.selection-sheet-enter { animation: selection-sheet-enter 0.38s cubic-bezier(0.34, 1.2, 0.64, 1) both; }
+
+/* ── Game Menu Drawer ───────────────────────────────────────────── */
+@keyframes drawer-slide-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.drawer-slide-in { animation: drawer-slide-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ── Toast Slide Down (HomePage transient toast) ──────────────── */
+@keyframes toast-slide-down {
+  from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+.toast-slide-down { animation: toast-slide-down 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+
+/* ── Drawer Backdrop ────────────────────────────────────────────── */
+@keyframes drawer-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.drawer-backdrop-in { animation: drawer-backdrop-in 0.25s ease both; }

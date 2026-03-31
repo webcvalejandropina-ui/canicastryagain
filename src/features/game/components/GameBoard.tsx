@@ -1677,7 +1677,7 @@ function DiceResultBanner({
     <div
       className={[
         'dice-result-overlay pointer-events-auto rounded-2xl border-2 border-white/20',
-        'px-5 py-3 shadow-2xl backdrop-blur-xl cursor-pointer',
+        'px-5 py-3 shadow-2xl backdrop-blur-xl cursor-pointer w-full max-w-[18rem] mx-3',
         meta.bg,
         meta.border
       ].join(' ')}

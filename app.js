@@ -22,7 +22,8 @@ const GameState = {
     ws: null,
     connected: false,
     loggedIn: false,
-    pendingGameCode: null // Código de juego pendiente después del login
+    pendingGameCode: null, // Código de juego pendiente después del login
+    cardsVisible: false // Info cards visibility toggle
 };
 
 // ============================================
@@ -132,9 +133,11 @@ function handleLogout() {
 function initializeGame() {
     const rowsInput = document.getElementById('rows-input');
     GameState.numRows = parseInt(rowsInput.value) || 7;
+    GameState.cardsVisible = false;
     resetGame();
     renderBoard();
     updateUI();
+    applyCardsVisibility();
 }
 
 function resetGame() {
@@ -702,6 +705,32 @@ function handleReset() {
     renderBoard();
     updateUI();
     hideGameOverModal();
+    // Start with info cards hidden during gameplay
+    GameState.cardsVisible = false;
+    applyCardsVisibility();
+}
+
+function handleInfoToggle() {
+    GameState.cardsVisible = !GameState.cardsVisible;
+    applyCardsVisibility();
+}
+
+function applyCardsVisibility() {
+    const gameInfo = document.querySelector('.game-info');
+    const moveHistory = document.querySelector('.move-history');
+    const btn = document.getElementById('info-toggle-btn');
+    
+    if (!gameInfo || !moveHistory || !btn) return;
+    
+    if (GameState.cardsVisible) {
+        gameInfo.classList.remove('hidden-cards');
+        moveHistory.classList.remove('hidden-cards');
+        btn.textContent = '🙈 Ocultar Info';
+    } else {
+        gameInfo.classList.add('hidden-cards');
+        moveHistory.classList.add('hidden-cards');
+        btn.textContent = '👁️ Info';
+    }
 }
 
 // ============================================
@@ -1093,6 +1122,9 @@ function setupEventListeners() {
     document.getElementById('rows-input').addEventListener('change', () => {
         // No hacer nada hasta que se presione reiniciar
     });
+    
+    // Info cards toggle
+    document.getElementById('info-toggle-btn').addEventListener('click', handleInfoToggle);
     
     // Navegación por teclado
     document.addEventListener('keydown', (e) => {

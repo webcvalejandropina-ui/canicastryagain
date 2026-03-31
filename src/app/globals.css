@@ -573,6 +573,19 @@ body {
   transform-origin: center top;
 }
 
+/* Toast progress bar — shows countdown until auto-dismiss */
+#toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, #f4c542, #5c8d3a);
+  transform-origin: left center;
+  border-radius: 0 0 0.75rem 0.75rem;
+  pointer-events: none;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }

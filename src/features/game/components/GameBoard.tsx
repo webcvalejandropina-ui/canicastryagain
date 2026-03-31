@@ -248,11 +248,12 @@ function createRemovedMarbleTexture(
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
-  // Dark hollow background
+  // Dark hollow background — brightened vs prior version so X mark stays visible
+  // against the dark scene background on mobile dark mode
   const baseGradient = ctx.createRadialGradient(90, 80, 24, 130, 130, 165);
-  baseGradient.addColorStop(0, '#1f2937');
-  baseGradient.addColorStop(0.6, '#111827');
-  baseGradient.addColorStop(1, '#030712');
+  baseGradient.addColorStop(0, '#334155');  // lighter slate — X will pop more
+  baseGradient.addColorStop(0.55, '#1e293b');
+  baseGradient.addColorStop(1, '#0f172a');
   ctx.fillStyle = baseGradient;
   ctx.fillRect(0, 0, 256, 256);
 
@@ -1245,6 +1246,22 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     colorSchemeMql?.removeEventListener?.('change', onColorSchemeChange);
   });
 
+  // Listen for manual theme toggle (canicas:theme-change) dispatched by HomePage
+  // so the 3D canvas updates when the user manually switches light/dark mode
+  const onManualThemeChange = (e: Event): void => {
+    const isDark = (e as CustomEvent<{ isDark: boolean }>).detail?.isDark
+      ?? colorSchemeMql?.matches ?? false;
+    const bgColor = isDark ? 0x0d0c09 : 0xf5f0e8;
+    if (context.scene) {
+      context.scene.background = new THREE.Color(bgColor);
+    }
+    renderer.setClearColor(bgColor, 1);
+  };
+  window.addEventListener('canicas:theme-change', onManualThemeChange);
+  context.cleanupHandlers.push(() => {
+    window.removeEventListener('canicas:theme-change', onManualThemeChange);
+  });
+
   // WebGL context loss / restore — critical for mobile stability
   const onContextLost = (event: Event): void => {
     event.preventDefault();
@@ -1442,13 +1459,13 @@ function LegacyBoardGrid({
                   // Light mode: very dark backgrounds for contrast
                   // Dark mode: slightly lighter so X mark stays visible against the dark page bg
                   const bgClass = isP1
-                    ? 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999 dark:from-red-900/80 dark:to-red-950 dark:border-red-500/70'
+                    ? 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999 dark:from-red-900 dark:to-red-950 dark:border-red-500/70'
                     : isP2
-                      ? 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900/80 dark:to-orange-950 dark:border-orange-500/70'
-                      : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-800/80 dark:to-slate-950 dark:border-slate-500/70';
+                      ? 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
+                      : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-700 dark:to-slate-900 dark:border-slate-500/70';
                   // X mark color matches the 3D texture: red for J1, blue for J2, grey for neutral
                   const xColor = isP1 ? '#ef4444' : isP2 ? '#3b82f6' : '#94a3b8';
-                  const xGlow = isP1 ? 'rgba(239,68,68,0.9)' : isP2 ? 'rgba(59,130,246,0.9)' : 'rgba(148,163,184,0.7)';
+                  const xGlow = isP1 ? 'rgba(239,68,68,1)' : isP2 ? 'rgba(59,130,246,1)' : 'rgba(148,163,184,0.9)';
 
                   return (
                     <button

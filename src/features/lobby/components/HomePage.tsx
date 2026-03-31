@@ -724,7 +724,7 @@ function VictoryOverlay({
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary/60 bg-[#1c1912] px-6 py-3.5 text-sm font-black uppercase tracking-wider text-primary shadow-lg shadow-primary/25 backdrop-blur transition-all hover:border-primary hover:bg-[#0f1408] active:scale-[0.97] dark:border-white/30 dark:bg-dark-card dark:text-amber-200 dark:shadow-primary/20"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary/60 bg-[#1c1912]/90 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-primary shadow-lg shadow-primary/25 backdrop-blur transition-all hover:border-primary hover:bg-[#0f1408]/95 active:scale-[0.97] dark:border-amber-400/50 dark:bg-dark-card/95 dark:text-amber-200 dark:shadow-primary/20"
           >
             <IconShare className="h-4 w-4 shrink-0" />
             <span>Compartir y retar</span>
@@ -738,7 +738,7 @@ function VictoryOverlay({
               'inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
                 ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-                : 'border-2 border-primary bg-primary/70 text-primary shadow-lg shadow-primary/30 hover:bg-primary/80 dark:border-primary/60 dark:bg-primary/60 dark:text-white dark:hover:bg-primary/80'
+                : 'border-2 border-primary/80 bg-primary/90 text-[#4a3f32] shadow-lg shadow-primary/30 hover:bg-primary dark:border-primary/70 dark:bg-primary/85 dark:text-[#2a1a00] dark:shadow-primary/25 dark:hover:bg-primary'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -822,8 +822,10 @@ export function HomePage(): React.ReactElement {
       } catch {}
       if (next) {
         document.documentElement.classList.add('dark');
+        window.dispatchEvent(new CustomEvent('canicas:theme-change', { detail: { isDark: true } }));
       } else {
         document.documentElement.classList.remove('dark');
+        window.dispatchEvent(new CustomEvent('canicas:theme-change', { detail: { isDark: false } }));
       }
       return next;
     });
@@ -836,14 +838,20 @@ export function HomePage(): React.ReactElement {
         setDarkMode(stored === 'dark');
         if (stored === 'dark') {
           document.documentElement.classList.add('dark');
+          window.dispatchEvent(new CustomEvent('canicas:theme-change', { detail: { isDark: true } }));
         } else {
           document.documentElement.classList.remove('dark');
+          window.dispatchEvent(new CustomEvent('canicas:theme-change', { detail: { isDark: false } }));
         }
       } else {
         const mql = window.matchMedia('(prefers-color-scheme: dark)');
         setDarkMode(mql.matches);
         if (mql.matches) {
           document.documentElement.classList.add('dark');
+          window.dispatchEvent(new CustomEvent('canicas:theme-change', { detail: { isDark: true } }));
+        } else {
+          document.documentElement.classList.remove('dark');
+          window.dispatchEvent(new CustomEvent('canicas:theme-change', { detail: { isDark: false } }));
         }
       }
     } catch {}

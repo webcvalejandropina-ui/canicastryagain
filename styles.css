@@ -321,17 +321,25 @@ main {
 
 .player-card.active-turn {
     border-color: #f1b64d;
-    box-shadow: 0 0 0 3px rgba(241, 182, 77, 0.22);
+    box-shadow:
+        0 0 0 3px rgba(241, 182, 77, 0.22),
+        0 0 18px rgba(241, 182, 77, 0.18);
     animation: pulseTurn 1.7s ease-in-out infinite;
 }
 
 @keyframes pulseTurn {
     0%,
     100% {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        box-shadow:
+            0 0 0 3px rgba(241, 182, 77, 0.22),
+            0 0 14px rgba(241, 182, 77, 0.12);
     }
     50% {
-        transform: translateY(-2px);
+        transform: translateY(-2px) scale(1.015);
+        box-shadow:
+            0 0 0 4px rgba(241, 182, 77, 0.35),
+            0 0 24px rgba(241, 182, 77, 0.28);
     }
 }
 
@@ -1173,8 +1181,27 @@ main {
     }
 
     .player-card.active-turn {
-        border-color: #b56b20;
-        box-shadow: 0 0 0 3px rgba(181, 107, 32, 0.3);
+        border-color: #e08030;
+        box-shadow:
+            0 0 0 3px rgba(224, 128, 48, 0.35),
+            0 0 20px rgba(224, 128, 48, 0.25);
+        animation: pulseTurnDark 1.7s ease-in-out infinite;
+    }
+
+    @keyframes pulseTurnDark {
+        0%,
+        100% {
+            transform: translateY(0) scale(1);
+            box-shadow:
+                0 0 0 3px rgba(224, 128, 48, 0.3),
+                0 0 16px rgba(224, 128, 48, 0.18);
+        }
+        50% {
+            transform: translateY(-2px) scale(1.015);
+            box-shadow:
+                0 0 0 4px rgba(224, 128, 48, 0.45),
+                0 0 28px rgba(224, 128, 48, 0.32);
+        }
     }
 
     .player-name {

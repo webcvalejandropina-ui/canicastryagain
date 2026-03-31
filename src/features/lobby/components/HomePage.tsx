@@ -799,7 +799,8 @@ export function HomePage(): React.ReactElement {
   const [showGameMenu, setShowGameMenu] = useState(false);
   const [showKeyRulesInMenu, setShowKeyRulesInMenu] = useState(false);
   const [gameGuideCollapsed, setGameGuideCollapsed] = useState(false);
-  const [gameInfoPanelsVisible, setGameInfoPanelsVisible] = useState(true);
+  // Info panels hidden by default during active play — user can expand via header button
+  const [gameInfoPanelsVisible, setGameInfoPanelsVisible] = useState(false);
   const [pendingMove, setPendingMove] = useState<{ rowIndex: number; startIndex: number; endIndex: number } | null>(null);
   const [turnBannerKey, setTurnBannerKey] = useState(0);
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
@@ -2011,17 +2012,23 @@ export function HomePage(): React.ReactElement {
                       aria-label={gameInfoPanelsVisible ? 'Ocultar información de juego' : 'Mostrar información de juego'}
                       title={gameInfoPanelsVisible ? 'Ocultar paneles de información' : 'Mostrar paneles de información'}
                       className={[
-                        'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors active:scale-95',
+                        'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all active:scale-95',
                         gameInfoPanelsVisible
                           ? 'bg-primary/20 text-primary hover:bg-primary/30 dark:bg-primary/25 dark:text-primary'
-                          : 'bg-slate-500/15 text-slate-500 hover:bg-slate-500/25 dark:bg-white/10 dark:text-dark-muted'
+                          : 'bg-amber-500/20 text-amber-600 hover:bg-amber-500/30 dark:bg-amber-400/20 dark:text-amber-400 ring-1 ring-amber-400/30'
                       ].join(' ')}
                     >
-                      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75"/>
-                        <path d="M12 8v5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
-                        <circle cx="12" cy="5.5" r="0.75" fill="currentColor" stroke="none"/>
-                      </svg>
+                      {gameInfoPanelsVisible ? (
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75"/>
+                          <path d="M12 8v5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                          <circle cx="12" cy="5.5" r="0.75" fill="currentColor" stroke="none"/>
+                        </svg>
+                      ) : (
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                      )}
                     </button>
                   </div>
                 ) : (

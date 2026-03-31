@@ -135,7 +135,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
       </div>
 
       {game.status === 'finished' ? (
-        <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-4 text-center">
+        <div className="mt-4 rounded-xl border-2 border-primary/40 bg-primary/15 px-4 py-4 text-center shadow-lg shadow-primary/10 dark:border-primary/50 dark:bg-primary/20">
           <p className="text-[10px] font-black uppercase tracking-[0.16em] text-brown dark:text-dark-muted">Resultado</p>
           {game.winner ? (
             <div className="mt-2 flex items-center justify-center gap-2">
@@ -151,7 +151,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
                   <path d="M4 20C4 16.686 7.582 14 12 14C16.418 14 20 16.686 20 20" stroke="#94a3b8" strokeWidth="1.75" strokeLinecap="round"/>
                 </svg>
               )}
-              <p className="text-lg font-bold text-brown dark:text-dark-text">
+              <p className="text-lg font-black text-brown dark:text-dark-text">
                 {game.winner === 1 ? player1Name : player2Name}
               </p>
             </div>
@@ -167,7 +167,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
             <button
               type="button"
               onClick={onNewGame}
-              className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#4a3f32] shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.97]"
+              className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark/60 bg-primary px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-[#3d2e1a] shadow-xl shadow-amber-600/30 transition-all hover:brightness-110 hover:shadow-amber-600/50 active:scale-[0.97] dark:border-primary-dark/80 dark:text-[#2d1f0f] dark:shadow-amber-500/40"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="12" cy="16" rx="6" ry="7" fill="#f4c542" stroke="#d4a82e" strokeWidth="1.25"/>

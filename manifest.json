@@ -4,8 +4,8 @@
   "description": "Juego de canicas en forma de pirámide para dos jugadores",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#4a90e2",
+  "background_color": "#f5f0e8",
+  "theme_color": "#F4C542",
   "orientation": "any",
   "icons": [
     {

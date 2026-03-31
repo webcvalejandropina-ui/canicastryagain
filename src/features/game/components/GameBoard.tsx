@@ -241,9 +241,7 @@ function createMarbleTexture(
 
 function createRemovedMarbleTexture(
   THREE: any,
-  initial: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _colors: { base: string; highlight: string; shadow: string }
+  xColor: string
 ): any {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
@@ -251,50 +249,48 @@ function createRemovedMarbleTexture(
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
-  // Dark background — clearly "dead"
+  // Dark hollow background
   const baseGradient = ctx.createRadialGradient(90, 80, 24, 130, 130, 165);
-  baseGradient.addColorStop(0, '#374151');
-  baseGradient.addColorStop(0.5, '#1f2937');
-  baseGradient.addColorStop(1, '#111827');
+  baseGradient.addColorStop(0, '#1f2937');
+  baseGradient.addColorStop(0.6, '#111827');
+  baseGradient.addColorStop(1, '#030712');
   ctx.fillStyle = baseGradient;
   ctx.fillRect(0, 0, 256, 256);
 
-  // Diagonal cross-hatch pattern to show "removed"
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-  ctx.lineWidth = 1;
-  for (let i = -256; i < 512; i += 16) {
-    ctx.beginPath();
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i + 256, 256);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(i + 256, 0);
-    ctx.lineTo(i, 256);
-    ctx.stroke();
-  }
-
-  // Big bold X mark — unmistakable "removed" indicator, thicker for mobile visibility
-  ctx.lineWidth = 34;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#ef4444';
-  ctx.shadowColor = 'rgba(239, 68, 68, 1.0)';
-  ctx.shadowBlur = 20;
+  // Inner shadow ring — hollow look
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(44, 44);
-  ctx.lineTo(212, 212);
+  ctx.arc(128, 128, 100, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(128, 128, 110, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Big bold X mark — unmistakable "removed"
+  ctx.lineWidth = 30;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = xColor;
+  ctx.shadowColor = xColor;
+  ctx.shadowBlur = 16;
+  ctx.beginPath();
+  ctx.moveTo(48, 48);
+  ctx.lineTo(208, 208);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(212, 44);
-  ctx.lineTo(44, 212);
+  ctx.moveTo(208, 48);
+  ctx.lineTo(48, 208);
   ctx.stroke();
   ctx.shadowBlur = 0;
 
-  // Small player initial at bottom for reference
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-  ctx.font = 'bold 36px sans-serif';
-  ctx.textAlign = 'center';
+  // Center dot for extra "hollow" cue
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.beginPath();
+  ctx.arc(128, 128, 18, 0, Math.PI * 2);
+  ctx.fill();
   ctx.textBaseline = 'bottom';
-  ctx.fillText(initial.toUpperCase(), 128, 248);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
@@ -370,16 +366,12 @@ function buildBoardMeshes(
 
   if (context.cachedP1Initial !== p1Initial || !context.removedP1Texture) {
     context.removedP1Texture?.dispose?.();
-    context.removedP1Texture = createRemovedMarbleTexture(THREE, p1Initial, {
-      base: '#dc2626', highlight: '#fca5a5', shadow: '#7f1d1d'
-    });
+    context.removedP1Texture = createRemovedMarbleTexture(THREE, '#ef4444'); // red X
     context.cachedP1Initial = p1Initial;
   }
   if (context.cachedP2Initial !== p2Initial || !context.removedP2Texture) {
     context.removedP2Texture?.dispose?.();
-    context.removedP2Texture = createRemovedMarbleTexture(THREE, p2Initial, {
-      base: '#ea580c', highlight: '#fdba74', shadow: '#7c2d12'
-    });
+    context.removedP2Texture = createRemovedMarbleTexture(THREE, '#3b82f6'); // blue X
     context.cachedP2Initial = p2Initial;
   }
 
@@ -475,8 +467,10 @@ function buildBoardMeshes(
       }
 
       let textureMap: any;
-      if (!isActive && !isDying) {
-        const cellOwner = cellOwnerMap.get(cellKey);
+      if (!isActive || isDying) {
+        // Show X texture immediately — both dead marbles AND marbles currently dying
+        // (dying balls animate in place; the X marks them as "about to be removed")
+        const cellOwner = isDying ? cellOwnerMap.get(cellKey) : cellOwnerMap.get(cellKey);
         if (cellOwner === 1) {
           textureMap = context.removedP1Texture;
         } else if (cellOwner === 2) {
@@ -1498,11 +1492,20 @@ function LegacyBoardGrid({
                   );
                 }
 
+                // Build a precise, accessible label — reflects real state, not just "disponible"
+                const marbleLabel = (() => {
+                  if (isRemoved) return `Fila ${rowIndex + 1}, canica ${ballIndex + 1} (quitada)`;
+                  if (isSelected) return `Fila ${rowIndex + 1}, canica ${ballIndex + 1} (seleccionada)`;
+                  if (isBlocked && !isMarbleDisabled) return `Fila ${rowIndex + 1}, canica ${ballIndex + 1} (bloqueada — fila tocada por el rival)`;
+                  if (isMarbleDisabled) return `Fila ${rowIndex + 1}, canica ${ballIndex + 1} (no disponible)`;
+                  return `Fila ${rowIndex + 1}, canica ${ballIndex + 1} (disponible)`;
+                })();
+
                 return (
                   <button
                     key={`ball-${rowIndex}-${ballIndex}`}
                     type="button"
-                    aria-label={`Fila ${rowIndex + 1}, canica ${ballIndex + 1} (disponible)`}
+                    aria-label={marbleLabel}
                     className={activeMarbleClass({
                       isSelected,
                       isBlocked,

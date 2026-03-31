@@ -1051,16 +1051,33 @@ main {
 }
 
 /* Collapsed state - show a pill badge style */
+/* Pulsing attention ring when info panels are hidden during active gameplay */
+@keyframes info-toggle-pulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15) !important, 0 0 0 0 rgba(74, 144, 226, 0.4);
+    }
+    50% {
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15) !important, 0 0 0 6px rgba(74, 144, 226, 0);
+    }
+}
+
 #info-toggle-btn.info-collapsed {
     background: linear-gradient(145deg, #d0dcea 0%, #b8c9e0 100%) !important;
     color: #2d6dc2 !important;
     border-color: #a0bce0 !important;
     box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15) !important;
+    animation: info-toggle-pulse 2.5s ease-in-out infinite !important;
 }
 
 #info-toggle-btn.info-collapsed:hover:not(:disabled) {
     background: linear-gradient(145deg, #c0d0e8 0%, #a8b8d8 100%) !important;
     color: #1a5ab8 !important;
+    animation: none !important;
+}
+
+/* When info panels are VISIBLE during gameplay, stop the pulse — user knows the button works */
+#info-toggle-btn:not(.info-collapsed) {
+    animation: none !important;
 }
 
 /* ── Dark Mode ─────────────────────────────────────────────────── */
@@ -1423,18 +1440,39 @@ main {
         font-weight: 700;
     }
 
-    .action-buttons button:not(:disabled):hover {
-        background: linear-gradient(145deg, #1a4a7a 0%, #0f3a6f 100%) !important;
-        border-color: #5a8ad0 !important;
+    /* Confirm button (accent green) - keep its distinct color even in dark mode */
+    #confirm-btn {
+        background: linear-gradient(145deg, #0d7a64 0%, #0a5c4a 100%) !important;
+        border-color: #00c9a7 !important;
+        color: #a7f3e8 !important;
+        box-shadow: 0 2px 12px rgba(0, 201, 167, 0.25) !important;
+    }
+
+    #confirm-btn:not(:disabled):hover {
+        background: linear-gradient(145deg, #00e8be 0%, #00c9a7 100%) !important;
+        border-color: #5fffdc !important;
+        color: #00352e !important;
+        box-shadow: 0 4px 20px rgba(0, 201, 167, 0.45) !important;
+    }
+
+    /* Cancel button (danger red) - keep its distinct color even in dark mode */
+    #cancel-btn {
+        background: linear-gradient(145deg, #8b1a28 0%, #6b1020 100%) !important;
+        border-color: #e05060 !important;
+        color: #fecdd3 !important;
+        box-shadow: 0 2px 12px rgba(224, 80, 96, 0.25) !important;
+    }
+
+    #cancel-btn:not(:disabled):hover {
+        background: linear-gradient(145deg, #ff6b7a 0%, #e05060 100%) !important;
+        border-color: #ff9aa2 !important;
+        color: #2a0810 !important;
+        box-shadow: 0 4px 20px rgba(224, 80, 96, 0.45) !important;
     }
 
     .action-buttons button:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-    }
-
-    .action-buttons button:not(:disabled):hover {
-        background: linear-gradient(145deg, #1a4a6a 0%, #0f3a5a 100%) !important;
     }
 
     /* Modal mobile dark mode */
@@ -1463,6 +1501,11 @@ main {
             background: linear-gradient(145deg, #2a3a50 0%, #1a2a40 100%) !important;
             border-color: #3a4a60 !important;
             color: var(--ink-500) !important;
+            animation: info-toggle-pulse 2.5s ease-in-out infinite !important;
+        }
+
+        #info-toggle-btn:not(.info-collapsed) {
+            animation: none !important;
         }
 
         /* Dark mode toast — muted deep-red that reads well on dark backgrounds */
@@ -1476,16 +1519,60 @@ main {
             background: rgba(240, 100, 140, 0.4);
         }
 
-        /* Mobile game-over button dark mode */
+        /* Mobile game-over button dark mode — high contrast green with glow */
         #modal-restart-btn {
             background: linear-gradient(145deg, #166534 0%, #14532d 100%) !important;
             border-color: #4ade80 !important;
+            border-width: 3px !important;
             color: #ffffff !important;
+            box-shadow:
+                0 4px 20px rgba(21, 128, 61, 0.6),
+                0 0 20px rgba(74, 222, 128, 0.2) !important;
         }
 
         #modal-restart-btn:hover:not(:disabled) {
             background: linear-gradient(145deg, #15803d 0%, #166534 100%) !important;
+            box-shadow:
+                0 6px 28px rgba(21, 128, 61, 0.7),
+                0 0 30px rgba(74, 222, 128, 0.35) !important;
+            transform: translateY(-2px);
         }
+    }
+
+    /* ── VictoryOverlay / game-over buttons in dark mode ──────────── */
+    /* Fixed overlay z-index 100 — ensure buttons are high contrast */
+    .fixed.inset-0.z-\[100\] button {
+        backdrop-filter: blur(8px);
+    }
+
+    /* "Nueva partida" button in VictoryOverlay — extra glow in dark mode */
+    .fixed.inset-0.z-\[100\] button[class*="emerald"] {
+        box-shadow: 0 4px 20px rgba(0, 201, 167, 0.35), 0 0 16px rgba(16, 185, 129, 0.2) !important;
+    }
+
+    .fixed.inset-0.z-\[100\] button[class*="emerald"]:hover {
+        box-shadow: 0 6px 28px rgba(0, 201, 167, 0.5), 0 0 24px rgba(16, 185, 129, 0.35) !important;
+    }
+
+    /* "Volver al lobby" (win) — bright golden button with glow in dark mode */
+    .fixed.inset-0.z-\[100\] button[class*="bg-primary"][class*="text-"] {
+        border-color: rgba(244, 197, 66, 0.7) !important;
+        box-shadow: 0 4px 16px rgba(244, 197, 66, 0.3), 0 0 12px rgba(244, 197, 66, 0.15) !important;
+    }
+
+    /* "Volver al lobby" (loss) — muted but visible in dark mode */
+    .fixed.inset-0.z-\[100\] button[class*="bg-primary/40"] {
+        border-color: rgba(244, 197, 66, 0.5) !important;
+        color: #fcd34d !important;
+        box-shadow: 0 2px 10px rgba(244, 197, 66, 0.2) !important;
+    }
+
+    /* "Compartir y retar" button in dark mode */
+    .fixed.inset-0.z-\[100\] button[class*="border-primary/60"][class*="bg-"] {
+        border-color: rgba(244, 197, 66, 0.6) !important;
+        color: #fcd34d !important;
+        background: rgba(28, 25, 18, 0.95) !important;
+        box-shadow: 0 4px 16px rgba(244, 197, 66, 0.2) !important;
     }
 }
 

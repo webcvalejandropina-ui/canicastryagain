@@ -735,7 +735,7 @@ function VictoryOverlay({
               'inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
                 ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-                : 'border-2 border-primary/60 bg-[#1c1912]/90 text-primary shadow-lg shadow-primary/15 hover:border-primary hover:bg-[#1c1912]'
+                : 'border-2 border-primary/70 bg-primary/15 text-primary shadow-lg shadow-primary/25 hover:border-primary hover:bg-primary/25 dark:border-primary/80 dark:bg-primary/20 dark:text-primary'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -747,7 +747,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-leaf bg-leaf px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-leaf/30 transition-all hover:border-leaf-light hover:bg-leaf-light active:scale-[0.97] dark:border-leaf-soft dark:bg-[#1c1912]/90 dark:text-leaf-soft dark:shadow-leaf-soft/20 dark:hover:border-leaf-soft dark:hover:bg-[#1c1912]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-leaf bg-leaf px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-leaf/30 transition-all hover:border-leaf-light hover:bg-leaf-light active:scale-[0.97] dark:border-leaf-soft dark:bg-leaf-soft/90 dark:text-white dark:shadow-leaf-soft/25 dark:hover:border-leaf-soft dark:hover:bg-leaf-soft"
             >
               <IconPlus className="h-4 w-4 shrink-0" />
               <span>Nueva partida</span>

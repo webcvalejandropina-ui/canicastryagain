@@ -271,19 +271,19 @@ function createRemovedMarbleTexture(
     ctx.stroke();
   }
 
-  // Big bold X mark — unmistakable "removed" indicator
-  ctx.lineWidth = 28;
+  // Big bold X mark — unmistakable "removed" indicator, thicker for mobile visibility
+  ctx.lineWidth = 34;
   ctx.lineCap = 'round';
   ctx.strokeStyle = '#ef4444';
-  ctx.shadowColor = 'rgba(239, 68, 68, 0.9)';
-  ctx.shadowBlur = 16;
+  ctx.shadowColor = 'rgba(239, 68, 68, 1.0)';
+  ctx.shadowBlur = 20;
   ctx.beginPath();
-  ctx.moveTo(48, 48);
-  ctx.lineTo(208, 208);
+  ctx.moveTo(44, 44);
+  ctx.lineTo(212, 212);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(208, 48);
-  ctx.lineTo(48, 208);
+  ctx.moveTo(212, 44);
+  ctx.lineTo(44, 212);
   ctx.stroke();
   ctx.shadowBlur = 0;
 
@@ -1240,6 +1240,21 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     reducedMotionMql?.removeEventListener?.('change', onReducedMotionChange);
   });
 
+  // Listen for color-scheme changes so the 3D scene background updates on mobile when the system theme switches
+  const colorSchemeMql = window.matchMedia?.('(prefers-color-scheme: dark)');
+  const onColorSchemeChange = (): void => {
+    const isDark = colorSchemeMql?.matches ?? false;
+    const bgColor = isDark ? 0x0d0c09 : 0xf5f0e8;
+    if (context.scene) {
+      context.scene.background = new THREE.Color(bgColor);
+    }
+    renderer.setClearColor(bgColor, 1);
+  };
+  colorSchemeMql?.addEventListener?.('change', onColorSchemeChange);
+  context.cleanupHandlers.push(() => {
+    colorSchemeMql?.removeEventListener?.('change', onColorSchemeChange);
+  });
+
   // WebGL context loss / restore — critical for mobile stability
   const onContextLost = (event: Event): void => {
     event.preventDefault();
@@ -1434,11 +1449,12 @@ function LegacyBoardGrid({
                   const isP1 = cellOwner === 1;
                   const isP2 = cellOwner === 2;
                   const initial = isP1 ? p1Initial : isP2 ? p2Initial : '';
+                  // Distinct dark backgrounds per owner — unmistakably "dead" balls
                   const bgClass = isP1
-                    ? 'border-red-500/80 bg-gradient-to-br from-red-800 to-red-950'
+                    ? 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999'
                     : isP2
-                      ? 'border-orange-500/80 bg-gradient-to-br from-orange-800 to-orange-950'
-                      : 'border-slate-600/80 bg-gradient-to-br from-slate-800 to-slate-950';
+                      ? 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999'
+                      : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999';
 
                   return (
                     <button
@@ -1457,9 +1473,9 @@ function LegacyBoardGrid({
                     >
                       {/* Bold SVG X mark — unmistakable "removed" indicator, matches 3D texture */}
                       <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center select-none">
-                        <svg viewBox="0 0 24 24" className="w-full h-full p-1 drop-shadow-[0_0_3px_rgba(239,68,68,0.9)]" xmlns="http://www.w3.org/2000/svg">
-                          <line x1="5" y1="5" x2="19" y2="19" stroke="#ef4444" strokeWidth="4" strokeLinecap="round"/>
-                          <line x1="19" y1="5" x2="5" y2="19" stroke="#ef4444" strokeWidth="4" strokeLinecap="round"/>
+                        <svg viewBox="0 0 24 24" className="w-full h-full p-1 drop-shadow-[0_0_6px_rgba(239,68,68,1)]" xmlns="http://www.w3.org/2000/svg">
+                          <line x1="4" y1="4" x2="20" y2="20" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
+                          <line x1="20" y1="4" x2="4" y2="20" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
                         </svg>
                       </span>
                       {/* Player initial at bottom-right corner for reference */}

@@ -1450,11 +1450,13 @@ function LegacyBoardGrid({
                   const isP2 = cellOwner === 2;
                   const initial = isP1 ? p1Initial : isP2 ? p2Initial : '';
                   // Distinct dark backgrounds per owner — unmistakably "dead" balls
+                  // Light mode: very dark backgrounds for contrast
+                  // Dark mode: slightly lighter so X mark stays visible against the dark page bg
                   const bgClass = isP1
-                    ? 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999'
+                    ? 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999 dark:from-red-900/80 dark:to-red-950 dark:border-red-500/70'
                     : isP2
-                      ? 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999'
-                      : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999';
+                      ? 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900/80 dark:to-orange-950 dark:border-orange-500/70'
+                      : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-800/80 dark:to-slate-950 dark:border-slate-500/70';
 
                   return (
                     <button

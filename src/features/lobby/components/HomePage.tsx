@@ -735,7 +735,7 @@ function VictoryOverlay({
               'inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
                 ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-                : 'border-2 border-primary/70 bg-primary/15 text-primary shadow-lg shadow-primary/25 hover:border-primary hover:bg-primary/25 dark:border-primary/80 dark:bg-primary/20 dark:text-primary'
+                : 'border-2 border-primary/70 bg-primary/30 text-primary shadow-lg shadow-primary/25 hover:border-primary hover:bg-primary/40 dark:border-primary/80 dark:bg-primary/25 dark:text-primary'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -747,7 +747,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-leaf bg-leaf px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-leaf/30 transition-all hover:border-leaf-light hover:bg-leaf-light active:scale-[0.97] dark:border-leaf-soft dark:bg-leaf-soft/90 dark:text-white dark:shadow-leaf-soft/25 dark:hover:border-leaf-soft dark:hover:bg-leaf-soft"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-leaf bg-leaf px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-leaf/40 transition-all hover:border-leaf-light hover:bg-leaf-light active:scale-[0.97] dark:border-leaf-soft dark:bg-leaf dark:text-white dark:shadow-leaf-soft/30 dark:hover:border-leaf-soft dark:hover:bg-leaf-soft"
             >
               <IconPlus className="h-4 w-4 shrink-0" />
               <span>Nueva partida</span>
@@ -806,6 +806,42 @@ export function HomePage(): React.ReactElement {
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
   const [boardAttentionPulse, setBoardAttentionPulse] = useState(false);
   const [lastDiceResult, setLastDiceResult] = useState<DiceResult | null>(null);
+  // Manual dark mode — persists to localStorage, falls back to system preference
+  const [darkMode, setDarkMode] = useState<boolean | null>(null);
+  const toggleDarkMode = useCallback(() => {
+    setDarkMode((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('__canicas_theme__', next ? 'dark' : 'light');
+      } catch {}
+      if (next) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return next;
+    });
+  }, []);
+  // Sync with system preference on mount if no stored preference
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('__canicas_theme__');
+      if (stored !== null) {
+        setDarkMode(stored === 'dark');
+        if (stored === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } else {
+        const mql = window.matchMedia('(prefers-color-scheme: dark)');
+        setDarkMode(mql.matches);
+        if (mql.matches) {
+          document.documentElement.classList.add('dark');
+        }
+      }
+    } catch {}
+  }, []);
 
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
@@ -1764,6 +1800,25 @@ export function HomePage(): React.ReactElement {
               </nav>
               <button
                 type="button"
+                aria-label={darkMode ? 'Modo claro' : 'Modo oscuro'}
+                title={darkMode ? 'Modo claro' : 'Modo oscuro'}
+                onClick={toggleDarkMode}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brown/30 bg-beige/80 text-brown transition-all hover:border-primary/40 hover:bg-primary/20 hover:text-primary active:scale-[0.98] dark:border-white/15 dark:bg-dark-card dark:text-dark-muted dark:hover:border-primary/40 dark:hover:bg-primary/15 dark:hover:text-primary sm:h-9 sm:w-9"
+              >
+                {darkMode ? (
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="4.5" fill="currentColor"/>
+                    <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M4.93 4.93l1.06 1.06M17.01 17.01l1.06 1.06M4.93 19.07l1.06-1.06M17.01 6.99l1.06-1.06" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.75 13.5a9.25 9.25 0 01-9.25-9.25c0-.83.11-1.63.31-2.38a9.25 9.25 0 016.9 6.9 9.25 9.25 0 012.04 2.73z" fill="currentColor"/>
+                    <path d="M3.75 13.5a9 9 0 019-9 9.25 9.25 0 016.9 2.73 6.75 6.75 0 010 9.19 9.25 9.25 0 01-6.9 2.73 9 9 0 01-9-9.25z" fill="currentColor" opacity=".35"/>
+                  </svg>
+                )}
+              </button>
+              <button
+                type="button"
                 aria-label="Ayuda"
                 title="Ayuda"
                 onClick={() => handleNavigate('reglas')}
@@ -1794,6 +1849,25 @@ export function HomePage(): React.ReactElement {
                 )}
               </button>
             ))}
+            <button
+              type="button"
+              aria-label={darkMode ? 'Modo claro' : 'Modo oscuro'}
+              title={darkMode ? 'Modo claro' : 'Modo oscuro'}
+              onClick={toggleDarkMode}
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brown/20 bg-beige/80 text-brown transition-colors hover:border-primary/40 hover:bg-primary/20 hover:text-primary active:scale-[0.98] dark:border-white/15 dark:bg-dark-card dark:text-dark-muted dark:hover:text-primary"
+            >
+              {darkMode ? (
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="4.5" fill="currentColor"/>
+                  <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M4.93 4.93l1.06 1.06M17.01 17.01l1.06 1.06M4.93 19.07l1.06-1.06M17.01 6.99l1.06-1.06" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                </svg>
+              ) : (
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21.75 13.5a9.25 9.25 0 01-9.25-9.25c0-.83.11-1.63.31-2.38a9.25 9.25 0 016.9 6.9 9.25 9.25 0 012.04 2.73z" fill="currentColor"/>
+                  <path d="M3.75 13.5a9 9 0 019-9 9.25 9.25 0 016.9 2.73 6.75 6.75 0 010 9.19 9.25 9.25 0 01-6.9 2.73 9 9 0 01-9-9.25z" fill="currentColor" opacity=".35"/>
+                </svg>
+              )}
+            </button>
           </nav>
 
           <main id="inicio" className="flex flex-1 items-start justify-center px-4 pb-6 pt-2 sm:px-6 md:items-center md:px-12">
@@ -2057,6 +2131,25 @@ export function HomePage(): React.ReactElement {
                           </button>
                         ))}
                       </nav>
+                      <button
+                        type="button"
+                        aria-label={darkMode ? 'Modo claro' : 'Modo oscuro'}
+                        title={darkMode ? 'Modo claro' : 'Modo oscuro'}
+                        onClick={toggleDarkMode}
+                        className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brown/30 bg-beige/80 text-brown transition-all hover:border-primary/40 hover:bg-primary/20 hover:text-primary active:scale-[0.98] dark:border-white/15 dark:bg-dark-card dark:text-dark-muted dark:hover:border-primary/40 dark:hover:bg-primary/15 dark:hover:text-primary sm:h-9 sm:w-9"
+                      >
+                        {darkMode ? (
+                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="4.5" fill="currentColor"/>
+                            <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M4.93 4.93l1.06 1.06M17.01 17.01l1.06 1.06M4.93 19.07l1.06-1.06M17.01 6.99l1.06-1.06" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                          </svg>
+                        ) : (
+                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21.75 13.5a9.25 9.25 0 01-9.25-9.25c0-.83.11-1.63.31-2.38a9.25 9.25 0 016.9 6.9 9.25 9.25 0 012.04 2.73z" fill="currentColor"/>
+                            <path d="M3.75 13.5a9 9 0 019-9 9.25 9.25 0 016.9 2.73 6.75 6.75 0 010 9.19 9.25 9.25 0 01-6.9 2.73 9 9 0 01-9-9.25z" fill="currentColor" opacity=".35"/>
+                          </svg>
+                        )}
+                      </button>
                       <button
                         type="button"
                         onClick={() => setShowDeleteModal(true)}

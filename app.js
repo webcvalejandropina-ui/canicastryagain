@@ -23,7 +23,8 @@ const GameState = {
     connected: false,
     loggedIn: false,
     pendingGameCode: null, // Código de juego pendiente después del login
-    cardsVisible: false // Info cards visibility toggle
+    cardsVisible: false, // Info cards visibility toggle
+    cardsManualOverride: false // Tracks if user manually toggled during selection
 };
 
 // ============================================
@@ -698,6 +699,7 @@ function handleConfirm() {
         // Limpiar selección inmediatamente
         GameState.selectedRowIndex = null;
         GameState.selectedCount = 0;
+        GameState.cardsManualOverride = false;
         renderBoard();
         updateUI();
     } else {
@@ -708,6 +710,7 @@ function handleConfirm() {
 function handleCancel() {
     GameState.selectedRowIndex = null;
     GameState.selectedCount = 0;
+    GameState.cardsManualOverride = false;
     renderBoard();
     updateUI();
 }
@@ -771,6 +774,10 @@ function handleReset() {
 }
 
 function handleInfoToggle() {
+    // If player is selecting balls, mark this as a manual override
+    if (GameState.selectedCount > 0) {
+        GameState.cardsManualOverride = true;
+    }
     GameState.cardsVisible = !GameState.cardsVisible;
     applyCardsVisibility();
 }
@@ -783,7 +790,18 @@ function applyCardsVisibility() {
     
     if (!btn) return;
     
-    if (GameState.cardsVisible) {
+    // Auto-collapse info cards when player is actively selecting balls
+    const isSelecting = GameState.selectedCount > 0;
+    
+    // If player explicitly toggled during selection, respect their choice
+    let shouldShow;
+    if (isSelecting && GameState.cardsManualOverride) {
+        shouldShow = GameState.cardsVisible;
+    } else {
+        shouldShow = !isSelecting && GameState.cardsVisible;
+    }
+    
+    if (shouldShow) {
         // Show extra info
         if (playersInfo) playersInfo.style.display = '';
         if (statsEl) statsEl.style.display = '';
@@ -867,6 +885,7 @@ function makeMove(rowIndex, removeCount) {
         GameState.playerTurn = GameState.playerTurn === 1 ? 2 : 1;
         GameState.selectedRowIndex = null;
         GameState.selectedCount = 0;
+        GameState.cardsManualOverride = false;
 
         renderBoard();
         updateUI();

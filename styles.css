@@ -623,14 +623,14 @@ main {
 .ball.removed-ball::after {
     content: '';
     position: absolute;
-    width: 78%;
-    height: 4px;
-    background: #dc2626;
+    width: 82%;
+    height: 5px;
+    background: #ef4444;
     border-radius: 3px;
     top: 50%;
     left: 50%;
     transform-origin: center;
-    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.5);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.8), 0 1px 3px rgba(220, 38, 38, 0.5);
 }
 
 .ball.removed-ball::before {
@@ -639,6 +639,14 @@ main {
 
 .ball.removed-ball::after {
     transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Subtle red tint behind removed balls to make them stand out more */
+.ball.removed-ball {
+    box-shadow:
+        inset 0 3px 8px rgba(0, 0, 0, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 0 12px rgba(239, 68, 68, 0.15) !important;
 }
 
 .ball.blocked-ball::after {
@@ -704,6 +712,11 @@ main {
     font-size: clamp(1.15rem, 2.5vw, 1.45rem);
     color: var(--ink-900);
     margin-bottom: 10px;
+}
+
+/* Hidden cards class for gameplay - used by JS to collapse info panels */
+.hidden-cards {
+    display: none !important;
 }
 
 #history-list {
@@ -956,32 +969,35 @@ main {
 
 /* Game over modal restart button - high visibility */
 #modal-restart-btn {
-    background: linear-gradient(145deg, #16a34a 0%, #15803d 50%, #166534 100%) !important;
+    background: linear-gradient(145deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
     color: #ffffff !important;
-    font-size: 1.1rem !important;
+    font-size: 1.15rem !important;
     font-weight: 900 !important;
-    border: 3px solid #4ade80 !important;
+    border: 4px solid #86efac !important;
     border-radius: 14px !important;
     box-shadow:
-        0 4px 20px rgba(21, 128, 61, 0.5),
-        0 0 0 1px rgba(74, 222, 128, 0.2) inset !important;
-    letter-spacing: 0.03em;
-    min-height: 56px;
-    padding: 0 28px !important;
+        0 4px 24px rgba(21, 128, 61, 0.6),
+        0 0 30px rgba(74, 222, 128, 0.3),
+        0 0 0 2px rgba(74, 222, 128, 0.25) inset !important;
+    letter-spacing: 0.04em;
+    min-height: 60px;
+    padding: 0 32px !important;
     text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #modal-restart-btn:hover:not(:disabled) {
-    background: linear-gradient(145deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
+    background: linear-gradient(145deg, #4ade80 0%, #22c55e 50%, #16a34a 100%) !important;
     box-shadow:
-        0 6px 28px rgba(21, 128, 61, 0.6),
-        0 0 0 2px rgba(74, 222, 128, 0.35) inset !important;
-    transform: translateY(-2px);
+        0 8px 32px rgba(21, 128, 61, 0.7),
+        0 0 40px rgba(74, 222, 128, 0.4),
+        0 0 0 3px rgba(74, 222, 128, 0.4) inset !important;
+    transform: translateY(-3px);
 }
 
 #modal-restart-btn:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(21, 128, 61, 0.4) !important;
+    box-shadow: 0 2px 12px rgba(21, 128, 61, 0.5) !important;
 }
 
 /* Game over modal message text */
@@ -1301,7 +1317,17 @@ main {
     .ball.removed-ball::before,
     .ball.removed-ball::after {
         background: #f87171 !important;
-        box-shadow: 0 1px 4px rgba(248, 113, 113, 0.6) !important;
+        box-shadow: 0 0 6px rgba(248, 113, 113, 0.8), 0 1px 4px rgba(248, 113, 113, 0.6) !important;
+        width: 84% !important;
+        height: 5px !important;
+    }
+
+    /* Dark mode: enhanced red tint for removed balls */
+    .ball.removed-ball {
+        box-shadow:
+            inset 0 3px 8px rgba(0, 0, 0, 0.5),
+            0 2px 4px rgba(0, 0, 0, 0.2),
+            inset 0 0 16px rgba(239, 68, 68, 0.2) !important;
     }
 
     /* Game over modal overlay */
@@ -1315,38 +1341,59 @@ main {
 
     /* Dark mode game-over button */
     #modal-restart-btn {
-        background: linear-gradient(145deg, #166534 0%, #14532d 100%) !important;
-        border-color: #4ade80 !important;
+        background: linear-gradient(145deg, #16a34a 0%, #15803d 50%, #14532d 100%) !important;
+        border-color: #86efac !important;
         color: #ffffff !important;
+        box-shadow:
+            0 4px 24px rgba(21, 128, 61, 0.6),
+            0 0 30px rgba(74, 222, 128, 0.25) !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     }
 
     #modal-restart-btn:hover:not(:disabled) {
-        background: linear-gradient(145deg, #15803d 0%, #166534 100%) !important;
+        background: linear-gradient(145deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
+        box-shadow:
+            0 6px 28px rgba(21, 128, 61, 0.7),
+            0 0 40px rgba(74, 222, 128, 0.35) !important;
     }
 
     /* ── Mobile dark mode fixes ─────────────────────────────────── */
     .selection-controls {
-        background: rgba(22, 32, 50, 0.97) !important;
-        backdrop-filter: blur(8px);
+        background: rgba(15, 22, 35, 0.98) !important;
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(60, 90, 130, 0.3) !important;
     }
 
     .selection-controls label {
-        color: var(--ink-700) !important;
+        color: #a0b8d8 !important;
+        font-weight: 600;
     }
 
     .quantity-buttons {
-        background: #162032 !important;
-        border-color: #2a3a50 !important;
+        background: #0f172a !important;
+        border-color: #2a3a5a !important;
     }
 
     #quantity-display {
-        color: #7ab8f5 !important;
+        color: #93c5fd !important;
+        font-weight: 700;
     }
 
     .action-buttons button {
-        background: linear-gradient(145deg, #1a3a5a 0%, #0f2a4a 100%) !important;
-        border-color: #2a5a8a !important;
-        color: #7ab8f5 !important;
+        background: linear-gradient(145deg, #1e3a5f 0%, #0f2a4f 100%) !important;
+        border-color: #3a6a9f !important;
+        color: #93c5fd !important;
+        font-weight: 700;
+    }
+
+    .action-buttons button:not(:disabled):hover {
+        background: linear-gradient(145deg, #1a4a7a 0%, #0f3a6f 100%) !important;
+        border-color: #5a8ad0 !important;
+    }
+
+    .action-buttons button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     .action-buttons button:not(:disabled):hover {

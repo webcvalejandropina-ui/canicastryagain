@@ -645,7 +645,7 @@ function VictoryOverlay({
               'mx-auto mb-3 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-black uppercase tracking-[0.16em]',
               isWin
                 ? 'border-primary/40 bg-primary/20 text-primary shadow-[0_0_12px_rgba(212,175,55,0.25)]'
-                : 'border-white/20 bg-white/10 text-white/80'
+                : 'border-primary/40 bg-[#1c1912]/90 text-primary shadow-[0_0_8px_rgba(212,175,55,0.15)]'
             ].join(' ')}
             role="status"
             aria-live="polite"
@@ -706,7 +706,7 @@ function VictoryOverlay({
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white backdrop-blur transition-all hover:bg-white/20 active:scale-[0.97]"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/50 bg-[#1c1912]/90 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-primary shadow-lg shadow-primary/20 backdrop-blur transition-all hover:border-primary hover:bg-[#1c1912] active:scale-[0.97]"
           >
             <IconShare className="h-4 w-4 shrink-0" />
             <span>Compartir y retar</span>
@@ -720,7 +720,7 @@ function VictoryOverlay({
               'inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
                 ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-                : 'border border-primary/40 bg-primary/15 text-white hover:bg-primary/25'
+                : 'border-2 border-primary/60 bg-[#1c1912]/90 text-primary shadow-lg shadow-primary/15 hover:border-primary hover:bg-[#1c1912]'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -732,7 +732,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-leaf/40 bg-leaf/20 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-leaf transition-all hover:border-leaf hover:bg-leaf/30 active:scale-[0.97] dark:text-leaf-soft dark:border-leaf-soft/40 dark:bg-leaf-soft/15 dark:hover:bg-leaf-soft/25"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-leaf bg-leaf px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-leaf/30 transition-all hover:border-leaf-light hover:bg-leaf-light active:scale-[0.97] dark:border-leaf-soft dark:bg-[#1c1912]/90 dark:text-leaf-soft dark:shadow-leaf-soft/20 dark:hover:border-leaf-soft dark:hover:bg-[#1c1912]"
             >
               <IconPlus className="h-4 w-4 shrink-0" />
               <span>Nueva partida</span>
@@ -784,6 +784,7 @@ export function HomePage(): React.ReactElement {
   const [showGameMenu, setShowGameMenu] = useState(false);
   const [showKeyRulesInMenu, setShowKeyRulesInMenu] = useState(false);
   const [gameGuideCollapsed, setGameGuideCollapsed] = useState(false);
+  const [gameInfoPanelsVisible, setGameInfoPanelsVisible] = useState(true);
   const [pendingMove, setPendingMove] = useState<{ rowIndex: number; startIndex: number; endIndex: number } | null>(null);
   const [turnBannerKey, setTurnBannerKey] = useState(0);
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
@@ -1989,6 +1990,24 @@ export function HomePage(): React.ReactElement {
                     >
                       <IconRefresh className="h-4 w-4 shrink-0" />
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setGameInfoPanelsVisible((v) => !v)}
+                      aria-label={gameInfoPanelsVisible ? 'Ocultar información de juego' : 'Mostrar información de juego'}
+                      title={gameInfoPanelsVisible ? 'Ocultar paneles de información' : 'Mostrar paneles de información'}
+                      className={[
+                        'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors active:scale-95',
+                        gameInfoPanelsVisible
+                          ? 'bg-primary/20 text-primary hover:bg-primary/30 dark:bg-primary/25 dark:text-primary'
+                          : 'bg-slate-500/15 text-slate-500 hover:bg-slate-500/25 dark:bg-white/10 dark:text-dark-muted'
+                      ].join(' ')}
+                    >
+                      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75"/>
+                        <path d="M12 8v5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                        <circle cx="12" cy="5.5" r="0.75" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </button>
                   </div>
                 ) : (
                   <>
@@ -2347,7 +2366,7 @@ export function HomePage(): React.ReactElement {
 
             {game ? (
               <section className={isGameMode ? 'flex flex-1 flex-col' : 'order-2'}>
-                {isGameMode && game.status === 'playing' ? (
+                {isGameMode && game.status === 'playing' && gameInfoPanelsVisible ? (
                   <div className="mx-2 mb-1.5 shrink-0 sm:mx-3">
                     <div className="rounded-2xl border border-leaf/25 bg-white/90 shadow-sm backdrop-blur dark:border-leaf-soft/20 dark:bg-dark-card/92">
                       <div className="flex items-center justify-between gap-2 border-b border-leaf/10 px-3 py-2 dark:border-white/10">
@@ -2395,7 +2414,7 @@ export function HomePage(): React.ReactElement {
                     </div>
                   </div>
                 ) : null}
-                {isGameMode && game.status === 'playing' ? (
+                {isGameMode && game.status === 'playing' && gameInfoPanelsVisible ? (
                   <div key={turnBannerKey} className="turn-banner-enter mx-2 mb-2 shrink-0 sm:mx-3" aria-live="polite">
                     <div className="rounded-2xl border border-brown/15 bg-white/90 px-3 py-2.5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-dark-card/92">
                       <div className="flex flex-wrap items-start justify-between gap-2">

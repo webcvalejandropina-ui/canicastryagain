@@ -1435,10 +1435,10 @@ function LegacyBoardGrid({
                   const isP2 = cellOwner === 2;
                   const initial = isP1 ? p1Initial : isP2 ? p2Initial : '';
                   const bgClass = isP1
-                    ? 'border-red-500/60 bg-gradient-to-br from-red-400 to-red-700'
+                    ? 'border-red-400/80 bg-gradient-to-br from-red-600 to-red-800'
                     : isP2
-                      ? 'border-orange-500/60 bg-gradient-to-br from-orange-400 to-orange-700'
-                      : 'border-red-900/50 bg-gradient-to-br from-red-800 to-red-950';
+                      ? 'border-orange-400/80 bg-gradient-to-br from-orange-600 to-orange-800'
+                      : 'border-slate-500/70 bg-gradient-to-br from-slate-700 to-slate-900';
 
                   return (
                     <button
@@ -1447,16 +1447,31 @@ function LegacyBoardGrid({
                       aria-label={`Fila ${rowIndex + 1}, canica ${ballIndex + 1} (quitada por ${isP1 ? game.player1?.name : isP2 ? game.player2?.name : 'dado'})`}
                       className={[
                         marbleSizeClass(density),
-                        'rounded-full border transition-all duration-150 cursor-default',
+                        'rounded-full border transition-all duration-150 cursor-default relative overflow-hidden',
                         'flex items-center justify-center',
-                        'text-black/80 font-bold shadow-inner',
                         density === 'dense' ? 'text-[8px]' : density === 'compact' ? 'text-[9px]' : 'text-[11px]',
                         bgClass
                       ].join(' ')}
                       disabled
                       style={{ touchAction: 'manipulation' }}
                     >
-                      {initial}
+                      {/* Bold X mark — unmistakable "removed" indicator, matches 3D texture */}
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-0 flex items-center justify-center font-black text-white select-none"
+                        style={{ fontSize: '0.7em', textShadow: '0 0 3px rgba(0,0,0,0.8)', color: '#ffffff' }}
+                      >
+                        ✕
+                      </span>
+                      {/* Player initial at bottom-right corner for reference */}
+                      {initial ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-px right-px text-[0.55em] font-bold text-white/50"
+                        >
+                          {initial}
+                        </span>
+                      ) : null}
                     </button>
                   );
                 }

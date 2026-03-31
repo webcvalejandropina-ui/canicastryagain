@@ -136,7 +136,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
 
       {game.status === 'finished' ? (
         <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-4 text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-primary/70">Resultado</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-brown dark:text-dark-muted">Resultado</p>
           {game.winner ? (
             <div className="mt-2 flex items-center justify-center gap-2">
               {game.winner === game.yourPlayerNumber ? (
@@ -156,7 +156,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
               </p>
             </div>
           ) : null}
-          <p className="mt-1 text-sm font-semibold text-primary">
+          <p className={`mt-1 text-sm font-semibold ${game.winner === game.yourPlayerNumber ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
             {game.winner
               ? game.winner === game.yourPlayerNumber
                 ? '¡Victoria!'
@@ -167,7 +167,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
             <button
               type="button"
               onClick={onNewGame}
-              className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/20 px-5 py-2 text-xs font-black uppercase tracking-[0.14em] text-primary shadow-sm transition hover:bg-primary/30 active:scale-[0.97]"
+              className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#4a3f32] shadow-lg shadow-primary/25 transition hover:brightness-110 active:scale-[0.97]"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="12" cy="16" rx="6" ry="7" fill="#f4c542" stroke="#d4a82e" strokeWidth="1.25"/>

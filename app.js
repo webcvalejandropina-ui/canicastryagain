@@ -523,6 +523,65 @@ function updateHistory() {
 // INTERACCIÓN
 // ============================================
 
+// ============================================
+// NAVEGACIÓN POR TECLADO DEL TABLERO (FLECHAS)
+// ============================================
+
+function handleBoardGridNav(e) {
+    const { key } = e;
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)) return;
+
+    const board = document.getElementById('board');
+    const activeEl = document.activeElement;
+    if (!activeEl.classList.contains('ball') || activeEl.classList.contains('removed-ball') || activeEl.classList.contains('blocked-ball')) return;
+
+    const fromRow = parseInt(activeEl.dataset.rowIndex);
+    const fromBall = parseInt(activeEl.dataset.ballIndex);
+    const rowCount = GameState.rows[fromRow];
+
+    let toRow = fromRow;
+    let toBall = fromBall;
+    let handled = false;
+
+    if (key === 'ArrowLeft') {
+        if (fromBall > 0) {
+            toBall = fromBall - 1;
+            handled = true;
+        }
+    } else if (key === 'ArrowRight') {
+        if (fromBall < rowCount - 1) {
+            toBall = fromBall + 1;
+            handled = true;
+        }
+    } else if (key === 'ArrowUp') {
+        if (fromRow > 0) {
+            const prevRowCount = GameState.rows[fromRow - 1];
+            // Map ball index to closest ball in previous row
+            toRow = fromRow - 1;
+            toBall = Math.min(fromBall, prevRowCount - 1);
+            handled = true;
+        }
+    } else if (key === 'ArrowDown') {
+        if (fromRow < GameState.rows.length - 1) {
+            const nextRowCount = GameState.rows[fromRow + 1];
+            // Map ball index to closest ball in next row
+            toRow = fromRow + 1;
+            toBall = Math.min(fromBall, nextRowCount - 1);
+            handled = true;
+        }
+    }
+
+    if (!handled) return;
+    e.preventDefault();
+
+    const targetRow = board.children[toRow];
+    if (!targetRow) return;
+    const targetBall = targetRow.children[toBall];
+    if (targetBall && targetBall.classList.contains('ball') && !targetBall.classList.contains('removed-ball')) {
+        targetBall.focus();
+    }
+}
+
 function handleBallClick(rowIndex, ballIndex) {
     if (GameState.mode === 'multiplayer' && GameState.playerTurn !== GameState.playerNumber) {
         return;
@@ -722,6 +781,12 @@ function makeMove(rowIndex, removeCount) {
             boardEl.classList.remove('flash-turn');
             void boardEl.offsetWidth; // force reflow to restart animation
             boardEl.classList.add('flash-turn');
+        }
+
+        // Move keyboard focus to first interactive ball of the new turn
+        if (boardEl) {
+            const firstBall = boardEl.querySelector('.ball:not(.removed-ball):not(.blocked-ball)');
+            if (firstBall) firstBall.focus();
         }
     }, 60);
 }
@@ -1037,6 +1102,10 @@ function setupEventListeners() {
             handleCancel();
         }
     });
+
+    // Flechas de dirección en el tablero
+    const board = document.getElementById('board');
+    board.addEventListener('keydown', handleBoardGridNav);
 }
 
 // ============================================

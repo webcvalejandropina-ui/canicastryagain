@@ -205,8 +205,9 @@ button:disabled {
 button:focus-visible,
 input:focus-visible,
 .ball:focus-visible {
-    outline: 3px solid rgba(11, 94, 200, 0.26);
-    outline-offset: 2px;
+    outline: 3px solid rgba(11, 94, 200, 0.55);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(11, 94, 200, 0.12);
 }
 
 #confirm-btn {

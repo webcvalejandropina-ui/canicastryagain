@@ -1446,6 +1446,9 @@ function LegacyBoardGrid({
                     : isP2
                       ? 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900/80 dark:to-orange-950 dark:border-orange-500/70'
                       : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-800/80 dark:to-slate-950 dark:border-slate-500/70';
+                  // X mark color matches the 3D texture: red for J1, blue for J2, grey for neutral
+                  const xColor = isP1 ? '#ef4444' : isP2 ? '#3b82f6' : '#94a3b8';
+                  const xGlow = isP1 ? 'rgba(239,68,68,0.9)' : isP2 ? 'rgba(59,130,246,0.9)' : 'rgba(148,163,184,0.7)';
 
                   return (
                     <button
@@ -1464,9 +1467,9 @@ function LegacyBoardGrid({
                     >
                       {/* Bold SVG X mark — unmistakable "removed" indicator, matches 3D texture */}
                       <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center select-none">
-                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.9))' }}>
-                          <line x1="3" y1="3" x2="21" y2="21" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
-                          <line x1="21" y1="3" x2="3" y2="21" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
+                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: `drop-shadow(0 0 4px ${xGlow})` }}>
+                          <line x1="3" y1="3" x2="21" y2="21" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
+                          <line x1="21" y1="3" x2="3" y2="21" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
                         </svg>
                       </span>
                       {/* Player initial at bottom-right corner for reference */}

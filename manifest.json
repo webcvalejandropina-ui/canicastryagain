@@ -1,11 +1,11 @@
 {
-  "name": "Canicas Try Again - Pirámide",
+  "name": "Canicas Try Again",
   "short_name": "Canicas",
-  "description": "Juego de canicas en forma de pirámide para dos jugadores",
+  "description": "Partidas en directo de misère de canicas contra un amigo, sin instalar nada",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f5f0e8",
-  "theme_color": "#F4C542",
+  "background_color": "#0d0c09",
+  "theme_color": "#0d0c09",
   "orientation": "any",
   "icons": [
     {

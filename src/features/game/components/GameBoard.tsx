@@ -1396,7 +1396,7 @@ function LegacyBoardGrid({
             role="row"
             aria-label={`Fila ${rowIndex + 1} con ${remainingCount} canicas`}
             className={[
-              'flex items-center gap-2 py-1.5 px-4 transition-all overflow-x-auto',
+              'flex items-center gap-2 py-1.5 px-4 transition-shadow duration-200 overflow-x-auto',
               isSelectedRow ? 'scale-[1.01]' : '',
               isBlocked ? 'blocked brightness-105' : '',
               blockedShakeRow === rowIndex ? 'blocked-shake' : ''
@@ -1517,7 +1517,7 @@ function LegacyBoardGrid({
                           blockedShakeTimerRef.current = window.setTimeout(() => {
                             setBlockedShakeRow(null);
                             blockedShakeTimerRef.current = null;
-                          }, 400);
+                          }, 460);
                         }
                       }
                       onBallClick(rowIndex, ballIndex);

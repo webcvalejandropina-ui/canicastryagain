@@ -808,6 +808,9 @@ export function HomePage(): React.ReactElement {
   const [lastDiceResult, setLastDiceResult] = useState<DiceResult | null>(null);
   // Manual dark mode — persists to localStorage, falls back to system preference
   const [darkMode, setDarkMode] = useState<boolean | null>(null);
+  // Detects whether the device likely has a physical keyboard (not touch-only).
+  // Used to suppress keyboard-shortcut hints on mobile/tablet where they are misleading.
+  const [supportsKeyboard, setSupportsKeyboard] = useState(true);
   const toggleDarkMode = useCallback(() => {
     setDarkMode((prev) => {
       const next = !prev;
@@ -841,6 +844,15 @@ export function HomePage(): React.ReactElement {
         }
       }
     } catch {}
+  }, []);
+
+  // Detect whether the device likely has a physical keyboard.
+  // Touch-only devices (mobile, tablet) don't benefit from keyboard-shortcut hints.
+  useEffect(() => {
+    const hasTouchScreen =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    setSupportsKeyboard(!hasTouchScreen);
   }, []);
 
   const autoJoinAttemptedRef = useRef(false);
@@ -2797,11 +2809,17 @@ export function HomePage(): React.ReactElement {
                 </button>
               </div>
             </div>
-            <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8c7d6b] dark:text-dark-muted">
-              {game?.yourDiceAvailable
-                ? 'Espacio: dado · Enter: aplica · Escape: cancela.'
-                : 'Enter: aplica · Escape: cancela.'}
-            </p>
+            {supportsKeyboard ? (
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8c7d6b] dark:text-dark-muted">
+                {game?.yourDiceAvailable
+                  ? 'Espacio: dado · Enter: aplica · Escape: cancela.'
+                  : 'Enter: aplica · Escape: cancela.'}
+              </p>
+            ) : (
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8c7d6b] dark:text-dark-muted">
+                Toca Aplicar para confirmar · Cancelar para limpiar.
+              </p>
+            )}
           </div>
         </div>
       ) : null}

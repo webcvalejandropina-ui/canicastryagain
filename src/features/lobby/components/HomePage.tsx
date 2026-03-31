@@ -1647,8 +1647,17 @@ export function HomePage(): React.ReactElement {
               setPendingMove(null);
             }
           } else {
-            // Middle of block — state unchanged, show message at top level so React re-renders
-            showTemporaryMessage('Toca un extremo del bloque para quitar una canica, o otra fila para empezar de nuevo.');
+            // Middle of block — shrink to just this single ball (useful for quick reset without cancelling).
+            // Validate that selecting only this ball is legal before committing.
+            const singleValidation = validateMove(game, rowIndex, ballIndex, 1);
+            if (!singleValidation.valid) {
+              showTemporaryMessage(singleValidation.reason ?? 'No se puede seleccionar solo esta canica');
+              return;
+            }
+            setPendingMove({ rowIndex, startIndex: ballIndex, endIndex: ballIndex });
+            if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+              navigator.vibrate(12);
+            }
           }
           return;
         }

@@ -19,7 +19,6 @@ type Props = {
   hasLiveChannel?: boolean;
   onBallClick: (rowIndex: number, ballIndex: number) => void;
   onBlockedRowClick?: (rowIndex: number) => void;
-  blockedShakeRow?: number | null;
   onDiceRoll?: () => Promise<DiceResult | null>;
   diceAvailable?: boolean;
   lastDiceResult?: DiceResult | null;
@@ -1348,13 +1347,14 @@ function LegacyBoardGrid({
   selectedEndIndex,
   canInteract,
   onBallClick,
-  onBlockedRowClick,
-  blockedShakeRow
+  onBlockedRowClick
 }: Props): React.ReactElement {
   const density = getDensity(game.numRows);
   const cellOwnerMap = useMemo(() => buildCellOwnerMap(game.moveHistory), [game.moveHistory]);
   const p1Initial = (game.player1?.name?.[0] ?? 'J').toUpperCase();
   const p2Initial = (game.player2?.name?.[0] ?? 'J').toUpperCase();
+  const [blockedShakeRow, setBlockedShakeRow] = useState<number | null>(null);
+  const blockedShakeTimerRef = useRef<number | null>(null);
 
   const winnerName = game.winner
     ? game.winner === 1
@@ -1508,7 +1508,17 @@ function LegacyBoardGrid({
                     })}
                     onClick={() => {
                       if (isBlocked && !isMarbleDisabled && !isRemoved) {
-                        onBlockedRowClick?.(rowIndex);
+                        // Use local state for 3D; prop is only wired in 2D fallback
+                        if (typeof onBlockedRowClick === 'function') {
+                          onBlockedRowClick(rowIndex);
+                        } else {
+                          if (blockedShakeTimerRef.current !== null) window.clearTimeout(blockedShakeTimerRef.current);
+                          setBlockedShakeRow(rowIndex);
+                          blockedShakeTimerRef.current = window.setTimeout(() => {
+                            setBlockedShakeRow(null);
+                            blockedShakeTimerRef.current = null;
+                          }, 400);
+                        }
                       }
                       onBallClick(rowIndex, ballIndex);
                     }}
@@ -1719,8 +1729,6 @@ export function GameBoard({
   const [diceResultOverlay, setDiceResultOverlay] = useState<DiceResult | null>(null);
   const [turnBadgeAnim, setTurnBadgeAnim] = useState<'pulse' | null>(null);
   const [boardGlowActive, setBoardGlowActive] = useState(false);
-  const [blockedShakeRow, setBlockedShakeRow] = useState<number | null>(null);
-  const blockedShakeTimerRef = useRef<number | null>(null);
   const diceResultTimerRef = useRef<number | null>(null);
   const prevDiceResultRef = useRef<DiceResult | null>(null);
   const boardGlowTimeoutRef = useRef<number | null>(null);
@@ -2048,10 +2056,6 @@ export function GameBoard({
         window.clearTimeout(diceResultArrivedTimerRef.current);
         diceResultArrivedTimerRef.current = null;
       }
-      if (blockedShakeTimerRef.current !== null) {
-        window.clearTimeout(blockedShakeTimerRef.current);
-        blockedShakeTimerRef.current = null;
-      }
     };
   }, []);
 
@@ -2183,17 +2187,6 @@ export function GameBoard({
               selectedEndIndex={selectedEndIndex}
               canInteract={canInteract}
               onBallClick={onBallClick}
-              onBlockedRowClick={(rowIndex) => {
-                if (blockedShakeTimerRef.current !== null) {
-                  window.clearTimeout(blockedShakeTimerRef.current);
-                }
-                setBlockedShakeRow(rowIndex);
-                blockedShakeTimerRef.current = window.setTimeout(() => {
-                  setBlockedShakeRow(null);
-                  blockedShakeTimerRef.current = null;
-                }, 400);
-              }}
-              blockedShakeRow={blockedShakeRow}
             />
           </div>
           {/* Dice result overlay — also shown on 2D fallback board */}

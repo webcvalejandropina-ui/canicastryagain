@@ -761,16 +761,19 @@ main {
 
 /* Shake animation when clicking a blocked row — .blocked-shake applied directly to row div */
 @keyframes row-shake {
-    0%, 100% { transform: translateX(0); }
-    20%       { transform: translateX(-6px); }
-    40%       { transform: translateX(6px); }
-    60%       { transform: translateX(-4px); }
-    80%       { transform: translateX(4px); }
+    0%, 100% { transform: translateX(0); border-color: transparent; }
+    15%       { transform: translateX(-7px); border-color: rgba(239,68,68,0.7); }
+    30%       { transform: translateX(7px);  border-color: rgba(239,68,68,0.5); }
+    50%       { transform: translateX(-5px); border-color: rgba(239,68,68,0.4); }
+    70%       { transform: translateX(4px);  border-color: rgba(239,68,68,0.25); }
+    85%       { transform: translateX(-2px); border-color: rgba(239,68,68,0.1); }
 }
 
 .blocked-shake {
     will-change: transform;
-    animation: row-shake 380ms ease-out;
+    animation: row-shake 420ms ease-out;
+    border-radius: 6px;
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.35);
 }
 
 .move-history,

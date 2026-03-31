@@ -1457,15 +1457,31 @@ function LegacyBoardGrid({
                   const initial = isP1 ? p1Initial : isP2 ? p2Initial : '';
                   // Distinct dark backgrounds per owner — unmistakably "dead" balls
                   // Light mode: very dark backgrounds for contrast
-                  // Dark mode: slightly lighter so X mark stays visible against the dark page bg
+                  // Dark mode: darker/more neutral so X mark pops; X mark also brighter in dark
+                  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
                   const bgClass = isP1
-                    ? 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999 dark:from-red-900 dark:to-red-950 dark:border-red-500/70'
+                    ? isDark
+                      ? 'border-red-600/80 bg-gradient-to-br from-stone-950 to-stone-950/90 dark:border-red-500/60 dark:from-stone-950 dark:to-stone-900'
+                      : 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999 dark:from-red-900 dark:to-red-950 dark:border-red-500/70'
                     : isP2
-                      ? 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
-                      : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-700 dark:to-slate-900 dark:border-slate-500/70';
-                  // X mark color matches the 3D texture: red for J1, blue for J2, grey for neutral
-                  const xColor = isP1 ? '#ef4444' : isP2 ? '#3b82f6' : '#94a3b8';
-                  const xGlow = isP1 ? 'rgba(239,68,68,1)' : isP2 ? 'rgba(59,130,246,1)' : 'rgba(148,163,184,0.9)';
+                      ? isDark
+                        ? 'border-orange-600/80 bg-gradient-to-br from-stone-950 to-stone-950/90 dark:border-orange-500/60 dark:from-stone-950 dark:to-stone-900'
+                        : 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
+                      : isDark
+                        ? 'border-slate-500/70 bg-gradient-to-br from-stone-950 to-stone-950/90 dark:border-slate-500/60 dark:from-stone-950 dark:to-stone-900'
+                        : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-700 dark:to-slate-900 dark:border-slate-500/70';
+                  // X mark color: brighter in dark mode so it pops against the dark ball background
+                  // Red for J1, blue for J2, grey for neutral — matches 3D texture approach
+                  const xColor = isP1
+                    ? isDark ? '#fca5a5' : '#ef4444'
+                    : isP2
+                      ? isDark ? '#93c5fd' : '#3b82f6'
+                      : isDark ? '#e2e8f0' : '#94a3b8';
+                  const xGlow = isP1
+                    ? isDark ? 'rgba(252,165,165,1)' : 'rgba(239,68,68,1)'
+                    : isP2
+                      ? isDark ? 'rgba(147,197,253,1)' : 'rgba(59,130,246,1)'
+                      : isDark ? 'rgba(226,232,240,1)' : 'rgba(148,163,184,0.9)';
 
                   return (
                     <button

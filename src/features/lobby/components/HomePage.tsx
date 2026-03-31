@@ -807,6 +807,8 @@ export function HomePage(): React.ReactElement {
   const [pendingMove, setPendingMove] = useState<{ rowIndex: number; startIndex: number; endIndex: number } | null>(null);
   const [turnBannerKey, setTurnBannerKey] = useState(0);
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
+  // Turn coach/spotlight banners hidden by default during active play — user can expand via quick-access button
+  const [turnCoachVisible, setTurnCoachVisible] = useState(false);
   const [boardAttentionPulse, setBoardAttentionPulse] = useState(false);
   const [lastDiceResult, setLastDiceResult] = useState<DiceResult | null>(null);
   // Manual dark mode — persists to localStorage, falls back to system preference
@@ -941,7 +943,7 @@ export function HomePage(): React.ReactElement {
     }
     return canInteract ? `Te toca · máximo ${turnLimit}` : 'Turno del rival';
   }, [game, pendingMove, pendingRemoveCount, canInteract, turnLimit]);
-  const showTurnCoach = isGameMode && game?.status === 'playing' && canInteract && !pendingMove;
+  const showTurnCoach = isGameMode && game?.status === 'playing' && canInteract && !pendingMove && turnCoachVisible;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -1314,9 +1316,10 @@ export function HomePage(): React.ReactElement {
         setShowTurnSpotlight(false);
         turnSpotlightTimerRef.current = null;
       }, 2400);
-      // Auto-collapse info panels when user receives their turn — reduces visual clutter during active play.
-      // Panels can be re-shown via the orange "Info" toggle button in the header.
+      // Auto-collapse info panels and turn coach banners when user receives their turn — reduces visual clutter during active play.
+      // Panels can be re-shown via the toggle button in the quick-access bar.
       setGameInfoPanelsVisible(false);
+      setTurnCoachVisible(false);
     }
 
     previousCanInteractRef.current = canInteract;
@@ -1537,6 +1540,8 @@ export function HomePage(): React.ReactElement {
     try {
       await leaveCurrentGame();
       clearGame();
+      setGameInfoPanelsVisible(false);
+      setTurnCoachVisible(false);
       setSharedCode('');
       setSharedInviteToken('');
       setJoinCode('');
@@ -2715,7 +2720,7 @@ export function HomePage(): React.ReactElement {
         </div>
       )}
 
-      {showTurnSpotlight && isGameMode && canInteract && !pendingMove ? (
+      {showTurnSpotlight && turnCoachVisible && isGameMode && canInteract && !pendingMove ? (
         <div
           className="pointer-events-none fixed inset-x-0 top-[4.4rem] z-[78] flex justify-center px-4 sm:top-[5rem]"
           aria-live="assertive"
@@ -2800,6 +2805,24 @@ export function HomePage(): React.ReactElement {
                       <span>Dado</span>
                     </button>
                   ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setTurnCoachVisible((v) => !v)}
+                    aria-label={turnCoachVisible ? 'Ocultar ayuda de turno' : 'Mostrar ayuda de turno'}
+                    title={turnCoachVisible ? 'Ocultar ayuda de turno' : 'Mostrar ayuda de turno'}
+                    className={[
+                      'inline-flex h-10 w-10 items-center justify-center rounded-full border transition-all active:scale-95',
+                      turnCoachVisible
+                        ? 'border-emerald-400/60 bg-emerald-500/20 text-emerald-600 dark:border-emerald-400/50 dark:bg-emerald-500/20 dark:text-emerald-300'
+                        : 'border-brown/15 bg-white/80 text-[#4a3f32] hover:border-primary/30 hover:text-primary dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted dark:hover:text-primary'
+                    ].join(' ')}
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75"/>
+                      <path d="M12 8v5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                      <circle cx="12" cy="5.5" r="0.75" fill="currentColor" stroke="none"/>
+                    </svg>
+                  </button>
                   <button
                     type="button"
                     onClick={() => setShowGameMenu(true)}
@@ -3087,6 +3110,8 @@ export function HomePage(): React.ReactElement {
             setShowGameMenu(false);
             setShowKeyRulesInMenu(false);
             setGameGuideCollapsed(false);
+            setGameInfoPanelsVisible(false);
+            setTurnCoachVisible(false);
             setSharedCode('');
             setSharedInviteToken('');
             setJoinCode('');
@@ -3100,6 +3125,8 @@ export function HomePage(): React.ReactElement {
             setShowGameMenu(false);
             setShowKeyRulesInMenu(false);
             setGameGuideCollapsed(false);
+            setGameInfoPanelsVisible(false);
+            setTurnCoachVisible(false);
             setSharedCode('');
             setSharedInviteToken('');
             setJoinCode('');

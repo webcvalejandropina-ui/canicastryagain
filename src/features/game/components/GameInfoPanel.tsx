@@ -110,6 +110,19 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
   const turnLimit = game.moveHistory.length + 1;
   const takenRows = new Set(game.moveHistory.map((move) => move.rowIndex)).size;
 
+  // Pop animation when ball count decreases (a ball was taken this turn)
+  const [ballsPop, setBallsPop] = useState(false);
+  const prevTotalBallsRef = useRef<number>(totalBalls);
+  useEffect(() => {
+    if (totalBalls < prevTotalBallsRef.current) {
+      setBallsPop(true);
+      const t = setTimeout(() => setBallsPop(false), 600);
+      prevTotalBallsRef.current = totalBalls;
+      return () => clearTimeout(t);
+    }
+    prevTotalBallsRef.current = totalBalls;
+  }, [totalBalls]);
+
   return (
     <section className="glass-panel rounded-2xl p-5 md:p-6" aria-live="polite" role="status">
       <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-center">
@@ -198,7 +211,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Canicas restantes</p>
-          <p className="mt-1 text-2xl font-bold text-brown dark:text-dark-text">{totalBalls}</p>
+          <p className={`mt-1 text-2xl font-bold text-brown dark:text-dark-text ${ballsPop ? 'balls-pop' : ''}`}>{totalBalls}</p>
           {/* Progress bar: visualises how many balls remain vs the starting total */}
           <div
             className="mt-2 h-2 w-full overflow-hidden rounded-full bg-brown/15 dark:bg-white/10"

@@ -1605,39 +1605,42 @@ main {
     }
 
     /* ── VictoryOverlay / game-over buttons in dark mode ──────────── */
-    /* Fixed overlay z-index 100 — ensure buttons are high contrast */
-    .fixed.inset-0.z-\[100\] button {
-        backdrop-filter: blur(8px);
-    }
+    /* Applies when: system prefers dark OR user manually toggled dark via html.dark */
+    @media (prefers-color-scheme: dark), (html.dark) {
+        /* Fixed overlay z-index 100 — ensure buttons are high contrast */
+        .fixed.inset-0.z-\[100\] button {
+            backdrop-filter: blur(8px);
+        }
 
-    /* "Nueva partida" button in VictoryOverlay — extra glow in dark mode */
-    .fixed.inset-0.z-\[100\] button[class*="emerald"] {
-        box-shadow: 0 4px 20px rgba(0, 201, 167, 0.35), 0 0 16px rgba(16, 185, 129, 0.2) !important;
-    }
+        /* "Nueva partida" button in VictoryOverlay — extra glow in dark mode */
+        .fixed.inset-0.z-\[100\] button[class*="emerald"] {
+            box-shadow: 0 4px 20px rgba(0, 201, 167, 0.35), 0 0 16px rgba(16, 185, 129, 0.2) !important;
+        }
 
-    .fixed.inset-0.z-\[100\] button[class*="emerald"]:hover {
-        box-shadow: 0 6px 28px rgba(0, 201, 167, 0.5), 0 0 24px rgba(16, 185, 129, 0.35) !important;
-    }
+        .fixed.inset-0.z-\[100\] button[class*="emerald"]:hover {
+            box-shadow: 0 6px 28px rgba(0, 201, 167, 0.5), 0 0 24px rgba(16, 185, 129, 0.35) !important;
+        }
 
-    /* "Volver al lobby" (win) — bright golden button with glow in dark mode */
-    .fixed.inset-0.z-\[100\] button[class*="bg-primary"][class*="text-"] {
-        border-color: #fbbf24 !important;
-        box-shadow: 0 4px 20px rgba(244, 197, 66, 0.5), 0 0 16px rgba(244, 197, 66, 0.3) !important;
-    }
+        /* "Volver al lobby" (win) — bright golden button with glow in dark mode */
+        .fixed.inset-0.z-\[100\] button[class*="bg-primary"][class*="text-"] {
+            border-color: #fbbf24 !important;
+            box-shadow: 0 4px 20px rgba(244, 197, 66, 0.5), 0 0 16px rgba(244, 197, 66, 0.3) !important;
+        }
 
-    /* "Volver al lobby" (loss) — muted but visible in dark mode */
-    .fixed.inset-0.z-\[100\] button[class*="bg-primary/40"] {
-        border-color: #fbbf24 !important;
-        color: #fde68a !important;
-        box-shadow: 0 2px 12px rgba(244, 197, 66, 0.4) !important;
-    }
+        /* "Volver al lobby" (loss) — muted but visible in dark mode */
+        .fixed.inset-0.z-\[100\] button[class*="bg-primary/40"] {
+            border-color: #fbbf24 !important;
+            color: #fde68a !important;
+            box-shadow: 0 2px 12px rgba(244, 197, 66, 0.4) !important;
+        }
 
-    /* "Compartir y retar" button in dark mode */
-    .fixed.inset-0.z-\[100\] button[class*="border-primary/60"][class*="bg-"] {
-        border-color: #fbbf24 !important;
-        color: #fde68a !important;
-        background: rgba(28, 25, 18, 0.98) !important;
-        box-shadow: 0 4px 20px rgba(244, 197, 66, 0.4), 0 0 12px rgba(244, 197, 66, 0.25) !important;
+        /* "Compartir y retar" button in dark mode */
+        .fixed.inset-0.z-\[100\] button[class*="border-primary/60"][class*="bg-"] {
+            border-color: #fbbf24 !important;
+            color: #fde68a !important;
+            background: rgba(28, 25, 18, 0.98) !important;
+            box-shadow: 0 4px 20px rgba(244, 197, 66, 0.4), 0 0 12px rgba(244, 197, 66, 0.25) !important;
+        }
     }
 }
 
@@ -1876,6 +1879,17 @@ html.dark .turn-info-pulse {
   box-shadow:
     0 0 0 3px rgba(224, 128, 48, 0.28),
     0 0 18px rgba(224, 128, 48, 0.22);
+}
+
+/* ── Balls Remaining Pop (when a ball is taken, number pops to draw attention) ── */
+@keyframes balls-pop {
+  0%   { transform: scale(1);    color: inherit; }
+  30%  { transform: scale(1.28); color: #ef4444; }
+  60%  { transform: scale(0.95); color: #dc2626; }
+  100% { transform: scale(1);    color: inherit; }
+}
+.balls-pop {
+  animation: balls-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* ── Board Glow (your turn) ─────────────────────────────────────── */

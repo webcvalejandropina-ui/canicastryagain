@@ -1681,8 +1681,7 @@ function DiceResultBanner({
         meta.bg,
         meta.border
       ].join(' ')}
-      onClick={onDismiss}
-      onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onDismiss?.(); }}
+      onClick={(e) => { e.stopPropagation(); onDismiss?.(); }}
       style={{ touchAction: 'manipulation' }}
     >
       {/* Screen-reader dismiss instruction — referred by aria-describedby on the alertdialog wrapper.
@@ -2264,7 +2263,7 @@ export function GameBoard({
               aria-modal="true"
               aria-labelledby="dice-result-title-2d"
               aria-describedby="dice-result-desc-2d dice-result-desc-2d-dismiss"
-              onClick={dismissDiceResult}
+              onClick={(e) => { e.stopPropagation(); dismissDiceResult(); }}
             >
               <DiceResultBanner
                 power={diceResultOverlay.power}
@@ -2328,7 +2327,7 @@ export function GameBoard({
               aria-modal="true"
               aria-labelledby="dice-result-title-3d"
               aria-describedby="dice-result-desc-3d dice-result-desc-3d-dismiss"
-              onClick={dismissDiceResult}
+              onClick={(e) => { e.stopPropagation(); dismissDiceResult(); }}
             >
               <DiceResultBanner
                 power={diceResultOverlay.power}

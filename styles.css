@@ -53,9 +53,16 @@ body {
         radial-gradient(1200px 500px at -5% -15%, #d9ecff 0%, transparent 65%),
         radial-gradient(1100px 450px at 105% 0%, #daf9f3 0%, transparent 60%),
         linear-gradient(160deg, #f8fbff 0%, #eff5fc 48%, #f4f8fd 100%);
-    padding: 18px;
+    padding:
+        calc(18px + env(safe-area-inset-top))
+        calc(18px + env(safe-area-inset-right))
+        calc(18px + env(safe-area-inset-bottom))
+        calc(18px + env(safe-area-inset-left));
     position: relative;
     line-height: 1.45;
+    /* Prevent iOS Safari overscroll bounce that makes game feel janky */
+    overscroll-behavior: none;
+    min-height: 100dvh;
 }
 
 body::before {
@@ -1090,6 +1097,13 @@ main {
             radial-gradient(1100px 450px at 105% 0%, #0f2a22 0%, transparent 60%),
             linear-gradient(160deg, #0a1220 0%, #0f1c2a 48%, #0a1520 100%);
         color: var(--ink-900);
+        padding:
+            calc(18px + env(safe-area-inset-top))
+            calc(18px + env(safe-area-inset-right))
+            calc(18px + env(safe-area-inset-bottom))
+            calc(18px + env(safe-area-inset-left));
+        overscroll-behavior: none;
+        min-height: 100dvh;
     }
 
     body::before {

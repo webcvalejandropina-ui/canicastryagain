@@ -944,13 +944,25 @@ function showMessage(message) {
         progressBar.style.animation = '';
     }
 
-    messageArea.textContent = message;
+    // Preserve the progress bar child — use innerHTML so it survives text updates
+    messageArea.innerHTML = `<span>${escapeHtml(message)}</span>`;
+    // Re-append progress bar (innerHTML wiped it)
+    if (progressBar) {
+        messageArea.appendChild(progressBar);
+    }
     messageArea.classList.add('show');
 
     if (showMessage._timeout) clearTimeout(showMessage._timeout);
     showMessage._timeout = setTimeout(() => {
         messageArea.classList.remove('show');
     }, 3000);
+}
+
+// Escape HTML to prevent XSS when rendering user/player names in toasts
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ============================================

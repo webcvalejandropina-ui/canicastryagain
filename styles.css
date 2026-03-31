@@ -1381,6 +1381,17 @@ main {
             color: var(--ink-500) !important;
         }
 
+        /* Dark mode toast — muted deep-red that reads well on dark backgrounds */
+        .message-area {
+            background: linear-gradient(145deg, #2a1520 0%, #3a1a28 100%);
+            border-color: #6a3040;
+            color: #f0a0b0;
+        }
+
+        #toast-progress {
+            background: rgba(240, 100, 140, 0.4);
+        }
+
         /* Mobile game-over button dark mode */
         #modal-restart-btn {
             background: linear-gradient(145deg, #166534 0%, #14532d 100%) !important;

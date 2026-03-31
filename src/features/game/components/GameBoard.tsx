@@ -1605,7 +1605,19 @@ const FALLBACK_DICE_ICON: React.ReactElement = (
   </svg>
 );
 
-function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () => void }): React.ReactElement {
+function DiceResultBanner({
+  power,
+  onDismiss,
+  titleId,
+  descId
+}: {
+  power: string;
+  onDismiss?: () => void;
+  /** ID for the element that labels this alertdialog (the power name). */
+  titleId?: string;
+  /** ID for the element that describes this alertdialog (the hint text). */
+  descId?: string;
+}): React.ReactElement {
   const meta = DICE_POWER_META[power] ?? {
     label: 'Poder especial',
     bg: 'bg-amber-500/90',
@@ -1617,6 +1629,7 @@ function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () 
 
   return (
     <div
+      aria-hidden="true"
       className={[
         'dice-result-overlay pointer-events-auto rounded-2xl border-2 border-white/20',
         'px-5 py-3 shadow-2xl backdrop-blur-xl cursor-pointer',
@@ -1640,10 +1653,10 @@ function DiceResultBanner({ power, onDismiss }: { power: string; onDismiss?: () 
           {meta.icon}
         </div>
         <div className="min-w-0 flex-1">
-          <p className={['text-[10px] font-black uppercase tracking-[0.2em]', meta.text, 'opacity-80'].join(' ')}>
+          <p id={descId} className={['text-[10px] font-black uppercase tracking-[0.2em]', meta.text, 'opacity-80'].join(' ')}>
             Dado especial usado
           </p>
-          <p className={['text-xl font-black tracking-tight', meta.text].join(' ')}>
+          <p id={titleId} className={['text-xl font-black tracking-tight', meta.text].join(' ')}>
             {meta.label}
           </p>
           {/* Accessible dismiss hint — always visible for discoverability on all devices */}
@@ -2184,11 +2197,18 @@ export function GameBoard({
           {diceResultOverlay ? (
             <div
               className="dice-result-overlay absolute inset-0 z-20 flex items-center justify-center"
-              aria-live="assertive"
-              role="status"
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="dice-result-title-2d"
+              aria-describedby="dice-result-desc-2d"
               onClick={dismissDiceResult}
             >
-              <DiceResultBanner power={diceResultOverlay.power} onDismiss={dismissDiceResult} />
+              <DiceResultBanner
+                power={diceResultOverlay.power}
+                onDismiss={dismissDiceResult}
+                titleId="dice-result-title-2d"
+                descId="dice-result-desc-2d"
+              />
             </div>
           ) : null}
         </div>
@@ -2241,13 +2261,18 @@ export function GameBoard({
           {diceResultOverlay ? (
             <div
               className="dice-result-overlay dice-result-pop absolute inset-0 z-20 flex items-center justify-center"
-              role="alert"
-              aria-live="assertive"
-              aria-atomic="true"
-              aria-label={`Resultado del dado: ${DICE_POWER_META[diceResultOverlay.power]?.label ?? diceResultOverlay.power}. Toca o haz clic para cerrar.`}
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="dice-result-title-3d"
+              aria-describedby="dice-result-desc-3d"
               onClick={dismissDiceResult}
             >
-              <DiceResultBanner power={diceResultOverlay.power} onDismiss={dismissDiceResult} />
+              <DiceResultBanner
+                power={diceResultOverlay.power}
+                onDismiss={dismissDiceResult}
+                titleId="dice-result-title-3d"
+                descId="dice-result-desc-3d"
+              />
             </div>
           ) : null}
         </div>

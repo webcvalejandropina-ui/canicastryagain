@@ -2422,7 +2422,7 @@ export function HomePage(): React.ReactElement {
                           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8c7d6b] dark:text-dark-muted">
                             {pendingMove ? 'Selección activa' : canInteract ? 'Momento de jugar' : 'Estado de turno'}
                           </p>
-                          <p className="mt-1 text-sm font-bold leading-snug text-[#4a3f32] dark:text-dark-text">
+                          <p className="mt-1 text-base font-bold leading-snug text-[#4a3f32] dark:text-dark-text sm:text-sm">
                             {turnBannerText}
                           </p>
                         </div>

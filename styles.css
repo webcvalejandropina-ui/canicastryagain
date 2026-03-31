@@ -698,6 +698,66 @@ main {
     pointer-events: none;
 }
 
+/* Soft drop-shadow for 3D ball appearance — applied via .ball-shadow in GameBoard */
+.ball-shadow {
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.18),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Gentle bobbing float for idle/active marbles in 2D grid */
+@keyframes marble-idle-float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-3px); }
+}
+
+.marble-idle-float {
+    animation: marble-idle-float 2.8s ease-in-out infinite;
+}
+
+/* Slower, subtler float for disabled (muted) marbles */
+@keyframes marble-muted-float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-1.5px); }
+}
+
+.marble-muted-float {
+    animation: marble-muted-float 4s ease-in-out infinite;
+}
+
+/* Pulse + slight scale for selected marbles */
+@keyframes marble-selected-pulse {
+    0%, 100% {
+        transform: translateY(-2px) scale(1.06);
+        box-shadow: 0 6px 16px rgba(217, 160, 54, 0.45), inset 0 -3px 7px rgba(115, 54, 10, 0.3);
+    }
+    50% {
+        transform: translateY(-4px) scale(1.1);
+        box-shadow: 0 10px 24px rgba(217, 160, 54, 0.6), inset 0 -4px 9px rgba(115, 54, 10, 0.35);
+    }
+}
+
+.marble-selected-pulse {
+    animation: marble-selected-pulse 1.6s ease-in-out infinite;
+}
+
+/* Skeleton loader for the 3D board loading state */
+@keyframes board-skeleton-pulse {
+    0%, 100% { opacity: 0.35; }
+    50%       { opacity: 0.7; }
+}
+
+.board-skeleton-ball {
+    background: linear-gradient(135deg, #d4c4a8 0%, #c8b898 50%, #bfae90 100%);
+    animation: board-skeleton-pulse 1.4s ease-in-out infinite;
+    border-radius: 9999px;
+}
+
+.board-skeleton-rows {
+    animation: board-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
 
 /* Shake animation when clicking a blocked row — .blocked-shake applied directly to row div */
 @keyframes row-shake {

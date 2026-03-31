@@ -2083,7 +2083,7 @@ export function GameBoard({
     }
   }, [renderMode, game, selectedRowIndex, selectedStartIndex, selectedEndIndex, canInteract]);
 
-  const showDiceAction = !!diceAvailable && canInteract && game.status === 'playing';
+  const showDiceAction = !!diceAvailable && canInteract && game.status === 'playing' && !hasPendingMove;
 
   const triggerDiceRoll = useMemo(
     () => async (): Promise<void> => {

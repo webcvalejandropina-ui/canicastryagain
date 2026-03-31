@@ -735,7 +735,7 @@ function VictoryOverlay({
               'inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
                 ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-                : 'border-2 border-primary bg-primary/40 text-primary shadow-lg shadow-primary/25 hover:bg-primary/60 dark:border-primary/60 dark:bg-primary/20 dark:text-amber-200 dark:hover:bg-primary/40'
+                : 'border-2 border-primary bg-primary/70 text-primary shadow-lg shadow-primary/30 hover:bg-primary/80 dark:border-primary/60 dark:bg-primary/60 dark:text-white dark:hover:bg-primary/80'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -1589,6 +1589,13 @@ export function HomePage(): React.ReactElement {
         return;
       }
 
+      // Tactile confirmation that the ball tap registered — especially important for
+      // the 2D fallback board where there is no 3D canvas pointer handler.
+      // The 3D board fires haptics in its own canvas pointer handler (GameBoard.tsx).
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(18);
+      }
+
       // Same-row click: handle edge-cases BEFORE setPendingMove so feedback fires even
       // when the resulting state is unchanged (React skips re-render when state doesn't change).
       if (pendingMove && pendingMove.rowIndex === rowIndex) {
@@ -1955,7 +1962,7 @@ export function HomePage(): React.ReactElement {
                   </div>
 
                   <button
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary font-bold uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 active:scale-[0.97] dark:shadow-primary/15"
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary font-bold uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 active:scale-[0.97] dark:bg-primary-dark dark:text-[#2a1a00] dark:shadow-lg dark:shadow-primary-dark/30"
                     type="submit"
                     aria-label="Entrar al lobby"
                     title="Entrar al lobby"
@@ -2098,22 +2105,28 @@ export function HomePage(): React.ReactElement {
                       aria-label={gameInfoPanelsVisible ? 'Ocultar información de juego' : 'Mostrar información de juego'}
                       title={gameInfoPanelsVisible ? 'Ocultar paneles de información' : 'Mostrar paneles de información'}
                       className={[
-                        'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all active:scale-95',
+                        'inline-flex items-center justify-center gap-1.5 rounded-full transition-all active:scale-95',
                         gameInfoPanelsVisible
-                          ? 'bg-primary/20 text-primary hover:bg-primary/30 dark:bg-primary/25 dark:text-primary'
-                          : 'bg-amber-500/20 text-amber-600 hover:bg-amber-500/30 dark:bg-amber-400/20 dark:text-amber-400 ring-1 ring-amber-400/30'
+                          ? 'h-9 px-3 bg-primary/20 text-primary hover:bg-primary/30 dark:bg-primary/25 dark:text-primary'
+                          : 'h-9 px-3 bg-orange-500/20 text-orange-600 hover:bg-orange-500/30 dark:bg-orange-400/20 dark:text-orange-300 ring-1 ring-orange-400/40'
                       ].join(' ')}
                     >
                       {gameInfoPanelsVisible ? (
-                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75"/>
-                          <path d="M12 8v5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
-                          <circle cx="12" cy="5.5" r="0.75" fill="currentColor" stroke="none"/>
-                        </svg>
+                        <>
+                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75"/>
+                            <path d="M12 8v5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
+                            <circle cx="12" cy="5.5" r="0.75" fill="currentColor" stroke="none"/>
+                          </svg>
+                          <span className="hidden text-xs font-bold sm:inline">Ocultar</span>
+                        </>
                       ) : (
-                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                        </svg>
+                        <>
+                          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                          <span className="hidden text-xs font-bold sm:inline">Info</span>
+                        </>
                       )}
                     </button>
                   </div>
@@ -2176,7 +2189,7 @@ export function HomePage(): React.ReactElement {
                         onClick={handleLogout}
                         aria-label="Cerrar sesión"
                         title="Cerrar sesión"
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-brown active:scale-[0.98]"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-brown active:scale-[0.98] dark:border-primary/40 dark:bg-primary/15 dark:text-primary-dark dark:hover:bg-primary-dark dark:hover:text-[#2a1a00]"
                       >
                         <IconLogout className="h-5 w-5 shrink-0" />
                       </button>
@@ -2266,7 +2279,7 @@ export function HomePage(): React.ReactElement {
                       <button
                         type="button"
                         onClick={() => void handleCopyUrl()}
-                        className="flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold uppercase tracking-wider text-[#4a3f32] shadow-md shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.97]"
+                        className="flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-xs font-bold uppercase tracking-wider text-[#4a3f32] shadow-md shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.97] dark:bg-primary-dark dark:text-[#2a1a00] dark:shadow-md dark:shadow-primary-dark/25"
                         aria-label="Compartir enlace"
                         title="Compartir enlace"
                       >
@@ -2802,7 +2815,7 @@ export function HomePage(): React.ReactElement {
                   onClick={() => void applyPendingMove()}
                   disabled={!canInteract || isBusy}
                   aria-label={pendingRowLabel !== null ? `Aplicar jugada: fila ${pendingRowLabel}, ${pendingRemoveCount} canica${pendingRemoveCount === 1 ? '' : 's'}` : 'Aplicar jugada'}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-black uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45 dark:focus-visible:ring-offset-[#1c1912]"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-xs font-black uppercase tracking-wider text-[#4a3f32] shadow-lg shadow-primary/25 transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45 dark:bg-primary-dark dark:text-[#2a1a00] dark:shadow-lg dark:shadow-primary-dark/30 dark:focus-visible:ring-offset-[#1c1912]"
                 >
                   <IconCheck className="h-4 w-4 shrink-0" />
                   <span>Aplicar jugada</span>

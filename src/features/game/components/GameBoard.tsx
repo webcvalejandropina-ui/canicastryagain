@@ -1826,10 +1826,15 @@ export function GameBoard({
       window.clearTimeout(diceResultTimerRef.current);
     }
     setDiceResultOverlay(lastDiceResult);
+    // Respect prefers-reduced-motion: no auto-dismiss for vestibular-sensitive users
+    // (the overlay is still dismissible via tap/click/ESC).
+    const rmDismissMs = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      ? Number.POSITIVE_INFINITY
+      : 2800;
     diceResultTimerRef.current = window.setTimeout(() => {
       setDiceResultOverlay(null);
       diceResultTimerRef.current = null;
-    }, 2800);
+    }, rmDismissMs);
 
     // Also pulse the HUD dice chip so the result is visible even after the overlay dismisses
     if (diceResultArrivedTimerRef.current) {

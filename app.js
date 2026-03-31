@@ -137,6 +137,9 @@ function initializeGame() {
     resetGame();
     renderBoard();
     updateUI();
+    // Clear any residual game-over fade
+    const boardEl = document.getElementById('board');
+    if (boardEl) boardEl.classList.remove('board-finished-fade');
     applyCardsVisibility();
 }
 
@@ -647,15 +650,18 @@ function triggerSingleBallAnimation(rowIndex, direction) {
     const board = document.getElementById('board');
     if (!board || !board.children[rowIndex]) return;
     const rowEl = board.children[rowIndex];
-    const currentCount = GameState.rows[rowIndex];
-    // The last N balls in the row are the selected ones (N = selectedCount)
-    // For 'add': animate the newly added ball at index selectedCount-1 (0-based in row's ball list)
-    // For 'remove': animate the ball just after the selection boundary
+    // selectedBalls: all active (non-removed) balls in DOM order for this row
     const selectedBalls = Array.from(rowEl.querySelectorAll('.ball:not(.removed-ball)'));
-    const targetIdx = direction === 'add'
-        ? selectedBalls.length - GameState.selectedCount   // first of newly selected
-        : selectedBalls.length - GameState.selectedCount - 1; // the one just deselected
-
+    let targetIdx;
+    if (direction === 'add') {
+        // Newly selected ball is the last one in the selected range
+        // Index in selectedBalls = selectedCount - 1 (0-based)
+        targetIdx = Math.min(GameState.selectedCount - 1, selectedBalls.length - 1);
+    } else {
+        // 'remove': ball just deselected is the one at the old boundary
+        // After decrement, it sits just past the new selection boundary
+        targetIdx = Math.min(GameState.selectedCount, selectedBalls.length - 1);
+    }
     const ball = selectedBalls[targetIdx];
     if (!ball) return;
     const cls = direction === 'add' ? 'just-selected' : 'just-deselected';
@@ -731,6 +737,13 @@ function handleDecrease() {
         renderBoard();
         updateUI();
         triggerSingleBallAnimation(GameState.selectedRowIndex, 'remove');
+    } else if (GameState.selectedCount === 1) {
+        // Deselect completely — same as Cancel
+        showMessage('Selección limpiada');
+        GameState.selectedRowIndex = null;
+        GameState.selectedCount = 0;
+        renderBoard();
+        updateUI();
     }
 }
 
@@ -749,6 +762,9 @@ function handleReset() {
     renderBoard();
     updateUI();
     hideGameOverModal();
+    // Clear any game-over fade on the board
+    const boardEl = document.getElementById('board');
+    if (boardEl) boardEl.classList.remove('board-finished-fade');
     // Start with info cards hidden during gameplay
     GameState.cardsVisible = false;
     applyCardsVisibility();
@@ -873,6 +889,11 @@ function makeMove(rowIndex, removeCount) {
 
 function endGame(losingPlayer, isMisere) {
     const winningPlayer = losingPlayer === 1 ? 2 : 1;
+
+    // Dim the 2D board to signal game-over clearly
+    const boardEl = document.getElementById('board');
+    if (boardEl) boardEl.classList.add('board-finished-fade');
+
     showGameOverModal(winningPlayer, losingPlayer);
 }
 

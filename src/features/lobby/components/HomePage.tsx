@@ -522,10 +522,18 @@ function VictoryOverlay({
   const confettiRef = useRef<HTMLDivElement>(null);
   const [showContent, setShowContent] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), 150);
-    return () => clearTimeout(timer);
+  // Detect reduced motion preference once (memoized to avoid re-running effect on renders).
+  const reduceMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }, []);
+
+  useEffect(() => {
+    // Skip the 150ms delay and instant fade-in for reduced motion users.
+    const delay = reduceMotion ? 0 : 150;
+    const timer = setTimeout(() => setShowContent(true), delay);
+    return () => clearTimeout(timer);
+  }, [reduceMotion]);
 
   const wholesomeLine = useMemo(() => {
     const seed = `${playerName}:${winnerName}:${rivalName}`;
@@ -581,6 +589,11 @@ function VictoryOverlay({
     const container = confettiRef.current;
     if (!container || !isWin) return;
 
+    // Skip confetti for users who prefer reduced motion — vestibular/motion-sensitive users
+    // should not see animated confetti falling. The inline animation style bypasses the CSS
+    // media query (which targets class-based animation), so we guard it here instead.
+    if (reduceMotion) return;
+
     const pieces: HTMLDivElement[] = [];
     for (let i = 0; i < CONFETTI_COUNT; i++) {
       const el = document.createElement('div');
@@ -616,7 +629,7 @@ function VictoryOverlay({
     return () => {
       pieces.forEach((p) => p.remove());
     };
-  }, [isWin]);
+  }, [isWin, reduceMotion]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden">
@@ -626,7 +639,8 @@ function VictoryOverlay({
           background: isWin
             ? 'radial-gradient(ellipse at center, rgba(34,211,238,0.15) 0%, rgba(0,0,0,0.75) 70%)'
             : 'radial-gradient(ellipse at center, rgba(244,197,66,0.14) 0%, rgba(92,141,58,0.08) 45%, rgba(0,0,0,0.78) 72%)',
-          opacity: showContent ? 1 : 0
+          opacity: showContent ? 1 : 0,
+          transitionDuration: reduceMotion ? '0ms' : undefined
         }}
       />
 
@@ -636,7 +650,8 @@ function VictoryOverlay({
         className="relative z-10 w-full max-w-md px-6 text-center transition-all duration-700"
         style={{
           opacity: showContent ? 1 : 0,
-          transform: showContent ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.9)'
+          transform: showContent ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.9)',
+          transitionDuration: reduceMotion ? '0ms' : undefined
         }}
       >
         {winnerName ? (

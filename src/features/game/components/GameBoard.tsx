@@ -1480,9 +1480,9 @@ function LegacyBoardGrid({
                     >
                       {/* Bold SVG X mark — unmistakable "removed" indicator, matches 3D texture */}
                       <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center select-none">
-                        <svg viewBox="0 0 24 24" className="w-full h-full p-1 drop-shadow-[0_0_6px_rgba(239,68,68,1)]" xmlns="http://www.w3.org/2000/svg">
-                          <line x1="4" y1="4" x2="20" y2="20" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
-                          <line x1="20" y1="4" x2="4" y2="20" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
+                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 0 4px rgba(239,68,68,0.9))' }}>
+                          <line x1="3" y1="3" x2="21" y2="21" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
+                          <line x1="21" y1="3" x2="3" y2="21" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
                         </svg>
                       </span>
                       {/* Player initial at bottom-right corner for reference */}

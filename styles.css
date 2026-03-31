@@ -710,7 +710,17 @@ main {
     80%       { transform: translateX(4px); }
 }
 
-.row.blocked-shake {
+/* Shake animation when clicking a blocked row — .blocked-shake applied directly to row div */
+@keyframes row-shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+}
+
+.blocked-shake {
+    will-change: transform;
     animation: row-shake 380ms ease-out;
 }
 

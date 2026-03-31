@@ -11,7 +11,7 @@ export function RankingTable({ rankings }: Props): React.ReactElement {
 
   return (
     <div className="overflow-x-auto rounded-xl border border-brown/20 dark:border-white/15">
-      <table className="min-w-[520px] w-full text-sm">
+      <table className="min-w-[340px] w-full text-sm sm:min-w-[520px]">
         <thead>
           <tr className="bg-primary/20 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-brown dark:text-dark-text">
             <th className="px-3 py-3">#</th>

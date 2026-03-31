@@ -750,7 +750,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-emerald-500 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-500/40 transition-all hover:border-emerald-400 hover:bg-emerald-400 active:scale-[0.97] dark:border-emerald-400 dark:bg-emerald-600 dark:text-white dark:shadow-emerald-500/30 dark:hover:border-emerald-300 dark:hover:bg-emerald-500"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-400 bg-gradient-to-b from-emerald-400 to-emerald-600 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-500/50 transition-all hover:border-emerald-300 hover:from-emerald-300 hover:to-emerald-500 hover:shadow-emerald-400/60 active:scale-[0.97] dark:border-emerald-400 dark:from-emerald-400 dark:to-emerald-600 dark:text-[#052e16] dark:shadow-[0_4px_20px_rgba(52,211,153,0.45)] dark:hover:border-emerald-300 dark:hover:from-emerald-300 dark:hover:to-emerald-500 dark:hover:shadow-[0_4px_28px_rgba(52,211,153,0.55)]"
             >
               <IconPlus className="h-4 w-4 shrink-0" />
               <span>Nueva partida</span>
@@ -1306,6 +1306,9 @@ export function HomePage(): React.ReactElement {
         setShowTurnSpotlight(false);
         turnSpotlightTimerRef.current = null;
       }, 2400);
+      // Auto-collapse info panels when user receives their turn — reduces visual clutter during active play.
+      // Panels can be re-shown via the orange "Info" toggle button in the header.
+      setGameInfoPanelsVisible(false);
     }
 
     previousCanInteractRef.current = canInteract;
@@ -2138,7 +2141,7 @@ export function HomePage(): React.ReactElement {
                         'inline-flex items-center justify-center gap-1.5 rounded-full transition-all active:scale-95',
                         gameInfoPanelsVisible
                           ? 'h-9 px-3 bg-primary/20 text-primary hover:bg-primary/30 dark:bg-primary/25 dark:text-primary'
-                          : 'h-9 px-3 bg-orange-500/20 text-orange-600 hover:bg-orange-500/30 dark:bg-orange-400/20 dark:text-orange-300 ring-1 ring-orange-400/40'
+                          : 'h-9 px-3 bg-orange-500/25 text-orange-600 hover:bg-orange-500/35 dark:bg-orange-400/25 dark:text-orange-300 ring-2 ring-orange-400/60 shadow-[0_0_8px_rgba(249,115,22,0.35)] dark:ring-orange-300/50 dark:shadow-[0_0_10px_rgba(251,146,60,0.3)] info-toggle-pulse'
                       ].join(' ')}
                     >
                       {gameInfoPanelsVisible ? (

@@ -183,6 +183,8 @@ button {
     background: linear-gradient(145deg, var(--primary) 0%, var(--primary-strong) 100%);
     box-shadow: var(--shadow-sm);
     transition: transform var(--transition), filter var(--transition), box-shadow var(--transition), opacity var(--transition);
+    /* Eliminate 300ms tap delay on iOS/mobile — critical for responsive game controls */
+    touch-action: manipulation;
 }
 
 button:hover:not(:disabled) {
@@ -545,6 +547,8 @@ main {
         inset 0 -5px 9px rgba(6, 40, 80, 0.24);
     cursor: pointer;
     transition: transform var(--transition), filter var(--transition), box-shadow var(--transition), opacity var(--transition);
+    /* Eliminate 300ms tap delay on iOS/mobile for responsive ball selection */
+    touch-action: manipulation;
 }
 
 .ball:hover:not(.removed):not(.selected):not(.removed-ball):not(.blocked-ball) {

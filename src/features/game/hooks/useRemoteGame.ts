@@ -11,6 +11,9 @@ const HIDDEN_SYNC_INTERVAL_MS = 12_000;
 const LIVE_CHANNEL_FALLBACK_MS = 18_000;
 const LIVE_HEALTH_STALE_MS = 14_000;
 const FOCUS_SYNC_STALE_MS = 3_500;
+const SSE_RECONNECT_BASE_MS = 1_000;
+const SSE_RECONNECT_MAX_MS = 30_000;
+const SSE_MAX_CONSECUTIVE_FAILURES = 12;
 
 function getSyncInterval(gameStatus: GameState['status'] | undefined, hasLiveChannel: boolean): number {
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
@@ -173,10 +176,11 @@ export function useRemoteGame(playerId: string): {
       return;
     }
 
-    const streamUrl = `/api/games/${encodeURIComponent(gameId)}/events?playerId=${encodeURIComponent(playerId)}`;
-    const source = new EventSource(streamUrl);
     let disposed = false;
+    let consecutiveFailures = 0;
+    let reconnectTimerId: ReturnType<typeof setTimeout> | null = null;
     let staleTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    let currentSource: EventSource | null = null;
 
     const parseEventPayload = (event: MessageEvent<string>): { game?: GameState; error?: string; code?: string } | null => {
       try {
@@ -203,6 +207,7 @@ export function useRemoteGame(playerId: string): {
 
     const markLive = (): void => {
       if (disposed) return;
+      consecutiveFailures = 0;
       setHasLiveChannel(true);
       scheduleStaleCheck();
     };
@@ -244,23 +249,64 @@ export function useRemoteGame(playerId: string): {
       }
     };
 
-    source.onopen = () => {
-      markLive();
-      if (!syncInFlightRef.current) {
-        void refreshGame();
+    const openConnection = (): void => {
+      if (disposed) return;
+      if (currentSource) {
+        currentSource.close();
+        currentSource = null;
       }
+
+      const streamUrl = `/api/games/${encodeURIComponent(gameId!)}/events?playerId=${encodeURIComponent(playerId!)}`;
+      const source = new EventSource(streamUrl);
+      currentSource = source;
+
+      source.onopen = () => {
+        markLive();
+        if (!syncInFlightRef.current) {
+          void refreshGame();
+        }
+      };
+
+      // EventSource onerror fires on network errors and accidental close.
+      // Reconnect with exponential backoff — critical for mobile network stability.
+      source.onerror = () => {
+        if (disposed) return;
+        markDisconnected();
+        source.close();
+        currentSource = null;
+
+        consecutiveFailures += 1;
+        if (consecutiveFailures > SSE_MAX_CONSECUTIVE_FAILURES) {
+          // After too many consecutive failures give up on SSE;
+          // the polling fallback below will keep the game in sync.
+          return;
+        }
+        const backoffMs = Math.min(
+          SSE_RECONNECT_BASE_MS * Math.pow(2, consecutiveFailures - 1),
+          SSE_RECONNECT_MAX_MS
+        );
+        reconnectTimerId = setTimeout(() => {
+          if (!disposed) openConnection();
+        }, backoffMs);
+      };
+
+      source.addEventListener('ready', onReady);
+      source.addEventListener('update', onUpdate);
+      source.addEventListener('sync-error', onSyncError);
+      source.addEventListener('ping', markLive);
     };
-    source.onerror = markDisconnected;
-    source.addEventListener('ready', onReady);
-    source.addEventListener('update', onUpdate);
-    source.addEventListener('sync-error', onSyncError);
-    source.addEventListener('ping', markLive);
+
+    openConnection();
 
     return () => {
       disposed = true;
       setHasLiveChannel(false);
+      if (reconnectTimerId !== null) clearTimeout(reconnectTimerId);
       if (staleTimeoutId !== null) clearTimeout(staleTimeoutId);
-      source.close();
+      if (currentSource) {
+        currentSource.close();
+        currentSource = null;
+      }
     };
   }, [gameId, playerId, gameStatus, refreshGame, markSynced]);
 

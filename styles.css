@@ -1614,17 +1614,24 @@ main {
 
         /* "Nueva partida" button in VictoryOverlay — extra glow in dark mode */
         .fixed.inset-0.z-\[100\] button[class*="emerald"] {
-            box-shadow: 0 4px 20px rgba(0, 201, 167, 0.35), 0 0 16px rgba(16, 185, 129, 0.2) !important;
+            box-shadow: 0 4px 20px rgba(0, 201, 167, 0.45), 0 0 20px rgba(16, 185, 129, 0.25) !important;
         }
 
         .fixed.inset-0.z-\[100\] button[class*="emerald"]:hover {
-            box-shadow: 0 6px 28px rgba(0, 201, 167, 0.5), 0 0 24px rgba(16, 185, 129, 0.35) !important;
+            box-shadow: 0 6px 28px rgba(0, 201, 167, 0.6), 0 0 28px rgba(16, 185, 129, 0.4) !important;
         }
 
         /* "Volver al lobby" (win) — bright golden button with glow in dark mode */
         .fixed.inset-0.z-\[100\] button[class*="bg-primary"][class*="text-"] {
             border-color: #fbbf24 !important;
-            box-shadow: 0 4px 20px rgba(244, 197, 66, 0.5), 0 0 16px rgba(244, 197, 66, 0.3) !important;
+            background-color: rgba(244, 197, 66, 0.92) !important;
+            color: #1c1100 !important;
+            box-shadow: 0 4px 24px rgba(244, 197, 66, 0.6), 0 0 20px rgba(244, 197, 66, 0.35) !important;
+        }
+
+        .fixed.inset-0.z-\[100\] button[class*="bg-primary"][class*="text-"]:hover {
+            background-color: rgba(244, 197, 66, 1) !important;
+            box-shadow: 0 6px 32px rgba(244, 197, 66, 0.7), 0 0 28px rgba(244, 197, 66, 0.45) !important;
         }
 
         /* "Volver al lobby" (loss) — muted but visible in dark mode */
@@ -1640,6 +1647,39 @@ main {
             color: #fde68a !important;
             background: rgba(28, 25, 18, 0.98) !important;
             box-shadow: 0 4px 20px rgba(244, 197, 66, 0.4), 0 0 12px rgba(244, 197, 66, 0.25) !important;
+        }
+    }
+
+    /* Game-over modal (html.dark) — mirrors the prefers-color-scheme dark block above
+       for when user manually toggled dark mode instead of relying on system preference */
+    @media (html.dark) {
+        #game-over-modal {
+            background: rgba(5, 10, 18, 0.65);
+        }
+
+        #modal-title {
+            color: #e9d8a6;
+        }
+
+        #modal-restart-btn {
+            background: linear-gradient(145deg, #16a34a 0%, #15803d 50%, #14532d 100%) !important;
+            border-color: #86efac !important;
+            color: #ffffff !important;
+            box-shadow:
+                0 4px 24px rgba(21, 128, 61, 0.6),
+                0 0 30px rgba(74, 222, 128, 0.25) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        #modal-restart-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #22c55e 0%, #16a34a 50%, #15803d 100%) !important;
+            box-shadow:
+                0 6px 28px rgba(21, 128, 61, 0.7),
+                0 0 40px rgba(74, 222, 128, 0.35) !important;
+        }
+
+        #modal-restart-btn:active:not(:disabled) {
+            background: linear-gradient(145deg, #14532d 0%, #15803d 50%, #166534 100%) !important;
         }
     }
 }
@@ -1807,12 +1847,103 @@ main {
     transform-origin: bottom center;
 }
 
+/* ── Accessibility: Respect prefers-reduced-motion ──────────────────────
+   Nuclear off → replaced with surgical approach:
+   - Short transitions (< 100ms) are safe for vestibular users and preserved.
+   - Functional game-state animations get a simple fade/solid alternative.
+   - Purely decorative vestibular animations are disabled.
+─────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+    /* Allow short, safe transitions */
     * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+        transition-duration: min(var(--transition-duration, 150ms), 100ms) !important;
         scroll-behavior: auto !important;
+    }
+
+    /* Preserve functional board glow (your-turn indicator) as a solid color */
+    .board-your-turn-glow {
+        box-shadow: inset 0 0 18px 4px rgba(16, 185, 29, 0.38), 0 0 8px 2px rgba(16, 185, 29, 0.18) !important;
+        animation: none !important;
+    }
+
+    /* Dice result overlay: functional feedback → simple fade-in instead of bounce */
+    .dice-result-overlay {
+        animation: none !important;
+    }
+    .dice-result-pop {
+        animation: dice-result-pop-reduced 0.25s ease-out both !important;
+    }
+    @keyframes dice-result-pop-reduced {
+        0%   { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    /* Turn badge: functional status change → instant swap, no pulse */
+    .turn-badge-pulse {
+        animation: none !important;
+    }
+
+    /* Turn info pulse: functional notification → solid border, no animation */
+    .turn-info-pulse {
+        animation: none !important;
+        border-color: rgba(241, 182, 77, 0.55) !important;
+        box-shadow: 0 0 0 3px rgba(241, 182, 77, 0.28), 0 0 20px rgba(241, 182, 77, 0.22) !important;
+    }
+    html.dark .turn-info-pulse {
+        border-color: rgba(224, 128, 48, 0.5) !important;
+        box-shadow: 0 0 0 3px rgba(224, 128, 48, 0.28), 0 0 18px rgba(224, 128, 48, 0.22) !important;
+    }
+
+    /* Balls pop: functional counter feedback → subtle color shift instead of bounce */
+    .balls-pop {
+        animation: balls-pop-reduced 0.45s ease-out both !important;
+    }
+    @keyframes balls-pop-reduced {
+        0%   { color: inherit; }
+        35%  { color: #ef4444; }
+        100% { color: inherit; }
+    }
+
+    /* Dice chip animations: disabled (decorative) */
+    .dice-ready-pop,
+    .dice-spent-chip,
+    .dice-result-arrived {
+        animation: none !important;
+    }
+
+    /* Ball pop-out (marble removal): functional → instant opacity fade */
+    .ball-pop-out {
+        animation: none !important;
+    }
+
+    /* Trophy bounce: decorative → static */
+    .animate-trophy-bounce,
+    .trophy-bounce {
+        animation: none !important;
+    }
+
+    /* Board skeleton loading: functional → static dimmed state */
+    .board-skeleton-ball {
+        animation: none !important;
+        opacity: 0.35 !important;
+    }
+    .board-skeleton-rows {
+        animation: none !important;
+    }
+
+    /* Toast animations: functional notification → instant */
+    .toast-enter {
+        animation: none !important;
+    }
+
+    /* Board attention pulse: decorative → solid border */
+    .board-attention-pulse {
+        animation: none !important;
+    }
+
+    /* Marble idle/muted float: decorative → static */
+    .board-canvas-enter {
+        animation: none !important;
     }
 }
 
@@ -2028,6 +2159,7 @@ html.dark .turn-info-pulse {
    ════════════════════════════════════════════════════════════════ */
 
 /* ── Enhanced dark mode for mobile ──────────────────────────────── */
+/* Supports both system preference (prefers-color-scheme) and manual toggle (html.dark) */
 @media (max-width: 768px) and (prefers-color-scheme: dark) {
     :root {
         --bg-page: #080c10;
@@ -2041,6 +2173,24 @@ html.dark .turn-info-pulse {
     }
 
     /* Player cards in GameInfoPanel: dark surface on mobile dark mode */
+    .player-card {
+        background: linear-gradient(175deg, #111d28 0%, #0d1520 100%) !important;
+        border-color: #1a2a3a !important;
+    }
+}
+
+@media (max-width: 768px) and (html.dark) {
+    :root {
+        --bg-page: #080c10;
+        --bg-surface: #0d1520;
+        --bg-surface-soft: #0a1218;
+        --bg-surface-contrast: #111d28;
+    }
+
+    body {
+        background: linear-gradient(160deg, #060a10 0%, #080c14 50%, #060a10 100%) !important;
+    }
+
     .player-card {
         background: linear-gradient(175deg, #111d28 0%, #0d1520 100%) !important;
         border-color: #1a2a3a !important;

@@ -1723,6 +1723,7 @@ export function GameBoard({
   const prevCanInteractRef = useRef<boolean | undefined>(undefined);
   const [renderMode, setRenderMode] = useState<'loading' | 'three' | 'fallback'>('loading');
   const [isRollingDice, setIsRollingDice] = useState(false);
+  const diceSpinTimeoutRef = useRef<number | null>(null);
   const [diceChipAnim, setDiceChipAnim] = useState<'ready' | 'spent' | null>(null);
   const [diceResultArrived, setDiceResultArrived] = useState(false);
   const diceResultArrivedTimerRef = useRef<number | null>(null);
@@ -2056,6 +2057,10 @@ export function GameBoard({
         window.clearTimeout(diceResultArrivedTimerRef.current);
         diceResultArrivedTimerRef.current = null;
       }
+      if (diceSpinTimeoutRef.current !== null) {
+        window.clearTimeout(diceSpinTimeoutRef.current);
+        diceSpinTimeoutRef.current = null;
+      }
     };
   }, []);
 
@@ -2095,6 +2100,12 @@ export function GameBoard({
       const context = sceneRef.current;
       if (!rollFn || isRollingDice) return;
 
+      // Clear any previously pending spin-stop timeout before starting a new roll
+      if (diceSpinTimeoutRef.current !== null) {
+        window.clearTimeout(diceSpinTimeoutRef.current);
+        diceSpinTimeoutRef.current = null;
+      }
+
       setIsRollingDice(true);
       if (context) {
         context.diceSpinning = true;
@@ -2104,7 +2115,8 @@ export function GameBoard({
       try {
         await rollFn();
       } finally {
-        window.setTimeout(() => {
+        diceSpinTimeoutRef.current = window.setTimeout(() => {
+          diceSpinTimeoutRef.current = null;
           const latestContext = sceneRef.current;
           if (latestContext) {
             latestContext.diceSpinning = false;
@@ -2116,8 +2128,18 @@ export function GameBoard({
     [isRollingDice]
   );
 
+  // Stop dice spin and clear pending timeout when dice action disappears
   useEffect(() => {
     if (!showDiceAction && isRollingDice) {
+      if (diceSpinTimeoutRef.current !== null) {
+        window.clearTimeout(diceSpinTimeoutRef.current);
+        diceSpinTimeoutRef.current = null;
+      }
+      // Also stop the 3D spin immediately if context still exists
+      const ctx = sceneRef.current;
+      if (ctx) {
+        ctx.diceSpinning = false;
+      }
       setIsRollingDice(false);
     }
   }, [showDiceAction, isRollingDice]);

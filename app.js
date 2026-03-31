@@ -944,6 +944,9 @@ function showGameOverModal(winner, yourPlayerNumber) {
     modalMessage.textContent = message;
     modal.setAttribute('aria-hidden', 'false');
     modal.style.display = 'flex';
+    // Accessibility: move focus to the restart button when modal opens
+    const restartBtn = document.getElementById('modal-restart-btn');
+    if (restartBtn) restartBtn.focus();
 }
 
 function hideGameOverModal() {
@@ -1076,6 +1079,9 @@ function showMultiplayerModal() {
     const modal = document.getElementById('multiplayer-modal');
     modal.setAttribute('aria-hidden', 'false');
     modal.style.display = 'flex';
+    // Accessibility: move focus to the close button when modal opens
+    const closeBtn = document.getElementById('close-multiplayer-modal-btn');
+    if (closeBtn) closeBtn.focus();
 }
 
 function hideMultiplayerModal() {

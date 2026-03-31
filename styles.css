@@ -852,7 +852,8 @@ main {
     background: rgba(133, 40, 58, 0.35);
     border-radius: 0 0 12px 12px;
     transform-origin: left;
-    animation: toastShrink 3s linear forwards;
+    /* Animation is driven by JS (requestAnimationFrame) to stay in sync with the dismiss timer. */
+    transform: scaleX(1);
 }
 
 @keyframes toastShrink {

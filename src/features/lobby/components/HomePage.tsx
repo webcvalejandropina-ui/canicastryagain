@@ -860,6 +860,8 @@ export function HomePage(): React.ReactElement {
 
   const autoJoinAttemptedRef = useRef(false);
   const toastTimerRef = useRef<number | null>(null);
+  const toastProgressRef = useRef<HTMLDivElement | null>(null);
+  const toastRafRef = useRef<number | null>(null);
   const turnSpotlightTimerRef = useRef<number | null>(null);
   const boardAttentionTimerRef = useRef<number | null>(null);
   const moveInFlightRef = useRef(false);
@@ -1114,8 +1116,28 @@ export function HomePage(): React.ReactElement {
     if (toastTimerRef.current) {
       window.clearTimeout(toastTimerRef.current);
     }
+    if (toastRafRef.current) {
+      window.cancelAnimationFrame(toastRafRef.current);
+    }
 
     const durationMs = Math.min(10_000, 2600 + text.length * 42);
+
+    // JS-driven progress bar animation — stays in sync with the actual dismiss timer.
+    const progressEl = toastProgressRef.current;
+    if (progressEl) {
+      progressEl.style.transform = 'scaleX(1)';
+      const startTime = performance.now();
+      const animate = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.max(0, 1 - elapsed / durationMs);
+        progressEl.style.transform = `scaleX(${progress})`;
+        if (progress > 0) {
+          toastRafRef.current = window.requestAnimationFrame(animate);
+        }
+      };
+      toastRafRef.current = window.requestAnimationFrame(animate);
+    }
+
     toastTimerRef.current = window.setTimeout(() => {
       setMessage('');
       toastTimerRef.current = null;
@@ -1173,6 +1195,9 @@ export function HomePage(): React.ReactElement {
     return () => {
       if (toastTimerRef.current) {
         window.clearTimeout(toastTimerRef.current);
+      }
+      if (toastRafRef.current) {
+        window.cancelAnimationFrame(toastRafRef.current);
       }
       if (turnSpotlightTimerRef.current) {
         window.clearTimeout(turnSpotlightTimerRef.current);
@@ -3017,7 +3042,7 @@ export function HomePage(): React.ReactElement {
           aria-live="polite"
         >
           <span className="mr-2">🍍</span>{message}
-          <div id="toast-progress" />
+          <div ref={toastProgressRef} id="toast-progress" />
         </div>
       ) : null}
 

@@ -907,10 +907,20 @@ function hideGameOverModal() {
 
 function showMessage(message) {
     const messageArea = document.getElementById('message-area');
+    const progressBar = document.getElementById('toast-progress');
+
+    // Restart the shrink animation so it always lasts exactly 3 s from the new message
+    if (progressBar) {
+        progressBar.style.animation = 'none';
+        void progressBar.offsetWidth; // force reflow
+        progressBar.style.animation = '';
+    }
+
     messageArea.textContent = message;
     messageArea.classList.add('show');
-    
-    setTimeout(() => {
+
+    if (showMessage._timeout) clearTimeout(showMessage._timeout);
+    showMessage._timeout = setTimeout(() => {
         messageArea.classList.remove('show');
     }, 3000);
 }

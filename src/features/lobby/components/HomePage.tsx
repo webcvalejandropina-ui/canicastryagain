@@ -721,7 +721,7 @@ function VictoryOverlay({
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary/60 bg-[#1c1912] px-6 py-3.5 text-sm font-black uppercase tracking-wider text-primary shadow-lg shadow-primary/25 backdrop-blur transition-all hover:border-primary hover:bg-[#0f1408] active:scale-[0.97]"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary/60 bg-[#1c1912] px-6 py-3.5 text-sm font-black uppercase tracking-wider text-primary shadow-lg shadow-primary/25 backdrop-blur transition-all hover:border-primary hover:bg-[#0f1408] active:scale-[0.97] dark:border-white/30 dark:bg-dark-card dark:text-amber-200 dark:shadow-primary/20"
           >
             <IconShare className="h-4 w-4 shrink-0" />
             <span>Compartir y retar</span>
@@ -735,7 +735,7 @@ function VictoryOverlay({
               'inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
                 ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-                : 'border-2 border-primary bg-primary/40 text-primary shadow-lg shadow-primary/25 hover:bg-primary/60 dark:border-primary/80 dark:bg-primary/30 dark:text-primary'
+                : 'border-2 border-primary bg-primary/40 text-primary shadow-lg shadow-primary/25 hover:bg-primary/60 dark:border-primary/60 dark:bg-primary/20 dark:text-amber-200 dark:hover:bg-primary/40'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />

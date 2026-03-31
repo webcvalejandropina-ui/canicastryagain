@@ -1130,12 +1130,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     highlight: '#e0f2fe',
     shadow: '#0c4a6e'
   });
-  const removedTexture = createMarbleTexture(THREE, {
-    base: '#64748b',
-    veins: '#94a3b8',
-    highlight: '#cbd5e1',
-    shadow: '#334155'
-  });
+  const removedTexture = createRemovedMarbleTexture(THREE, '#94a3b8'); // grey X for neutral dead balls
 
   const context: SceneContext = {
     THREE,
@@ -1272,12 +1267,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     // are re-created (and their materials re-populated) the next time the dice appears.
     context.diceTextures.forEach((tex) => tex.dispose());
     context.diceTextures = [];
-    context.removedTexture = createMarbleTexture(THREE, {
-      base: '#64748b',
-      veins: '#94a3b8',
-      highlight: '#cbd5e1',
-      shadow: '#334155'
-    });
+    context.removedTexture = createRemovedMarbleTexture(THREE, '#94a3b8'); // grey X for neutral dead balls
     context.activeTexture = createMarbleTexture(THREE, {
       base: '#38bdf8',
       veins: '#bae6fd',
@@ -1761,9 +1751,9 @@ export function GameBoard({
     ? `${selectedCount}/${turnLimit} seleccionadas · restan ${remainingSelectionCapacity}`
     : canInteract
       ? diceAvailable
-        ? `Usa el dado (arriba a la derecha) o toca canicas — hasta ${turnLimit} seguida${turnLimit === 1 ? '' : 's'} contiguas`
-        : `Toca canicas contiguas en una fila — hasta ${turnLimit}`
-      : 'Esperando jugada rival';
+        ? `Dado listo — lanza primero o selecciona canicas (hasta ${turnLimit} contiguas)`
+        : `Selecciona canicas contiguas — hasta ${turnLimit}`
+      : 'Esperando turno del rival';
 
   useEffect(() => {
     onBallClickRef.current = onBallClick;
@@ -2373,13 +2363,13 @@ export function GameBoard({
             </p>
             {selectedCount > 0 ? (
               <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
-                Toca más canicas de la misma fila para ampliar; toca un extremo para reducir la selección.
+                Amplía tocando más canicas; toca un extremo para reducir.
               </p>
             ) : canInteract ? (
               <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
                 {diceAvailable
-                  ? 'El dado está listo — úsalo primero o selecciona canicas directamente.'
-                  : 'Toca una canica para empezar a seleccionar; puedes ampliar o reducir tocando extremos.'}
+                  ? 'El dado está listo — lanza primero o selecciona canicas.'
+                  : 'Toca una canica para empezar a seleccionar.'}
               </p>
             ) : null}
           </div>
@@ -2413,8 +2403,8 @@ export function GameBoard({
             </button>
             <p className="rounded-full bg-black/45 px-2.5 py-1 text-right text-[10px] font-semibold leading-tight text-white/80 backdrop-blur">
               {renderMode === 'fallback'
-                ? 'Tu navegador usa tablero 2D: el dado sigue disponible aquí.'
-                : 'Acceso táctil rápido al dado especial.'}
+                ? 'El dado está disponible aquí abajo.'
+                : 'Toca para lanzar el dado.'}
             </p>
           </div>
         </div>

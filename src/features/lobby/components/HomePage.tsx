@@ -2874,8 +2874,14 @@ export function HomePage(): React.ReactElement {
       ) : null}
 
       {message ? (
-        <div className="toast-slide-down fixed inset-x-4 top-4 z-[100] rounded-2xl border border-primary/20 bg-white/95 px-4 py-3 text-sm font-bold text-[#4a3f32] shadow-xl shadow-primary/10 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:text-dark-text dark:shadow-primary/5 sm:inset-x-auto sm:right-6 sm:max-w-sm" role="status" aria-live="polite">
+        <div
+          key={message}
+          className="toast-slide-down fixed inset-x-4 top-4 z-[100] rounded-2xl border border-primary/20 bg-white/95 px-4 py-3 text-sm font-bold text-[#4a3f32] shadow-xl shadow-primary/10 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:text-dark-text dark:shadow-primary/5 sm:inset-x-auto sm:right-6 sm:max-w-sm overflow-hidden"
+          role="status"
+          aria-live="polite"
+        >
           <span className="mr-2">🍍</span>{message}
+          <div id="toast-progress" />
         </div>
       ) : null}
 

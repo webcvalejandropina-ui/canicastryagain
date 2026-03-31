@@ -1838,6 +1838,9 @@ export function GameBoard({
       prevDiceAvailableRef.current = diceAvailable;
       return () => clearTimeout(timer);
     }
+    // No state change — but still return cleanup so the pending timer is cleared on unmount
+    prevDiceAvailableRef.current = diceAvailable;
+    return () => {};
   }, [diceAvailable]);
 
   // Pulse the turn badge AND retrigger the board glow when the user receives the turn (false → true).
@@ -1909,6 +1912,11 @@ export function GameBoard({
     }, 700);
 
     return () => {
+      // Clear both pending timers to prevent stale setState on unmounted component
+      if (diceResultTimerRef.current) {
+        window.clearTimeout(diceResultTimerRef.current);
+        diceResultTimerRef.current = null;
+      }
       if (diceResultArrivedTimerRef.current) {
         window.clearTimeout(diceResultArrivedTimerRef.current);
         diceResultArrivedTimerRef.current = null;

@@ -2277,13 +2277,13 @@ export function GameBoard({
                 const base = diceAvailable
                   ? 'border-amber-400/40 bg-amber-50/70 text-amber-600 dark:border-amber-400/35 dark:bg-amber-400/10 dark:text-amber-300'
                   : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60';
-                // NOTE: parentheses around || expr are required — without them the precedence
-                // (ternary ? : binds tighter than ||) causes dice-result-arrived to be skipped
-                // whenever diceChipAnim === 'spent' (short-circuit on truthy 'dice-spent-chip').
+                // NOTE: diceResultArrived && lastDiceResult must be checked BEFORE the diceChipAnim
+                // spent branch — otherwise the || short-circuits on truthy 'dice-spent-chip' and
+                // the dice-result-arrived animation never fires when the dice is already spent.
                 const anim = diceAvailable
                   ? (diceChipAnim === 'ready' ? 'dice-ready-pop' : '')
-                  : ((diceChipAnim === 'spent' ? 'dice-spent-chip' : '')
-                  || (diceResultArrived && lastDiceResult ? 'dice-result-arrived' : ''));
+                  : ((diceResultArrived && lastDiceResult ? 'dice-result-arrived' : '')
+                  || (diceChipAnim === 'spent' ? 'dice-spent-chip' : ''));
                 return (
                   <span
                     aria-label={diceAvailable ? 'Dado especial disponible' : 'Dado especial ya usado'}

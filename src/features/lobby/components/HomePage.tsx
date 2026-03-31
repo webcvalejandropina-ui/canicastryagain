@@ -585,14 +585,11 @@ function VictoryOverlay({
     }
   }, [isWin, rivalName, winnerName, shareOrigin, onToast]);
 
-  useEffect(() => {
+  // Extracted to a named function so it can be called from the useEffect above.
+  // The guard (isWin && !reduceMotion) is applied by the caller.
+  const spawnConfetti = (): (() => void) => {
     const container = confettiRef.current;
-    if (!container || !isWin) return;
-
-    // Skip confetti for users who prefer reduced motion — vestibular/motion-sensitive users
-    // should not see animated confetti falling. The inline animation style bypasses the CSS
-    // media query (which targets class-based animation), so we guard it here instead.
-    if (reduceMotion) return;
+    if (!container) return () => {};
 
     const pieces: HTMLDivElement[] = [];
     for (let i = 0; i < CONFETTI_COUNT; i++) {
@@ -629,6 +626,12 @@ function VictoryOverlay({
     return () => {
       pieces.forEach((p) => p.remove());
     };
+  };
+
+  // Guard confetti creation before calling — avoids DOM nodes for reduced-motion users
+  useEffect(() => {
+    if (!(isWin && !reduceMotion)) return;
+    void spawnConfetti();
   }, [isWin, reduceMotion]);
 
   return (
@@ -2059,7 +2062,9 @@ export function HomePage(): React.ReactElement {
                               : 'bg-slate-500/10 text-slate-500 dark:bg-slate-500/15 dark:text-slate-400'
                           ].join(' ')}
                         >
-                          {canInteract ? '🟢 Tu turno' : '⏳ Rival'} · max {turnLimit}
+                          {canInteract
+                            ? <span aria-label="Es tu turno"><span aria-hidden="true">🟢</span> Tu turno</span>
+                            : <span aria-label="Turno del rival"><span aria-hidden="true">⏳</span> Rival</span>} · max {turnLimit}
                         </div>
                         <div
                           aria-live="polite"

@@ -691,24 +691,6 @@ main {
     pointer-events: none;
 }
 
-/* Turn change flash on the board */
-@keyframes board-flash {
-    0%, 100% { background-color: transparent; }
-    30% { background-color: var(--bg-surface-contrast, rgba(74, 144, 226, 0.08)); }
-}
-
-.board.flash-turn {
-    animation: board-flash 500ms ease-out;
-}
-
-/* Shake animation when clicking a blocked row */
-@keyframes row-shake {
-    0%, 100% { transform: translateX(0); }
-    20%       { transform: translateX(-6px); }
-    40%       { transform: translateX(6px); }
-    60%       { transform: translateX(-4px); }
-    80%       { transform: translateX(4px); }
-}
 
 /* Shake animation when clicking a blocked row — .blocked-shake applied directly to row div */
 @keyframes row-shake {
@@ -1266,7 +1248,7 @@ main {
         box-shadow: inset 0 0 0 1px rgba(74, 144, 226, 0.3);
     }
 
-    .row.blocked {
+    [role="row"].blocked {
         background: rgba(240, 160, 32, 0.12);
         box-shadow: inset 0 0 0 1px rgba(240, 160, 32, 0.3);
     }

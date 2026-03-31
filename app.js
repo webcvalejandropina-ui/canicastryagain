@@ -621,6 +621,24 @@ function handleBallClick(rowIndex, ballIndex) {
     
     renderBoard();
     updateUI();
+    triggerBallPopAnimation(rowIndex);
+}
+
+// Briefly add just-selected class so the CSS pop animation retriggers on each click
+function triggerBallPopAnimation(rowIndex) {
+    const board = document.getElementById('board');
+    if (!board || !board.children[rowIndex]) return;
+    const rowEl = board.children[rowIndex];
+    const selectedBalls = rowEl.querySelectorAll('.ball.selected');
+    selectedBalls.forEach(ball => {
+        ball.classList.remove('just-selected');
+        void ball.offsetWidth; // force reflow to restart animation
+        ball.classList.add('just-selected');
+    });
+    // Clean up after animation completes so re-renders don't replay it
+    setTimeout(() => {
+        selectedBalls.forEach(ball => ball.classList.remove('just-selected'));
+    }, 350);
 }
 
 function handleConfirm() {
@@ -675,6 +693,7 @@ function handleIncrease() {
         GameState.selectedCount++;
         renderBoard();
         updateUI();
+        triggerBallPopAnimation(GameState.selectedRowIndex);
     }
 }
 
@@ -687,6 +706,7 @@ function handleDecrease() {
         GameState.selectedCount--;
         renderBoard();
         updateUI();
+        triggerBallPopAnimation(GameState.selectedRowIndex);
     }
 }
 

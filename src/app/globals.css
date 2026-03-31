@@ -235,6 +235,19 @@ body {
   }
 }
 
+/* Bounce animation for trophy icon in finished-game banner */
+@keyframes trophyBounce {
+  0%   { transform: scale(0.7) translateY(6px); opacity: 0.5; }
+  45%  { transform: scale(1.15) translateY(-4px); opacity: 1; }
+  70%  { transform: scale(0.95) translateY(2px); }
+  85%  { transform: scale(1.04) translateY(-1px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.animate-trophy-bounce {
+  animation: trophyBounce 900ms cubic-bezier(0.22, 0.78, 0.38, 1.2) both;
+}
+
 .victory-text-shimmer {
   background: linear-gradient(
     90deg,
@@ -516,6 +529,21 @@ body {
   will-change: transform, opacity;
 }
 
+/* ── Blocked-row shake (user tapped a locked row) ───────────────── */
+@keyframes blockedShake {
+  0%,  100% { transform: translateX(0); }
+  15%        { transform: translateX(-6px) rotate(-1.5deg); }
+  30%        { transform: translateX(5px)  rotate(1.5deg); }
+  45%        { transform: translateX(-4px) rotate(-1deg); }
+  60%        { transform: translateX(3px)  rotate(0.8deg); }
+  75%        { transform: translateX(-2px); }
+  90%        { transform: translateX(1px); }
+}
+
+.blocked-shake {
+  animation: blockedShake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
 /* ── Finished Game Banner (2D fallback board) ───────────────────── */
 @keyframes boardFinishedBannerIn {
   0%   { opacity: 0; transform: scale(0.88) translateY(-8px); }
@@ -569,6 +597,8 @@ body {
   .dice-result-arrived,
   .board-your-turn-glow,
   .board-finished-banner,
+  .blocked-shake,
+  .animate-trophy-bounce,
   .animate-spin {
     animation: none !important;
     transform: none !important;

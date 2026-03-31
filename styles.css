@@ -613,11 +613,24 @@ main {
 /* Turn change flash on the board */
 @keyframes board-flash {
     0%, 100% { background-color: transparent; }
-    30% { background-color: rgba(74, 144, 226, 0.08); }
+    30% { background-color: var(--bg-surface-contrast, rgba(74, 144, 226, 0.08)); }
 }
 
 .board.flash-turn {
     animation: board-flash 500ms ease-out;
+}
+
+/* Shake animation when clicking a blocked row */
+@keyframes row-shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+}
+
+.row.blocked-shake {
+    animation: row-shake 380ms ease-out;
 }
 
 .move-history,

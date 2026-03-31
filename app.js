@@ -528,6 +528,21 @@ function handleBallClick(rowIndex, ballIndex) {
         return;
     }
     
+    // Immediate feedback: blocked rows cannot be selected
+    const isBlocked = GameState.lastTouchedRowIndex === rowIndex;
+    if (isBlocked) {
+        showMessage(`La fila ${rowIndex + 1} está bloqueada: el rival la tocó en el turno anterior`);
+        // Shake the blocked row for tactile feedback
+        const board = document.getElementById('board');
+        if (board && board.children[rowIndex]) {
+            const rowEl = board.children[rowIndex];
+            rowEl.classList.remove('blocked-shake');
+            void rowEl.offsetWidth;
+            rowEl.classList.add('blocked-shake');
+        }
+        return;
+    }
+    
     if (GameState.selectedRowIndex === null) {
         GameState.selectedRowIndex = rowIndex;
         GameState.selectedCount = 1;

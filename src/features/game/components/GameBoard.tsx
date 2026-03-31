@@ -1642,7 +1642,6 @@ function DiceResultBanner({
 
   return (
     <div
-      aria-hidden="true"
       className={[
         'dice-result-overlay pointer-events-auto rounded-2xl border-2 border-white/20',
         'px-5 py-3 shadow-2xl backdrop-blur-xl cursor-pointer',
@@ -1653,6 +1652,11 @@ function DiceResultBanner({
       onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); onDismiss?.(); }}
       style={{ touchAction: 'manipulation' }}
     >
+      {/* Screen-reader dismiss instruction — referred by aria-describedby on the alertdialog wrapper.
+          Visually hidden so the visible close button stays the sole visual affordance. */}
+      <span id={`${descId}-dismiss`} className="sr-only">
+        Toca o haz clic para cerrar el diálogo.
+      </span>
       {/* Tap/click anywhere on banner to dismiss — critical for mobile UX */}
       <div
         className="flex items-center gap-3"
@@ -1672,8 +1676,8 @@ function DiceResultBanner({
           <p id={titleId} className={['text-xl font-black tracking-tight', meta.text].join(' ')}>
             {meta.label}
           </p>
-          {/* Accessible dismiss hint — always visible for discoverability on all devices */}
-          <p className="mt-1 text-[10px] font-semibold leading-tight text-white/70">
+          {/* Visible dismiss hint for sighted users. Screen readers get the sr-only version above. */}
+          <p aria-hidden="true" className="mt-1 text-[10px] font-semibold leading-tight text-white/70">
             Toca o haz clic para cerrar
           </p>
         </div>
@@ -2218,7 +2222,7 @@ export function GameBoard({
               role="alertdialog"
               aria-modal="true"
               aria-labelledby="dice-result-title-2d"
-              aria-describedby="dice-result-desc-2d"
+              aria-describedby="dice-result-desc-2d dice-result-desc-2d-dismiss"
               onClick={dismissDiceResult}
             >
               <DiceResultBanner
@@ -2282,7 +2286,7 @@ export function GameBoard({
               role="alertdialog"
               aria-modal="true"
               aria-labelledby="dice-result-title-3d"
-              aria-describedby="dice-result-desc-3d"
+              aria-describedby="dice-result-desc-3d dice-result-desc-3d-dismiss"
               onClick={dismissDiceResult}
             >
               <DiceResultBanner

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { Game } from '../src/backend/game/domain/Game';
+import { Game } from '../src/backend/game/domain/Game.js';
 
 function createPlayableGame(): Game {
   const game = Game.create({

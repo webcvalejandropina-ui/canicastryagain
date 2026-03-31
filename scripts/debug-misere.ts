@@ -1,4 +1,4 @@
-import { Game } from '../src/backend/game/domain/Game';
+import { Game } from '../src/backend/game/domain/Game.js';
 
 const g = Game.create({ id: 't', code: 'T', numRows: 3, creator: { id: 'p1', name: 'P1' } });
 g.join({ id: 'p2', name: 'P2' });

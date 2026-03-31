@@ -57,7 +57,7 @@ function SparkIcon({ className }: { className?: string }): React.ReactElement {
 function playerCardClass(isYou: boolean, isActiveTurn: boolean): string {
   return [
     'rounded-xl border p-4 transition-all duration-200',
-    isYou ? 'border-primary/40 bg-primary/10' : 'border-brown/15 bg-sand/40 dark:border-white/10 dark:bg-dark-surface',
+    isYou ? 'border-primary/40 bg-primary/10' : 'border-brown/15 dark:border-white/10 bg-sand/40 dark:border-white/10 dark:bg-dark-surface',
     isActiveTurn ? 'ring-1 ring-primary/60 shadow-glow dark:shadow-casino-card-dark' : ''
   ]
     .filter(Boolean)
@@ -270,7 +270,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
       ) : null}
 
       {game.moveHistory.length > 0 && game.status !== 'finished' && (
-        <div className="mt-3 rounded-xl border border-brown/15 bg-sand/30 p-3 dark:border-white/8 dark:bg-dark-surface/60">
+        <div className="mt-3 rounded-xl border border-brown/15 dark:border-white/10 bg-sand/30 p-3 dark:border-white/8 dark:bg-dark-surface/60">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-brown/60 dark:text-dark-muted">
             Historial
           </p>

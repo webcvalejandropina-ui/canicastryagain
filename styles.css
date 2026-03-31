@@ -581,6 +581,17 @@ main {
     animation: ball-select-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
+/* Shrink bounce when a ball is deselected via the − button */
+@keyframes ball-deselect-shrink {
+    0%   { transform: translateY(-2px) scale(1.07); }
+    40%  { transform: translateY(1px) scale(0.93); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+.ball.just-deselected {
+    animation: ball-deselect-shrink 300ms cubic-bezier(0.36, 0.07, 0.64, 1) both;
+}
+
 .ball.removed {
     opacity: 0;
     transform: scale(0.4);

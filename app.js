@@ -641,6 +641,30 @@ function triggerBallPopAnimation(rowIndex) {
     }, 350);
 }
 
+// Animate only the ball that just changed selection state
+// direction: 'add' | 'remove'
+function triggerSingleBallAnimation(rowIndex, direction) {
+    const board = document.getElementById('board');
+    if (!board || !board.children[rowIndex]) return;
+    const rowEl = board.children[rowIndex];
+    const currentCount = GameState.rows[rowIndex];
+    // The last N balls in the row are the selected ones (N = selectedCount)
+    // For 'add': animate the newly added ball at index selectedCount-1 (0-based in row's ball list)
+    // For 'remove': animate the ball just after the selection boundary
+    const selectedBalls = Array.from(rowEl.querySelectorAll('.ball:not(.removed-ball)'));
+    const targetIdx = direction === 'add'
+        ? selectedBalls.length - GameState.selectedCount   // first of newly selected
+        : selectedBalls.length - GameState.selectedCount - 1; // the one just deselected
+
+    const ball = selectedBalls[targetIdx];
+    if (!ball) return;
+    const cls = direction === 'add' ? 'just-selected' : 'just-deselected';
+    ball.classList.remove(cls);
+    void ball.offsetWidth;
+    ball.classList.add(cls);
+    setTimeout(() => ball.classList.remove(cls), 350);
+}
+
 function handleConfirm() {
     if (GameState.selectedRowIndex === null || GameState.selectedCount === 0) {
         showMessage('Selecciona al menos una canica para quitar');
@@ -693,7 +717,7 @@ function handleIncrease() {
         GameState.selectedCount++;
         renderBoard();
         updateUI();
-        triggerBallPopAnimation(GameState.selectedRowIndex);
+        triggerSingleBallAnimation(GameState.selectedRowIndex, 'add');
     }
 }
 
@@ -706,7 +730,7 @@ function handleDecrease() {
         GameState.selectedCount--;
         renderBoard();
         updateUI();
-        triggerBallPopAnimation(GameState.selectedRowIndex);
+        triggerSingleBallAnimation(GameState.selectedRowIndex, 'remove');
     }
 }
 

@@ -26,6 +26,36 @@ type Props = {
   onNewGame?: () => void;
 };
 
+// Small variants (14px) for compact/history areas where text is text-[10px]
+const DICE_POWER_SVG_SMALL: Record<string, React.ReactElement> = {
+  bomba: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="14" r="8" fill="#374151" stroke="#9ca3af" strokeWidth="1.5"/>
+      <circle cx="8" cy="11" r="1.5" fill="#9ca3af"/>
+      <circle cx="14" cy="9" r="1" fill="#9ca3af"/>
+      <rect x="10.5" y="3" width="3" height="5" rx="1.5" fill="#6b7280"/>
+      <path d="M12 3 Q14 1 15.5 2" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+    </svg>
+  ),
+  rayo: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
+    </svg>
+  ),
+  diagonal: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 6l4 4M10 4l6 6M18 6l-4 4" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M6 18l4-4M10 20l6-6M18 18l-4-4" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  ),
+  resurreccion: (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3v3M5.64 5.64l2.12 2.12M3 12h3M5.64 18.36l2.12-2.12M12 21v-3M18.36 18.36l-2.12-2.12M21 12h-3M18.36 5.64l-2.12 2.12" stroke="#34d399" strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="12" cy="12" r="4" fill="#10b981" stroke="#34d399" strokeWidth="1.5"/>
+    </svg>
+  )
+};
+
 const DICE_POWER_SVG: Record<string, React.ReactElement> = {
   bomba: (
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
@@ -347,7 +377,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
                   Historial
                 </p>
                 <div
-                  className="flex flex-col gap-1.5 max-h-28 overflow-y-auto custom-scrollbar"
+                  className="flex flex-col gap-1.5 max-h-36 overflow-y-auto custom-scrollbar"
                   style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(140,98,57,0.3) rgba(0,0,0,0.05)' }}
                 >
                   {game.moveHistory.slice(-10).map((move, i) => {
@@ -436,7 +466,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
             Historial
           </p>
           <div
-            className="flex flex-col gap-1.5 max-h-28 overflow-y-auto custom-scrollbar"
+            className="flex flex-col gap-1.5 max-h-36 overflow-y-auto custom-scrollbar"
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(140,98,57,0.3) rgba(0,0,0,0.05)' }}
           >
             {game.moveHistory.slice(-10).map((move, i) => {
@@ -449,7 +479,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
 
               const detail = move.fromDice ? (
                 <span className={`text-[10px] font-semibold ${DICE_POWER_COLORS[move.dicePower ?? ''] ?? 'text-amber-500'}`}>
-                  {DICE_POWER_SVG[move.dicePower ?? ''] ?? move.dicePower}
+                  {DICE_POWER_SVG_SMALL[move.dicePower ?? ''] ?? move.dicePower}
                 </span>
               ) : (
                 <span className="text-[10px] text-brown/70 dark:text-dark-muted">

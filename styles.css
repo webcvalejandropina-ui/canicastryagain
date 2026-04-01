@@ -899,8 +899,9 @@ main {
 
 .message-area {
     position: fixed;
-    top: 16px;
-    right: 16px;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    left: max(16px, env(safe-area-inset-left));
     z-index: 2200;
     display: none;
     max-width: min(88vw, 420px);

@@ -586,11 +586,13 @@ body {
 }
 
 /* When `.dark` class is on <html>, glass-panel also gets dark styles even if OS is light.
-   Uses .dark as ancestor (dark class lives on <html>). */
+   Uses .dark as ancestor (dark class lives on <html>).
+   No !important here — let specificity and cascade decide; .dark wins over the
+   @media (prefers-color-scheme: dark) block above it. */
 .dark .glass-panel {
-  background: rgba(28, 25, 18, 0.92) !important;
-  border-color: rgba(244, 197, 66, 0.15) !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(244, 197, 66, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  background: rgba(28, 25, 18, 0.92);
+  border-color: rgba(244, 197, 66, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(244, 197, 66, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* ── Finished Game Banner (2D fallback board) ───────────────────── */

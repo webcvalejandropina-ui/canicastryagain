@@ -623,14 +623,14 @@ main {
         radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.2) 0 18%, transparent 30%),
         linear-gradient(170deg, #9ca3af 0%, #6b7280 58%, #4b5563 100%) !important;
     border-color: #d1d5db !important;
-    opacity: 0.75;
+    opacity: 0.85 !important;
+    transform: scale(1) !important;
     position: relative;
+    pointer-events: none;
+    cursor: default;
 }
 
 .ball.removed-ball {
-    pointer-events: none;
-    cursor: default;
-    position: relative;
     /* Strong inner shadow to make it look "sunken/inactive" */
     box-shadow:
         inset 0 3px 8px rgba(0, 0, 0, 0.3),
@@ -644,20 +644,20 @@ main {
     position: absolute;
     width: 85%;
     height: 6px;
-    background: #f87171;
+    background: #ef4444;
     border-radius: 3px;
     top: 50%;
     left: 50%;
     transform-origin: center;
-    box-shadow: 0 0 10px rgba(248, 113, 113, 0.9), 0 0 4px rgba(220, 38, 38, 0.8), 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 1), 0 0 6px rgba(220, 38, 38, 0.9), 0 2px 3px rgba(0,0,0,0.4);
 }
 
 .ball.removed-ball::before {
-    transform: translate(-50%, -50%) rotate(45deg);
+    transform: translate(-50%, -50%) rotate(45deg) !important;
 }
 
 .ball.removed-ball::after {
-    transform: translate(-50%, -50%) rotate(-45deg);
+    transform: translate(-50%, -50%) rotate(-45deg) !important;
 }
 
 /* Subtle red tint behind removed balls to make them stand out more */
@@ -665,7 +665,7 @@ main {
     box-shadow:
         inset 0 3px 8px rgba(0, 0, 0, 0.3),
         0 2px 4px rgba(0, 0, 0, 0.1),
-        inset 0 0 12px rgba(239, 68, 68, 0.15) !important;
+        inset 0 0 16px rgba(239, 68, 68, 0.2) !important;
 }
 
 .ball.blocked-ball::after {
@@ -933,8 +933,8 @@ main {
     align-items: center;
     justify-content: center;
     padding: 16px;
-    background: rgba(8, 28, 52, 0.45);
-    backdrop-filter: blur(4px);
+    background: rgba(5, 15, 30, 0.7);
+    backdrop-filter: blur(6px);
 }
 
 .modal[aria-hidden='false'] {
@@ -947,24 +947,27 @@ main {
 
 .modal-content {
     width: min(96vw, 520px);
-    background: #fff;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     border-radius: var(--radius-lg);
-    border: 1px solid #ccdded;
-    box-shadow: var(--shadow-lg);
-    padding: 22px;
+    border: 2px solid #b8cde2;
+    box-shadow: 0 25px 60px rgba(5, 15, 30, 0.25), 0 8px 24px rgba(5, 15, 30, 0.15);
+    padding: 24px;
     text-align: center;
     display: grid;
-    gap: 12px;
+    gap: 14px;
 }
 
 .modal-content h2 {
     color: var(--ink-900);
-    font-size: clamp(1.45rem, 3.8vw, 2rem);
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .modal-content p {
     color: var(--ink-700);
     font-weight: 600;
+    line-height: 1.5;
 }
 
 .modal-content label {
@@ -1078,10 +1081,14 @@ main {
 
 /* Game over modal message text */
 #modal-message {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: var(--ink-700);
     font-weight: 700;
     line-height: 1.5;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+    border-radius: 12px;
+    border: 1px solid #d4e3f2;
 }
 
 /* Modal title for game over - make it bold and colored */

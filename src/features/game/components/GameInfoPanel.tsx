@@ -204,8 +204,8 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
       </div>
 
       {game.status === 'finished' ? (
-        <div className="mt-4 rounded-xl border-2 border-primary/40 bg-primary/15 px-4 py-4 text-center shadow-lg shadow-primary/10 dark:border-primary/50 dark:bg-primary/20">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-brown dark:text-dark-text/80">Resultado</p>
+        <div className="mt-4 rounded-xl border-2 border-primary/60 bg-primary/25 px-4 py-4 text-center shadow-lg shadow-primary/20 dark:border-amber-400/80 dark:bg-amber-400/20">
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-brown dark:text-dark-text">Resultado</p>
           {game.winner ? (
             <div className="mt-2 flex items-center justify-center gap-2">
               {game.winner === game.yourPlayerNumber ? (
@@ -225,7 +225,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
               </p>
             </div>
           ) : null}
-          <p className={`mt-1 text-sm font-semibold ${game.winner === game.yourPlayerNumber ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+          <p className={`mt-1 text-sm font-bold ${game.winner === game.yourPlayerNumber ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
             {game.winner
               ? game.winner === game.yourPlayerNumber
                 ? '¡Victoria!'
@@ -309,11 +309,11 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
           >
             {detailsExpanded ? (
               <span className="inline-flex items-center gap-1.5">
-                <ChevronUpIcon className="h-4 w-4" /> Ocultar detalles
+                <ChevronUpIcon className="h-4 w-4" /> Ocultar
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5">
-                <ChevronDownIcon className="h-4 w-4" /> Ver más ({takenRows} filas · dado · historial)
+                <ChevronDownIcon className="h-4 w-4" /> Más detalles
               </span>
             )}
           </button>

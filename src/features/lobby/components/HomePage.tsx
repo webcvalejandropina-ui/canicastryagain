@@ -2726,10 +2726,10 @@ export function HomePage(): React.ReactElement {
           className="pointer-events-none fixed inset-x-0 top-[4.4rem] z-[78] flex justify-center px-4 sm:top-[5rem]"
           aria-live="assertive"
         >
-          <div className="turn-spotlight-enter max-w-md rounded-2xl border border-emerald-400/25 bg-emerald-500/92 px-4 py-3 text-center text-white shadow-2xl shadow-emerald-900/30 backdrop-blur-xl dark:border-emerald-300/20 dark:bg-emerald-500/82">
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-50/90">Piiiiiiiishi, te toca</p>
-            <p className="mt-1 text-base font-black leading-tight sm:text-lg">Haz tu jugada · máximo {turnLimit}</p>
-            <p className="mt-1 text-[11px] font-semibold leading-snug text-emerald-50/90">
+          <div className="turn-spotlight-enter max-w-md rounded-2xl border-2 border-emerald-300 bg-emerald-500 px-4 py-3 text-center text-white shadow-2xl shadow-emerald-900/50 ring-4 ring-emerald-400/20 backdrop-blur-xl dark:border-emerald-300 dark:bg-emerald-500/95 dark:shadow-emerald-950/60 dark:ring-emerald-300/15">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-50">Piiiiiiiishi, te toca</p>
+            <p className="mt-1 text-base font-black leading-tight text-white sm:text-lg">Haz tu jugada · máximo {turnLimit}</p>
+            <p className="mt-1 text-[11px] font-semibold leading-snug text-emerald-50">
               Toca el tablero y selecciona un bloque seguido en una sola fila.
             </p>
           </div>

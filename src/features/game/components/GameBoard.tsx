@@ -248,12 +248,12 @@ function createRemovedMarbleTexture(
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
-  // Dark hollow background — brightened vs prior version so X mark stays visible
-  // against the dark scene background on mobile dark mode
+  // Dark hollow background — use lighter slate so ball is visible against dark scene bg
   const baseGradient = ctx.createRadialGradient(90, 80, 24, 130, 130, 165);
-  baseGradient.addColorStop(0, '#334155');  // lighter slate — X will pop more
-  baseGradient.addColorStop(0.55, '#1e293b');
-  baseGradient.addColorStop(1, '#0f172a');
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  baseGradient.addColorStop(0, isDark ? '#64748b' : '#334155');   // slate-500 in dark (visible), slate-700 in light
+  baseGradient.addColorStop(0.55, isDark ? '#334155' : '#1e293b');
+  baseGradient.addColorStop(1, isDark ? '#1e293b' : '#0f172a');
   ctx.fillStyle = baseGradient;
   ctx.fillRect(0, 0, 256, 256);
 
@@ -1490,34 +1490,32 @@ function LegacyBoardGrid({
                   const initial = isP1 ? p1Initial : isP2 ? p2Initial : '';
                   // Removed ball backgrounds: vivid/saturated to clearly distinguish from active balls
                   // Light mode: medium-light backgrounds so colored X pops clearly
-                  // Dark mode: very dark backgrounds so bright colored X stands out
+                  // Dark mode: BRIGHTER backgrounds so the colored X mark is clearly visible
+                  //   (game board is dark (#0d0c09), so dark-on-dark gives poor contrast)
                   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-                  // Removed ball backgrounds: vivid/saturated to clearly distinguish from active balls
-                  // Light mode: medium-light backgrounds so colored X pops clearly
-                  // Dark mode: brighter/more saturated backgrounds so X mark is clearly visible
                   const bgClass = isP1
                     ? isDark
-                      ? 'border-rose-500/80 bg-gradient-to-br from-rose-800 to-rose-900/95 dark:border-rose-400/60 dark:from-rose-800 dark:to-rose-900/95'
+                      ? 'border-rose-400/90 bg-gradient-to-br from-rose-700 to-rose-800 dark:border-rose-400/90 dark:from-rose-700 dark:to-rose-800'
                       : 'border-rose-400/90 bg-gradient-to-br from-rose-200 to-rose-300/80 dark:from-rose-900 dark:to-rose-950 dark:border-rose-500/70'
                     : isP2
                       ? isDark
-                        ? 'border-orange-500/80 bg-gradient-to-br from-orange-800 to-orange-900/95 dark:border-orange-400/60 dark:from-orange-800 dark:to-orange-900/95'
+                        ? 'border-orange-400/90 bg-gradient-to-br from-orange-700 to-orange-800 dark:border-orange-400/90 dark:from-orange-700 dark:to-orange-800'
                         : 'border-orange-400/90 bg-gradient-to-br from-orange-200 to-orange-300/80 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
                       : isDark
-                        ? 'border-slate-400/70 bg-gradient-to-br from-slate-700 to-slate-800/95 dark:border-slate-400/60 dark:from-slate-700 dark:to-slate-800/95'
+                        ? 'border-slate-400/90 bg-gradient-to-br from-slate-600 to-slate-700 dark:border-slate-400/90 dark:from-slate-600 dark:to-slate-700'
                         : 'border-slate-400/90 bg-gradient-to-br from-slate-200 to-slate-300/80 dark:from-slate-700 dark:to-slate-800 dark:border-slate-500/70';
                   // X mark color: vivid colored in both modes for unmistakable "removed" look
                   // P1 → red, P2 → blue, neutral → amber — bright in dark mode, warm in light mode
                   const xColor = isP1
-                    ? isDark ? '#ff5555' : '#dc2626'
+                    ? isDark ? '#ff7070' : '#dc2626'
                     : isP2
-                      ? isDark ? '#58a6ff' : '#2563eb'
-                      : isDark ? '#fbbf24' : '#d97706';
+                      ? isDark ? '#7ab8ff' : '#2563eb'
+                      : isDark ? '#fcd34d' : '#d97706';
                   const xGlow = isP1
-                    ? isDark ? 'rgba(255,85,85,1)' : 'rgba(220,38,38,0.9)'
+                    ? isDark ? 'rgba(255,112,112,1)' : 'rgba(220,38,38,0.9)'
                     : isP2
-                      ? isDark ? 'rgba(88,166,255,1)' : 'rgba(37,99,235,0.9)'
-                      : isDark ? 'rgba(251,191,36,1)' : 'rgba(217,119,6,0.9)';
+                      ? isDark ? 'rgba(122,184,255,1)' : 'rgba(37,99,235,0.9)'
+                      : isDark ? 'rgba(252,211,77,1)' : 'rgba(217,119,6,0.9)';
                   return (
                     <button
                       key={`ball-${rowIndex}-${ballIndex}`}

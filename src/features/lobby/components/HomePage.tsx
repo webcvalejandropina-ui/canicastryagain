@@ -738,7 +738,7 @@ function VictoryOverlay({
               'victory-exit-btn inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
                 ? 'border-2 border-amber-400 bg-primary text-[#2a1a00] shadow-lg shadow-primary/30 hover:brightness-110 hover:border-amber-300 dark:border-amber-300 dark:bg-gradient-to-b dark:from-amber-400 dark:to-amber-600 dark:text-[#1c0f00] dark:shadow-[0_4px_20px_rgba(251,191,36,0.5)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-500 dark:hover:shadow-[0_4px_28px_rgba(251,191,36,0.65)]'
-                : 'border-2 border-amber-400 bg-gradient-to-b from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/50 hover:border-amber-300 hover:from-amber-400 hover:to-amber-600 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-600 dark:text-[#1c0f00] dark:shadow-[0_4px_20px_rgba(251,191,36,0.5)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-500 dark:hover:shadow-[0_4px_28px_rgba(251,191,36,0.65)]'
+                : 'border-2 border-amber-400 bg-gradient-to-b from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/50 hover:border-amber-300 hover:from-amber-400 hover:to-amber-600 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-600 dark:text-white dark:shadow-[0_4px_20px_rgba(251,191,36,0.5)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-500 dark:hover:shadow-[0_4px_28px_rgba(251,191,36,0.65)]'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -1316,10 +1316,9 @@ export function HomePage(): React.ReactElement {
         setShowTurnSpotlight(false);
         turnSpotlightTimerRef.current = null;
       }, 2400);
-      // Auto-collapse info panels and turn coach banners when user receives their turn — reduces visual clutter during active play.
-      // Panels can be re-shown via the toggle button in the quick-access bar.
+      // Auto-collapse info panels when user receives their turn — reduces visual clutter.
+      // Coach banner stays visible to guide the player through their turn.
       setGameInfoPanelsVisible(false);
-      setTurnCoachVisible(false);
     }
 
     previousCanInteractRef.current = canInteract;

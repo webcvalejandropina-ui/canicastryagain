@@ -11,7 +11,7 @@ module.exports = {
     {
       name: 'canicas-try-again',
       script: 'server.js',
-      cwd: '/home/openclaw_vps/.openclaw/workspace/proyectos/juego-bolitas',
+      cwd: '/home/openclaw_vps/.openclaw/workspace/proyectos/juego-bolitas/.next/standalone',
       instances: 1,
       autorestart: true,
       watch: false,
@@ -19,13 +19,14 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
+        HOSTNAME: '0.0.0.0',
         SQLITE_PATH: '/home/openclaw_vps/.openclaw/workspace/proyectos/juego-bolitas/data/game.db'
       },
       error_file: '/home/openclaw_vps/.openclaw/workspace/logs/canicas-error.log',
       out_file: '/home/openclaw_vps/.openclaw/workspace/logs/canicas-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
       merge_logs: true,
-      kill_timeout: 5000,
+      kill_timeout: 10000,
       restart_delay: 4000
     }
   ]

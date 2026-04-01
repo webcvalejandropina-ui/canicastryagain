@@ -750,7 +750,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="victory-new-game-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-400 bg-gradient-to-b from-emerald-400 to-emerald-600 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-500/50 transition-all hover:border-emerald-300 hover:from-emerald-300 hover:to-emerald-500 hover:shadow-emerald-400/60 active:scale-[0.97] dark:border-emerald-400 dark:from-emerald-400 dark:to-emerald-600 dark:text-[#052e16] dark:shadow-[0_4px_20px_rgba(52,211,153,0.45)] dark:hover:border-emerald-300 dark:hover:from-emerald-300 dark:hover:to-emerald-500 dark:hover:shadow-[0_4px_28px_rgba(52,211,153,0.55)]"
+              className="victory-new-game-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-600 bg-gradient-to-b from-emerald-600 to-emerald-800 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-700/50 transition-all hover:border-emerald-400 hover:from-emerald-500 hover:to-emerald-700 hover:shadow-emerald-600/60 active:scale-[0.97] dark:border-emerald-400 dark:from-emerald-400 dark:to-emerald-600 dark:text-[#052e16] dark:shadow-[0_4px_20px_rgba(52,211,153,0.45)] dark:hover:border-emerald-300 dark:hover:from-emerald-300 dark:hover:to-emerald-500 dark:hover:shadow-[0_4px_28px_rgba(52,211,153,0.55)]"
             >
               <IconPlus className="h-4 w-4 shrink-0" />
               <span>Nueva partida</span>

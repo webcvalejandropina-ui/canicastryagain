@@ -364,14 +364,19 @@ function buildBoardMeshes(
   const p1Initial = (game.player1?.name?.[0] ?? 'J').toUpperCase();
   const p2Initial = (game.player2?.name?.[0] ?? 'J').toUpperCase();
 
+  // Detect dark mode for X-mark brightness — bright colors work in both modes vs dark ball background
+  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const p1XColor = isDarkMode ? '#ff8080' : '#ef4444'; // brighter red in dark mode
+  const p2XColor = isDarkMode ? '#93c5fd' : '#3b82f6'; // blue already good in dark mode
+
   if (context.cachedP1Initial !== p1Initial || !context.removedP1Texture) {
     context.removedP1Texture?.dispose?.();
-    context.removedP1Texture = createRemovedMarbleTexture(THREE, '#ef4444'); // red X
+    context.removedP1Texture = createRemovedMarbleTexture(THREE, p1XColor);
     context.cachedP1Initial = p1Initial;
   }
   if (context.cachedP2Initial !== p2Initial || !context.removedP2Texture) {
     context.removedP2Texture?.dispose?.();
-    context.removedP2Texture = createRemovedMarbleTexture(THREE, '#3b82f6'); // blue X
+    context.removedP2Texture = createRemovedMarbleTexture(THREE, p2XColor);
     context.cachedP2Initial = p2Initial;
   }
 
@@ -1130,7 +1135,9 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     highlight: '#e0f2fe',
     shadow: '#0c4a6e'
   });
-  const removedTexture = createRemovedMarbleTexture(THREE, '#94a3b8'); // grey X for neutral dead balls
+  const _isDarkModeInit = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const _neutralXColorInit = _isDarkModeInit ? '#e2e8f0' : '#94a3b8';
+  const removedTexture = createRemovedMarbleTexture(THREE, _neutralXColorInit); // grey X for neutral dead balls
 
   const context: SceneContext = {
     THREE,
@@ -1283,7 +1290,8 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     // are re-created (and their materials re-populated) the next time the dice appears.
     context.diceTextures.forEach((tex) => tex.dispose());
     context.diceTextures = [];
-    context.removedTexture = createRemovedMarbleTexture(THREE, '#94a3b8'); // grey X for neutral dead balls
+    const _isDarkModeRestore = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+    context.removedTexture = createRemovedMarbleTexture(THREE, _isDarkModeRestore ? '#e2e8f0' : '#94a3b8'); // grey X for neutral dead balls
     context.activeTexture = createMarbleTexture(THREE, {
       base: '#38bdf8',
       veins: '#bae6fd',
@@ -2258,7 +2266,7 @@ export function GameBoard({
           {/* Dice result overlay — also shown on 2D fallback board */}
           {diceResultOverlay ? (
             <div
-              className="dice-result-overlay absolute inset-0 z-20 flex items-center justify-center"
+              className="dice-result-overlay dice-result-pop absolute inset-0 z-20 flex items-center justify-center"
               role="alertdialog"
               aria-modal="true"
               aria-labelledby="dice-result-title-2d"

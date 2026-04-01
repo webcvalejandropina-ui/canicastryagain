@@ -1155,7 +1155,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     shadow: '#0c4a6e'
   });
   const _isDarkModeInit = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-  const _neutralXColorInit = _isDarkModeInit ? '#fbbf24' : '#d97706'; // warm amber X — clearly different from active balls
+  const _neutralXColorInit = _isDarkModeInit ? '#fb923c' : '#ea580c'; // vivid orange X — unmistakable "removed/neutral"
   const removedTexture = createRemovedMarbleTexture(THREE, _neutralXColorInit);
 
   const context: SceneContext = {
@@ -1319,7 +1319,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     context.diceTextures.forEach((tex) => tex.dispose());
     context.diceTextures = [];
     const _isDarkModeRestore = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-    context.removedTexture = createRemovedMarbleTexture(THREE, _isDarkModeRestore ? '#fbbf24' : '#d97706'); // warm amber X — clearly different from active balls
+    context.removedTexture = createRemovedMarbleTexture(THREE, _isDarkModeRestore ? '#fb923c' : '#ea580c'); // vivid orange X — unmistakable "removed/neutral"
     context.activeTexture = createMarbleTexture(THREE, {
       base: '#38bdf8',
       veins: '#bae6fd',

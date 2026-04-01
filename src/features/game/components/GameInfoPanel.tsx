@@ -249,28 +249,28 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
       </div>
 
       {game.status === 'finished' ? (
-        <div className="mt-4 rounded-xl border-2 border-primary/60 bg-primary/25 px-4 py-4 text-center shadow-lg shadow-primary/20 dark:border-amber-400/80 dark:bg-amber-400/20">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-brown dark:text-dark-text">Resultado</p>
+        <div className="mt-4 rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-amber-50 to-primary/20 px-5 py-4 text-center shadow-xl shadow-amber-500/25 dark:border-amber-400/80 dark:from-amber-900/50 dark:to-amber-800/30 dark:bg-gradient-to-br">
+          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-brown dark:text-amber-300">Resultado</p>
           {game.winner ? (
             <div className="mt-2 flex items-center justify-center gap-2">
               {game.winner === game.yourPlayerNumber ? (
-                <svg aria-hidden="true" className="h-7 w-7 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg aria-hidden="true" className="h-8 w-8 shrink-0 animate-trophy-bounce" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 2L9 9H2L7.5 13.5L5.5 21L12 16.5L18.5 21L16.5 13.5L22 9H15L12 2Z" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round"/>
                   <rect x="9" y="16" width="6" height="3" rx="0.5" fill="#f59e0b"/>
                   <rect x="7" y="18.5" width="10" height="2" rx="0.5" fill="#d97706"/>
                 </svg>
               ) : (
-                <svg aria-hidden="true" className="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg aria-hidden="true" className="h-7 w-7 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="12" cy="8" r="4" stroke="#94a3b8" strokeWidth="1.75" fill="none"/>
                   <path d="M4 20C4 16.686 7.582 14 12 14C16.418 14 20 16.686 20 20" stroke="#94a3b8" strokeWidth="1.75" strokeLinecap="round"/>
                 </svg>
               )}
-              <p className="text-lg font-black text-brown dark:text-dark-text">
+              <p className="text-lg font-black text-brown dark:text-amber-100">
                 {game.winner === 1 ? player1Name : player2Name}
               </p>
             </div>
           ) : null}
-          <p className={`mt-1 text-sm font-bold ${game.winner === game.yourPlayerNumber ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+          <p className={`mt-1 text-sm font-bold ${game.winner === game.yourPlayerNumber ? 'text-emerald-600 dark:text-emerald-300' : 'text-rose-600 dark:text-rose-300'}`}>
             {game.winner
               ? game.winner === game.yourPlayerNumber
                 ? '¡Victoria!'
@@ -281,7 +281,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
             <button
               type="button"
               onClick={onNewGame}
-              className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-amber-400 bg-primary px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] shadow-xl shadow-amber-600/40 transition-all hover:brightness-110 hover:shadow-amber-600/60 active:scale-[0.97] dark:border-amber-500 dark:bg-amber-400 dark:text-amber-950 dark:shadow-[0_8px_32px_rgba(251,191,36,0.55)] dark:hover:brightness-110 dark:hover:shadow-[0_8px_40px_rgba(251,191,36,0.7)]"
+              className="mt-3 inline-flex items-center gap-2 rounded-2xl border-2 border-amber-400 bg-primary px-6 py-3 text-sm font-black uppercase tracking-[0.14em] shadow-xl shadow-amber-600/50 transition-all hover:brightness-110 hover:scale-[1.03] active:scale-[0.97] dark:border-amber-400 dark:bg-gradient-to-br dark:from-amber-400 dark:to-amber-600 dark:text-amber-950 dark:shadow-[0_8px_32px_rgba(251,191,36,0.6)] dark:hover:brightness-110 dark:hover:shadow-[0_8px_44px_rgba(251,191,36,0.8)]"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="12" cy="16" rx="6" ry="7" fill="#f4c542" stroke="#d4a82e" strokeWidth="1.25"/>

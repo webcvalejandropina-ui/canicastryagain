@@ -1717,11 +1717,6 @@ function DiceResultBanner({
       onClick={(e) => { e.stopPropagation(); onDismiss?.(); }}
       style={{ touchAction: 'manipulation' }}
     >
-      {/* Screen-reader dismiss instruction — referred by aria-describedby on the alertdialog wrapper.
-          Visually hidden so the visible close button stays the sole visual affordance. */}
-      <span id={`${descId}-dismiss`} className="sr-only">
-        Toca o haz clic para cerrar el diálogo.
-      </span>
       {/* Tap/click anywhere on banner to dismiss — critical for mobile UX */}
       <div
         className="flex items-center gap-3"
@@ -2295,7 +2290,7 @@ export function GameBoard({
               role="alertdialog"
               aria-modal="true"
               aria-labelledby="dice-result-title-2d"
-              aria-describedby="dice-result-desc-2d dice-result-desc-2d-dismiss"
+              aria-describedby="dice-result-desc-2d"
               onClick={(e) => { e.stopPropagation(); dismissDiceResult(); }}
             >
               <DiceResultBanner
@@ -2359,7 +2354,7 @@ export function GameBoard({
               role="alertdialog"
               aria-modal="true"
               aria-labelledby="dice-result-title-3d"
-              aria-describedby="dice-result-desc-3d dice-result-desc-3d-dismiss"
+              aria-describedby="dice-result-desc-3d"
               onClick={(e) => { e.stopPropagation(); dismissDiceResult(); }}
             >
               <DiceResultBanner

@@ -2223,3 +2223,52 @@ html.dark .turn-info-pulse {
         padding: 0 20px !important;
     }
 }
+
+/* ── Victory overlay: dark mode mobile overrides for better contrast ── */
+@media (max-width: 640px) and (prefers-color-scheme: dark) {
+    .victory-new-game-btn {
+        border-color: #6ee7b7 !important;
+        box-shadow:
+            0 6px 28px rgba(52, 211, 153, 0.7),
+            0 0 24px rgba(52, 211, 153, 0.4),
+            0 0 48px rgba(52, 211, 153, 0.15) !important;
+    }
+
+    .victory-exit-btn {
+        border-color: #fcd34d !important;
+        box-shadow:
+            0 4px 20px rgba(251, 191, 36, 0.5),
+            0 0 16px rgba(251, 191, 36, 0.2) !important;
+    }
+
+    .victory-share-btn {
+        border-color: #fcd34d !important;
+        box-shadow:
+            0 4px 20px rgba(251, 191, 36, 0.5),
+            0 0 16px rgba(251, 191, 36, 0.2) !important;
+    }
+}
+
+@media (max-width: 640px) and (html.dark) {
+    .victory-new-game-btn {
+        border-color: #6ee7b7 !important;
+        box-shadow:
+            0 6px 28px rgba(52, 211, 153, 0.7),
+            0 0 24px rgba(52, 211, 153, 0.4),
+            0 0 48px rgba(52, 211, 153, 0.15) !important;
+    }
+
+    .victory-exit-btn {
+        border-color: #fcd34d !important;
+        box-shadow:
+            0 4px 20px rgba(251, 191, 36, 0.5),
+            0 0 16px rgba(251, 191, 36, 0.2) !important;
+    }
+
+    .victory-share-btn {
+        border-color: #fcd34d !important;
+        box-shadow:
+            0 4px 20px rgba(251, 191, 36, 0.5),
+            0 0 16px rgba(251, 191, 36, 0.2) !important;
+    }
+}

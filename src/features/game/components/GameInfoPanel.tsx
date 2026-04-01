@@ -180,7 +180,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
             <button
               type="button"
               onClick={onNewGame}
-              className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-amber-400 bg-primary px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] shadow-xl shadow-amber-600/40 transition-all hover:brightness-110 hover:shadow-amber-600/60 active:scale-[0.97] dark:border-amber-300/80 dark:bg-amber-400 dark:text-amber-950 dark:shadow-amber-500/60 dark:hover:brightness-110"
+              className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-amber-400 bg-primary px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] shadow-xl shadow-amber-600/40 transition-all hover:brightness-110 hover:shadow-amber-600/60 active:scale-[0.97] dark:border-amber-400 dark:bg-amber-400 dark:text-[#1c0f00] dark:shadow-[0_8px_32px_rgba(251,191,36,0.55)] dark:hover:brightness-110 dark:hover:shadow-[0_8px_40px_rgba(251,191,36,0.7)]"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="12" cy="16" rx="6" ry="7" fill="#f4c542" stroke="#d4a82e" strokeWidth="1.25"/>

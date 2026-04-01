@@ -1151,8 +1151,8 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     shadow: '#0c4a6e'
   });
   const _isDarkModeInit = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-  const _neutralXColorInit = _isDarkModeInit ? '#e2e8f0' : '#94a3b8';
-  const removedTexture = createRemovedMarbleTexture(THREE, _neutralXColorInit); // grey X for neutral dead balls
+  const _neutralXColorInit = _isDarkModeInit ? '#fbbf24' : '#d97706'; // warm amber X — clearly different from active balls
+  const removedTexture = createRemovedMarbleTexture(THREE, _neutralXColorInit);
 
   const context: SceneContext = {
     THREE,
@@ -1311,7 +1311,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     context.diceTextures.forEach((tex) => tex.dispose());
     context.diceTextures = [];
     const _isDarkModeRestore = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-    context.removedTexture = createRemovedMarbleTexture(THREE, _isDarkModeRestore ? '#e2e8f0' : '#94a3b8'); // grey X for neutral dead balls
+    context.removedTexture = createRemovedMarbleTexture(THREE, _isDarkModeRestore ? '#fbbf24' : '#d97706'); // warm amber X — clearly different from active balls
     context.activeTexture = createMarbleTexture(THREE, {
       base: '#38bdf8',
       veins: '#bae6fd',
@@ -1499,17 +1499,17 @@ function LegacyBoardGrid({
                         ? 'border-slate-500/80 bg-gradient-to-br from-slate-800 to-slate-900/95 dark:border-slate-400/60 dark:from-slate-800 dark:to-slate-900/95'
                         : 'border-slate-400/90 bg-gradient-to-br from-slate-200 to-slate-300/80 dark:from-slate-700 dark:to-slate-800 dark:border-slate-500/70';
                   // X mark color: vivid colored in both modes for unmistakable "removed" look
-                  // P1 → red, P2 → blue, neutral → slate — bright in dark mode, dark in light mode
+                  // P1 → red, P2 → blue, neutral → amber — bright in dark mode, warm in light mode
                   const xColor = isP1
                     ? isDark ? '#ff6b6b' : '#dc2626'
                     : isP2
                       ? isDark ? '#74c0fc' : '#2563eb'
-                      : isDark ? '#e2e8f0' : '#475569';
+                      : isDark ? '#fbbf24' : '#d97706';
                   const xGlow = isP1
                     ? isDark ? 'rgba(255,107,107,0.9)' : 'rgba(220,38,38,0.8)'
                     : isP2
                       ? isDark ? 'rgba(116,192,252,0.9)' : 'rgba(37,99,235,0.8)'
-                      : isDark ? 'rgba(226,232,240,0.8)' : 'rgba(71,85,105,0.7)';
+                      : isDark ? 'rgba(251,191,36,0.9)' : 'rgba(217,119,6,0.8)';
                   return (
                     <button
                       key={`ball-${rowIndex}-${ballIndex}`}
@@ -2418,13 +2418,12 @@ export function GameBoard({
                 const base = diceAvailable
                   ? 'border-amber-400/40 bg-amber-50/70 text-amber-600 dark:border-amber-400/35 dark:bg-amber-400/10 dark:text-amber-300'
                   : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 line-through';
-                // NOTE: diceResultArrived && lastDiceResult must be checked BEFORE the diceChipAnim
-                // spent branch — otherwise the || short-circuits on truthy 'dice-spent-chip' and
-                // the dice-result-arrived animation never fires when the dice is already spent.
+                // dice-result-arrived takes priority over the 'spent' animation so a new dice result
+                // always animates in, even when the chip is already in the 'spent' state.
+                // Both conditions must be true (dice spent AND new result just arrived).
                 const anim = diceAvailable
                   ? (diceChipAnim === 'ready' ? 'dice-ready-pop' : '')
-                  : ((diceResultArrived && lastDiceResult ? 'dice-result-arrived' : '')
-                  || (diceChipAnim === 'spent' ? 'dice-spent-chip' : ''));
+                  : ((diceResultArrived && lastDiceResult ? 'dice-result-arrived' : diceChipAnim === 'spent' ? 'dice-spent-chip' : ''));
                 return (
                   <span
                     aria-label={diceAvailable ? 'Dado especial disponible' : 'Dado especial ya usado'}

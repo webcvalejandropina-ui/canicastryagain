@@ -724,7 +724,7 @@ function VictoryOverlay({
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"
-            className="victory-share-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-amber-400 bg-gradient-to-b from-amber-600 to-amber-800 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-amber-900/60 backdrop-blur transition-all hover:border-amber-300 hover:from-amber-500 hover:to-amber-700 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-700 dark:text-white dark:shadow-[0_4px_28px_rgba(251,191,36,0.6)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-600 dark:hover:shadow-[0_4px_36px_rgba(251,191,36,0.75)]"
+            className="victory-share-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-amber-400 bg-gradient-to-b from-amber-600 to-amber-800 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-amber-900/60 backdrop-blur transition-all hover:border-amber-300 hover:from-amber-500 hover:to-amber-700 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-700 dark:text-[#1c0f00] dark:shadow-[0_4px_28px_rgba(251,191,36,0.6)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-600 dark:hover:shadow-[0_4px_36px_rgba(251,191,36,0.75)]"
           >
             <IconShare className="h-4 w-4 shrink-0" />
             <span>Compartir y retar</span>
@@ -737,8 +737,8 @@ function VictoryOverlay({
             className={[
               'victory-exit-btn inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
-                ? 'border-2 border-amber-400 bg-primary text-[#2a1a00] shadow-lg shadow-primary/30 hover:brightness-110 hover:border-amber-300 dark:border-amber-400 dark:bg-primary dark:text-[#2a1a00] dark:shadow-[0_4px_20px_rgba(251,191,36,0.35)] dark:hover:border-amber-300 dark:hover:brightness-110'
-                : 'border-2 border-amber-400 bg-gradient-to-b from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/50 hover:border-amber-300 hover:from-amber-400 hover:to-amber-600 active:scale-[0.97] dark:border-amber-400 dark:from-amber-500 dark:to-amber-700 dark:text-white dark:shadow-[0_4px_20px_rgba(251,191,36,0.4)] dark:hover:border-amber-300 dark:hover:from-amber-400 dark:hover:to-amber-600'
+                ? 'border-2 border-amber-400 bg-primary text-[#2a1a00] shadow-lg shadow-primary/30 hover:brightness-110 hover:border-amber-300 dark:border-amber-300 dark:bg-gradient-to-b dark:from-amber-400 dark:to-amber-600 dark:text-[#1c0f00] dark:shadow-[0_4px_20px_rgba(251,191,36,0.5)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-500 dark:hover:shadow-[0_4px_28px_rgba(251,191,36,0.65)]'
+                : 'border-2 border-amber-400 bg-gradient-to-b from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/50 hover:border-amber-300 hover:from-amber-400 hover:to-amber-600 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-600 dark:text-[#1c0f00] dark:shadow-[0_4px_20px_rgba(251,191,36,0.5)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-500 dark:hover:shadow-[0_4px_28px_rgba(251,191,36,0.65)]'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -750,7 +750,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="victory-new-game-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-gradient-to-b from-emerald-500 to-emerald-700 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-700/50 transition-all hover:border-emerald-400 hover:from-emerald-400 hover:to-emerald-600 hover:shadow-emerald-600/60 active:scale-[0.97] dark:border-emerald-400 dark:from-emerald-400 dark:to-emerald-600 dark:text-[#022c22] dark:shadow-[0_4px_24px_rgba(52,211,153,0.5)] dark:hover:border-emerald-300 dark:hover:from-emerald-300 dark:hover:to-emerald-500 dark:hover:shadow-[0_4px_32px_rgba(52,211,153,0.6)]"
+              className="victory-new-game-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-gradient-to-b from-emerald-500 to-emerald-700 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-700/50 transition-all hover:border-emerald-400 hover:from-emerald-400 hover:to-emerald-600 hover:shadow-emerald-600/60 active:scale-[0.97] dark:border-emerald-300 dark:from-emerald-400 dark:to-emerald-600 dark:text-[#022c22] dark:shadow-[0_4px_24px_rgba(52,211,153,0.6)] dark:hover:border-emerald-200 dark:hover:from-emerald-300 dark:hover:to-emerald-500 dark:hover:shadow-[0_4px_32px_rgba(52,211,153,0.75)]"
             >
               <IconPlus className="h-4 w-4 shrink-0" />
               <span>Nueva partida</span>
@@ -2155,6 +2155,7 @@ export function HomePage(): React.ReactElement {
                       <IconRefresh className="h-4 w-4 shrink-0" />
                     </button>
                     <button
+                      id="info-toggle-btn"
                       type="button"
                       onClick={() => setGameInfoPanelsVisible((v) => !v)}
                       aria-label={gameInfoPanelsVisible ? 'Ocultar información de juego' : 'Mostrar información de juego'}
@@ -2163,7 +2164,7 @@ export function HomePage(): React.ReactElement {
                         'inline-flex items-center justify-center gap-1.5 rounded-full transition-all active:scale-95',
                         gameInfoPanelsVisible
                           ? 'h-9 px-3 bg-primary/20 text-primary hover:bg-primary/30 dark:bg-primary/25 dark:text-primary'
-                          : 'h-9 px-3 bg-amber-500/30 text-amber-700 hover:bg-amber-500/45 dark:bg-amber-400/30 dark:text-amber-200 ring-2 ring-amber-400/80 shadow-[0_0_12px_rgba(251,191,36,0.5)] dark:ring-amber-300/70 dark:shadow-[0_0_14px_rgba(251,191,36,0.45)] info-toggle-pulse'
+                          : 'h-9 px-3 bg-amber-500/30 text-amber-700 hover:bg-amber-500/45 dark:bg-amber-400/20 dark:text-amber-200 border border-amber-400/60 dark:border-amber-400/50 ring-2 ring-amber-400/80 shadow-[0_0_10px_rgba(251,191,36,0.4)] dark:ring-amber-300/60 dark:shadow-[0_0_12px_rgba(251,191,36,0.35)] info-toggle-pulse info-collapsed'
                       ].join(' ')}
                     >
                       {gameInfoPanelsVisible ? (

@@ -101,7 +101,7 @@ export function GameControls({
             type="button"
             onClick={onCancel}
             disabled={!hasSelection}
-            className={`${buttonBase} border border-brown/25 bg-white/80 text-brown hover:border-primary hover:bg-primary/10 active:scale-[0.96] dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-200 dark:hover:border-white/20 dark:hover:bg-white/[0.10]`}
+            className={`${buttonBase} border border-brown/25 bg-white/80 text-brown hover:border-primary hover:bg-primary/10 active:scale-[0.96] dark:border-white/20 dark:bg-white/10 dark:text-slate-100 dark:hover:border-white/30 dark:hover:bg-white/15`}
           >
             Cancelar
           </button>

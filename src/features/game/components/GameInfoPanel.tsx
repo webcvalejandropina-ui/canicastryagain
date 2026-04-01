@@ -197,11 +197,11 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
       <button
         type="button"
         onClick={() => setPanelHidden(false)}
-        className="w-full rounded-full border border-primary/30 bg-sand/60 px-4 py-2 text-center text-xs font-bold uppercase tracking-[0.14em] text-brown/70 shadow backdrop-blur transition hover:border-primary/60 hover:bg-sand/80 active:scale-[0.97] dark:border-primary/30 dark:bg-dark-surface/80 dark:text-dark-muted dark:hover:border-primary/40 dark:hover:bg-dark-surface"
+        className="w-full rounded-2xl border-2 border-primary/40 bg-gradient-to-r from-primary/15 to-accent/10 px-5 py-2.5 text-center text-sm font-bold uppercase tracking-[0.14em] text-primary shadow-lg shadow-primary/20 backdrop-blur transition-all hover:border-primary/70 hover:from-primary/25 hover:to-accent/15 hover:shadow-primary/35 hover:scale-[1.02] active:scale-[0.98] dark:border-primary/50 dark:from-primary/20 dark:to-accent/15 dark:bg-dark-surface/90 dark:text-primary/90 dark:shadow-primary/30 dark:hover:border-primary/70 dark:hover:from-primary/30 dark:hover:to-accent/20 dark:hover:shadow-primary/40"
         aria-label="Mostrar panel de información durante la partida"
       >
         <span className="inline-flex items-center gap-2">
-          <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 12h6M9 16h6M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           Ver panel de juego

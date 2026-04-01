@@ -309,6 +309,21 @@ function buildCellOwnerMap(
   return map;
 }
 
+// Cache de geometrías de esfera por nivel de detalle — evita crear Geometry nuevo
+// en cada buildBoardMeshes (que se dispara en cada turno/move del juego).
+const sphereGeometryCache: Map<number, Map<number, any>> = new Map();
+
+function getCachedSphereGeometry(THREE: any, radius: number, detail: number): any {
+  if (!sphereGeometryCache.has(detail)) {
+    sphereGeometryCache.set(detail, new Map());
+  }
+  const detailMap = sphereGeometryCache.get(detail)!;
+  if (!detailMap.has(radius)) {
+    detailMap.set(radius, new THREE.SphereGeometry(radius, detail, detail));
+  }
+  return detailMap.get(radius)!;
+}
+
 /* Three.js se carga vía dynamic import (npm) en loadThree() arriba. */
 
 function disposeObject3D(root: any): void {
@@ -401,7 +416,7 @@ function buildBoardMeshes(
   camera.position.z = Math.max(baseCamZ, neededZ);
   camera.position.y = density === 'dense' ? 0.2 : 0.45;
 
-  const sphereGeometry = new THREE.SphereGeometry(radius, detail, detail);
+  const sphereGeometry = getCachedSphereGeometry(THREE, radius, detail);
 
   game.rows.forEach((rowCells, rowIndex) => {
     const rowTotal = rowCells.length;

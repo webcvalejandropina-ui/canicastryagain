@@ -2502,10 +2502,16 @@ export function GameBoard({
               onClick={() => void triggerDiceRoll()}
               disabled={isRollingDice}
               aria-label={isRollingDice ? 'Lanzando dado especial' : 'Usar dado especial'}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-amber-300/45 bg-black/60 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] text-amber-100 shadow-lg shadow-amber-950/30 backdrop-blur transition hover:border-amber-200/70 hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-70"
+              className={[
+                'inline-flex min-h-11 items-center gap-2 rounded-full border bg-black/60 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] shadow-lg shadow-amber-950/30 backdrop-blur transition hover:border-amber-200/70 hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-70',
+                'border-amber-300/45 text-amber-100',
+                isRollingDice
+                  ? 'dice-rolling-active border-amber-400/70 text-amber-200'
+                  : ''
+              ].join(' ')}
             >
               {isRollingDice ? (
-                <span aria-hidden="true" className="text-base leading-none animate-spin">⟳</span>
+                <span aria-hidden="true" className="dice-spin text-base leading-none select-none">⟳</span>
               ) : (
                 <Image
                   aria-hidden="true"

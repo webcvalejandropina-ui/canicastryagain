@@ -724,7 +724,7 @@ function VictoryOverlay({
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"
-            className="victory-share-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-amber-400 bg-gradient-to-b from-amber-600 to-amber-800 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-amber-900/60 backdrop-blur transition-all hover:border-amber-300 hover:from-amber-500 hover:to-amber-700 active:scale-[0.97] dark:border-amber-400 dark:from-amber-500 dark:to-amber-700 dark:text-white dark:shadow-[0_4px_24px_rgba(251,191,36,0.5)] dark:hover:border-amber-300 dark:hover:from-amber-400 dark:hover:to-amber-600"
+            className="victory-share-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-amber-400 bg-gradient-to-b from-amber-600 to-amber-800 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-amber-900/60 backdrop-blur transition-all hover:border-amber-300 hover:from-amber-500 hover:to-amber-700 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-700 dark:text-white dark:shadow-[0_4px_28px_rgba(251,191,36,0.6)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-600 dark:hover:shadow-[0_4px_36px_rgba(251,191,36,0.75)]"
           >
             <IconShare className="h-4 w-4 shrink-0" />
             <span>Compartir y retar</span>
@@ -737,7 +737,7 @@ function VictoryOverlay({
             className={[
               'victory-exit-btn inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
-                ? 'bg-primary text-[#2a1a00] shadow-lg shadow-primary/30 hover:brightness-110 dark:bg-primary dark:text-[#2a1a00]'
+                ? 'border-2 border-amber-400 bg-primary text-[#2a1a00] shadow-lg shadow-primary/30 hover:brightness-110 hover:border-amber-300 dark:border-amber-400 dark:bg-primary dark:text-[#2a1a00] dark:shadow-[0_4px_20px_rgba(251,191,36,0.35)] dark:hover:border-amber-300 dark:hover:brightness-110'
                 : 'border-2 border-amber-400 bg-gradient-to-b from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/50 hover:border-amber-300 hover:from-amber-400 hover:to-amber-600 active:scale-[0.97] dark:border-amber-400 dark:from-amber-500 dark:to-amber-700 dark:text-white dark:shadow-[0_4px_20px_rgba(251,191,36,0.4)] dark:hover:border-amber-300 dark:hover:from-amber-400 dark:hover:to-amber-600'
             ].join(' ')}
           >
@@ -2562,7 +2562,7 @@ export function HomePage(): React.ReactElement {
             {game ? (
               <section className={isGameMode ? 'flex flex-1 flex-col' : 'order-2'}>
                 {isGameMode && game.status === 'playing' && gameInfoPanelsVisible ? (
-                  <div className="mx-2 mb-1.5 shrink-0 sm:mx-3">
+                  <div className="info-panel-enter mx-2 mb-1.5 shrink-0 sm:mx-3">
                     <div className="rounded-2xl border border-leaf/25 bg-white/90 shadow-sm backdrop-blur dark:border-leaf-soft/20 dark:bg-dark-card/92">
                       <div className="flex items-center justify-between gap-2 border-b border-leaf/10 px-3 py-2 dark:border-white/10">
                         <p className="text-[9px] font-black uppercase tracking-[0.18em] text-leaf dark:text-leaf-soft">Guía y avisos</p>
@@ -2610,7 +2610,7 @@ export function HomePage(): React.ReactElement {
                   </div>
                 ) : null}
                 {isGameMode && game.status === 'playing' && gameInfoPanelsVisible ? (
-                  <div key={turnBannerKey} className="turn-banner-enter mx-2 mb-2 shrink-0 sm:mx-3" aria-live="polite">
+                  <div key={`${turnBannerKey}-${gameInfoPanelsVisible}`} className="turn-banner-enter mx-2 mb-2 shrink-0 sm:mx-3" aria-live="polite">
                     <div className="rounded-2xl border border-brown/15 bg-white/90 px-3 py-2.5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-dark-card/92">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">

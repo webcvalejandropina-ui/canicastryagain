@@ -270,11 +270,11 @@ function createRemovedMarbleTexture(
   ctx.stroke();
 
   // Big bold X mark — unmistakable "removed"
-  ctx.lineWidth = 30;
+  ctx.lineWidth = 36;
   ctx.lineCap = 'round';
   ctx.strokeStyle = xColor;
   ctx.shadowColor = xColor;
-  ctx.shadowBlur = 16;
+  ctx.shadowBlur = 22;
   ctx.beginPath();
   ctx.moveTo(48, 48);
   ctx.lineTo(208, 208);
@@ -1117,13 +1117,13 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     antialias: true,
     alpha: true
   });
-  renderer.setClearColor(
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 0x0d0c09 : 0xf5f0e8,
-    1
-  );
+  const initialBgDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  renderer.setClearColor(initialBgDark ? 0x0d0c09 : 0xf5f0e8, 1);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.domElement.className = 'h-full w-full';
   renderer.domElement.style.touchAction = 'none';
+  // Inline background prevents white flash on mobile dark mode before Three.js renders
+  renderer.domElement.style.backgroundColor = initialBgDark ? '#0d0c09' : '#f5f0e8';
 
   const ambient = new THREE.AmbientLight(0xffffff, 0.72);
   const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
@@ -1258,10 +1258,12 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   const onColorSchemeChange = (): void => {
     const isDark = colorSchemeMql?.matches ?? false;
     const bgColor = isDark ? 0x0d0c09 : 0xf5f0e8;
+    const bgColorCss = isDark ? '#0d0c09' : '#f5f0e8';
     if (context.scene) {
       context.scene.background = new THREE.Color(bgColor);
     }
     renderer.setClearColor(bgColor, 1);
+    renderer.domElement.style.backgroundColor = bgColorCss;
   };
   colorSchemeMql?.addEventListener?.('change', onColorSchemeChange);
   context.cleanupHandlers.push(() => {
@@ -1274,10 +1276,13 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     const isDark = (e as CustomEvent<{ isDark: boolean }>).detail?.isDark
       ?? colorSchemeMql?.matches ?? false;
     const bgColor = isDark ? 0x0d0c09 : 0xf5f0e8;
+    const bgColorCss = isDark ? '#0d0c09' : '#f5f0e8';
     if (context.scene) {
       context.scene.background = new THREE.Color(bgColor);
     }
     renderer.setClearColor(bgColor, 1);
+    // Keep canvas CSS background in sync so no white flash during repaints
+    renderer.domElement.style.backgroundColor = bgColorCss;
   };
   window.addEventListener('canicas:theme-change', onManualThemeChange);
   context.cleanupHandlers.push(() => {
@@ -1493,18 +1498,18 @@ function LegacyBoardGrid({
                       : isDark
                         ? 'border-slate-500/70 bg-gradient-to-br from-slate-900 to-slate-950/95 dark:border-slate-400/60 dark:from-slate-900 dark:to-slate-950/95'
                         : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-700 dark:to-slate-900 dark:border-slate-500/70';
-                  // X mark color: brighter in dark mode so it pops against the dark ball background
-                  // Red for J1, blue for J2, grey for neutral — matches 3D texture approach
+                  // X mark color: vivid/bright in dark mode so it unmistakably reads as "removed"
+                  // Red for J1, blue for J2, white for neutral — very high contrast
                   const xColor = isP1
-                    ? isDark ? '#fca5a5' : '#ef4444'
+                    ? isDark ? '#ffffff' : '#ef4444'
                     : isP2
-                      ? isDark ? '#93c5fd' : '#3b82f6'
-                      : isDark ? '#e2e8f0' : '#94a3b8';
+                      ? isDark ? '#ffffff' : '#3b82f6'
+                      : isDark ? '#ffffff' : '#94a3b8';
                   const xGlow = isP1
-                    ? isDark ? 'rgba(252,165,165,1)' : 'rgba(239,68,68,1)'
+                    ? isDark ? 'rgba(255,120,120,1)' : 'rgba(239,68,68,1)'
                     : isP2
-                      ? isDark ? 'rgba(147,197,253,1)' : 'rgba(59,130,246,1)'
-                      : isDark ? 'rgba(226,232,240,1)' : 'rgba(148,163,184,0.9)';
+                      ? isDark ? 'rgba(120,180,255,1)' : 'rgba(59,130,246,1)'
+                      : isDark ? 'rgba(255,255,255,1)' : 'rgba(148,163,184,0.9)';
 
                   return (
                     <button
@@ -1523,9 +1528,9 @@ function LegacyBoardGrid({
                     >
                       {/* Bold SVG X mark — unmistakable "removed" indicator, matches 3D texture */}
                       <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center select-none">
-                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: `drop-shadow(0 0 6px ${xGlow}) drop-shadow(0 0 2px ${xGlow})` }}>
-                          <line x1="3" y1="3" x2="21" y2="21" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
-                          <line x1="21" y1="3" x2="3" y2="21" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
+                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: `drop-shadow(0 0 8px ${xGlow}) drop-shadow(0 0 3px ${xGlow}) drop-shadow(0 0 1px ${xGlow})` }}>
+                          <line x1="3" y1="3" x2="21" y2="21" stroke={xColor} strokeWidth="5.5" strokeLinecap="round"/>
+                          <line x1="21" y1="3" x2="3" y2="21" stroke={xColor} strokeWidth="5.5" strokeLinecap="round"/>
                         </svg>
                       </span>
                       {/* Player initial at bottom-right corner for reference */}

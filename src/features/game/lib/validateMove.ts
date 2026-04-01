@@ -41,13 +41,23 @@ export function validateMove(
 
   // Regla de fila bloqueada (misère): no puedes vaciar una fila que el rival tocó en el turno anterior.
   // EXCEPCIÓN: si es la última canica del tablero, sí se puede (el que la toma pierde).
+  // Solo bloqueamos si el ÚLTIMO movimiento fue del rival (no del jugador actual — eso es tu propia fila, permitido).
   const rowRemainingAfterMove = row.filter((c) => c === 1).length - removeCount;
   const totalBalls = game.rows.reduce(
     (sum, r) => sum + r.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
     0
   );
   const isLastBall = totalBalls === removeCount && rowRemainingAfterMove === 0;
-  if (game.lastTouchedRowIndex === rowIndex && rowRemainingAfterMove === 0 && !isLastBall) {
+  const lastRivalMove = game.moveHistory.length > 0
+    ? game.moveHistory[game.moveHistory.length - 1]
+    : null;
+  const lastTouchWasByRival = lastRivalMove !== null && lastRivalMove.player !== game.currentTurn;
+  if (
+    lastTouchWasByRival &&
+    lastRivalMove!.rowIndex === rowIndex &&
+    rowRemainingAfterMove === 0 &&
+    !isLastBall
+  ) {
     return {
       valid: false,
       reason: `No puedes vaciar la fila ${rowIndex + 1} porque el rival la tocó en el turno anterior. Debes dejar al menos 1 canica.`

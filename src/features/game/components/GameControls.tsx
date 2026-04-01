@@ -39,7 +39,7 @@ export function GameControls({
             aria-label="Cantidad de canicas a quitar"
             aria-live="polite"
             aria-atomic="true"
-            className="inline-flex items-center rounded-full border border-white/10 bg-slate-900/60 p-1"
+            className="inline-flex items-center rounded-full border border-brown/20 bg-sand/80 p-1 dark:border-white/10 dark:bg-slate-900/80"
           >
             <button
               id="decrease-btn"
@@ -48,7 +48,7 @@ export function GameControls({
               aria-disabled={!canInteract || !hasSelection}
               onClick={onDecrease}
               disabled={!canInteract || !hasSelection}
-              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-brown/25 bg-white/80 text-brown transition hover:border-primary hover:text-primary active:scale-90 disabled:opacity-40 dark:border-white/10 dark:bg-black/40 dark:text-slate-200 dark:hover:border-primary/50 dark:hover:text-primary"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-6 w-6" xmlns="http://www.w3.org/2000/svg">
                 <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor" />
@@ -58,7 +58,7 @@ export function GameControls({
             {/* Visible quantity display — no htmlFor since the parent has role="spinbutton" */}
             <span
               id="quantity-display"
-              className="mx-4 min-w-10 text-center text-2xl font-bold tracking-tight text-white"
+              className="mx-4 min-w-10 text-center text-2xl font-bold tracking-tight text-brown dark:text-white"
             >
               {selectedCount}
             </span>
@@ -70,7 +70,7 @@ export function GameControls({
               aria-disabled={!canInteract || !hasSelection}
               onClick={onIncrease}
               disabled={!canInteract || !hasSelection}
-              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-black/30 text-slate-200 transition hover:border-primary/50 hover:text-primary active:scale-90 disabled:opacity-40"
+              className="flex h-11 w-11 min-w-[44px] items-center justify-center rounded-full border border-brown/25 bg-white/80 text-brown transition hover:border-primary hover:text-primary active:scale-90 disabled:opacity-40 dark:border-white/10 dark:bg-black/40 dark:text-slate-200 dark:hover:border-primary/50 dark:hover:text-primary"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-6 w-6" xmlns="http://www.w3.org/2000/svg">
                 <rect x="11" y="4" width="2" height="16" rx="1" fill="currentColor" />
@@ -78,7 +78,7 @@ export function GameControls({
               </svg>
             </button>
           </div>
-          <p className="mt-1.5 text-xs text-slate-500" id="quantity-instructions">
+          <p className="mt-1.5 text-xs text-brown/60 dark:text-slate-400" id="quantity-instructions">
             {hasSelection
               ? `${selectedCount} de ${turnLimit} · toca − / + para ajustar`
               : 'Selecciona una fila válida para activar los controles.'}
@@ -91,7 +91,7 @@ export function GameControls({
             type="button"
             onClick={onConfirm}
             disabled={!canInteract || !hasSelection}
-            className={`${buttonBase} bg-primary text-background-dark hover:brightness-110 active:scale-[0.96]`}
+            className={`${buttonBase} bg-primary text-[#2a1a00] hover:brightness-110 active:scale-[0.96] dark:text-[#2a1a00]`}
           >
             Confirmar jugada
           </button>
@@ -101,7 +101,7 @@ export function GameControls({
             type="button"
             onClick={onCancel}
             disabled={!hasSelection}
-            className={`${buttonBase} border border-white/10 bg-white/[0.04] text-slate-200 hover:border-white/20 hover:bg-white/[0.08] active:scale-[0.96]`}
+            className={`${buttonBase} border border-brown/25 bg-white/80 text-brown hover:border-primary hover:bg-primary/10 active:scale-[0.96] dark:border-white/10 dark:bg-white/[0.06] dark:text-slate-200 dark:hover:border-white/20 dark:hover:bg-white/[0.10]`}
           >
             Cancelar
           </button>

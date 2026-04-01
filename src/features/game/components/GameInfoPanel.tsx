@@ -220,13 +220,17 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
             aria-valuemin={0}
             aria-valuemax={initialBalls}
             aria-label={`${totalBalls} de ${initialBalls} canicas restantes`}
+            aria-valuetext={`${totalBalls} de ${initialBalls} canicas restantes (${Math.round(ballProgress)}%)`}
           >
             <div
               className="h-full rounded-full bg-gradient-to-r from-leaf to-primary transition-all duration-500 ease-out"
               style={{ width: `${ballProgress}%` }}
             />
           </div>
-          <p className="mt-1 text-[9px] text-brown/50 dark:text-dark-muted">{initialBalls} inicial</p>
+          <div className="mt-1 flex items-center justify-between">
+            <p className="text-[9px] text-brown/50 dark:text-dark-muted">{initialBalls} inicial</p>
+            <p className="text-[9px] font-semibold text-primary dark:text-primary/80">{Math.round(ballProgress)}%</p>
+          </div>
         </div>
         <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Límite de turno</p>

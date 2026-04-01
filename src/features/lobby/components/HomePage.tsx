@@ -724,7 +724,7 @@ function VictoryOverlay({
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"
-            className="victory-share-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary/60 bg-[#1c1912]/90 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-primary shadow-lg shadow-primary/25 backdrop-blur transition-all hover:border-primary hover:bg-[#0f1408]/95 active:scale-[0.97] dark:border-amber-400/50 dark:bg-dark-card/95 dark:text-amber-200 dark:shadow-primary/20"
+            className="victory-share-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-amber-500/70 bg-[#1c1912]/95 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-amber-300 shadow-lg shadow-amber-900/50 backdrop-blur transition-all hover:border-amber-400 hover:bg-[#0f1408]/98 active:scale-[0.97] dark:border-amber-400/80 dark:bg-[#0d0c09]/98 dark:text-amber-200 dark:shadow-[0_4px_20px_rgba(251,191,36,0.25)]"
           >
             <IconShare className="h-4 w-4 shrink-0" />
             <span>Compartir y retar</span>
@@ -737,8 +737,8 @@ function VictoryOverlay({
             className={[
               'victory-exit-btn inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
               isWin
-                ? 'bg-primary text-[#4a3f32] shadow-lg shadow-primary/30 hover:brightness-110'
-                : 'border-2 border-primary/80 bg-primary/90 text-[#4a3f32] shadow-lg shadow-primary/30 hover:bg-primary dark:border-primary/70 dark:bg-primary/85 dark:text-[#2a1a00] dark:shadow-primary/25 dark:hover:bg-primary'
+                ? 'bg-primary text-[#2a1a00] shadow-lg shadow-primary/30 hover:brightness-110 dark:bg-primary dark:text-[#2a1a00]'
+                : 'border-2 border-amber-500/80 bg-amber-500 text-[#2a1a00] shadow-lg shadow-amber-600/30 hover:bg-amber-400 active:scale-[0.97] dark:border-amber-400/70 dark:bg-amber-500 dark:text-[#2a1a00] dark:shadow-amber-500/25 dark:hover:bg-amber-400'
             ].join(' ')}
           >
             <IconHome className="h-4 w-4 shrink-0" />
@@ -750,7 +750,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="victory-new-game-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-600 bg-gradient-to-b from-emerald-600 to-emerald-800 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-700/50 transition-all hover:border-emerald-400 hover:from-emerald-500 hover:to-emerald-700 hover:shadow-emerald-600/60 active:scale-[0.97] dark:border-emerald-400 dark:from-emerald-400 dark:to-emerald-600 dark:text-[#052e16] dark:shadow-[0_4px_20px_rgba(52,211,153,0.45)] dark:hover:border-emerald-300 dark:hover:from-emerald-300 dark:hover:to-emerald-500 dark:hover:shadow-[0_4px_28px_rgba(52,211,153,0.55)]"
+              className="victory-new-game-btn inline-flex items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-gradient-to-b from-emerald-500 to-emerald-700 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-700/50 transition-all hover:border-emerald-400 hover:from-emerald-400 hover:to-emerald-600 hover:shadow-emerald-600/60 active:scale-[0.97] dark:border-emerald-400 dark:from-emerald-400 dark:to-emerald-600 dark:text-[#022c22] dark:shadow-[0_4px_24px_rgba(52,211,153,0.5)] dark:hover:border-emerald-300 dark:hover:from-emerald-300 dark:hover:to-emerald-500 dark:hover:shadow-[0_4px_32px_rgba(52,211,153,0.6)]"
             >
               <IconPlus className="h-4 w-4 shrink-0" />
               <span>Nueva partida</span>

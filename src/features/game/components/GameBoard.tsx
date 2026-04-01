@@ -1484,14 +1484,14 @@ function LegacyBoardGrid({
                   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
                   const bgClass = isP1
                     ? isDark
-                      ? 'border-red-600/80 bg-gradient-to-br from-stone-950 to-stone-950/90 dark:border-red-500/60 dark:from-stone-950 dark:to-stone-900'
-                      : 'border-red-600/90 bg-gradient-to-br from-red-950 to-red-999 dark:from-red-900 dark:to-red-950 dark:border-red-500/70'
+                      ? 'border-rose-500/70 bg-gradient-to-br from-rose-950 to-rose-990/95 dark:border-rose-400/60 dark:from-rose-950 dark:to-rose-900/95'
+                      : 'border-rose-600/90 bg-gradient-to-br from-rose-950 to-rose-999 dark:from-rose-900 dark:to-rose-950 dark:border-rose-500/70'
                     : isP2
                       ? isDark
-                        ? 'border-orange-600/80 bg-gradient-to-br from-stone-950 to-stone-950/90 dark:border-orange-500/60 dark:from-stone-950 dark:to-stone-900'
+                        ? 'border-orange-500/70 bg-gradient-to-br from-orange-950 to-orange-990/95 dark:border-orange-400/60 dark:from-orange-950 dark:to-orange-900/95'
                         : 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
                       : isDark
-                        ? 'border-slate-500/70 bg-gradient-to-br from-stone-950 to-stone-950/90 dark:border-slate-500/60 dark:from-stone-950 dark:to-stone-900'
+                        ? 'border-slate-500/70 bg-gradient-to-br from-slate-900 to-slate-950/95 dark:border-slate-400/60 dark:from-slate-900 dark:to-slate-950/95'
                         : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-700 dark:to-slate-900 dark:border-slate-500/70';
                   // X mark color: brighter in dark mode so it pops against the dark ball background
                   // Red for J1, blue for J2, grey for neutral — matches 3D texture approach
@@ -1523,7 +1523,7 @@ function LegacyBoardGrid({
                     >
                       {/* Bold SVG X mark — unmistakable "removed" indicator, matches 3D texture */}
                       <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center select-none">
-                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: `drop-shadow(0 0 4px ${xGlow})` }}>
+                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: `drop-shadow(0 0 6px ${xGlow}) drop-shadow(0 0 2px ${xGlow})` }}>
                           <line x1="3" y1="3" x2="21" y2="21" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
                           <line x1="21" y1="3" x2="3" y2="21" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
                         </svg>

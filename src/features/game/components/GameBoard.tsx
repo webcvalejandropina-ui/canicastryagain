@@ -1836,8 +1836,11 @@ export function GameBoard({
     : canInteract
       ? 'Tu turno'
       : `Esperando · ${currentTurnPlayerName}`;
+  const atMax = selectedCount > 0 && remainingSelectionCapacity === 0;
   const boardHudBody = selectedCount > 0
-    ? `${selectedCount}/${turnLimit} seleccionadas · restan ${remainingSelectionCapacity}`
+    ? atMax
+      ? `¡Máximo! ${selectedCount}/${turnLimit} · confirma tu jugada`
+      : `${selectedCount}/${turnLimit} seleccionadas · restan ${remainingSelectionCapacity}`
     : canInteract
       ? diceAvailable
         ? `Dado listo — lanza primero o selecciona canicas (hasta ${turnLimit} contiguas)`
@@ -2402,15 +2405,17 @@ export function GameBoard({
               <span
                 className={[
                   'rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em]',
-                  selectedCount > 0
-                    ? 'bg-primary/15 text-primary'
-                    : canInteract
-                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
-                  turnBadgeAnim === 'pulse' ? 'turn-badge-pulse' : ''
+                  atMax
+                    ? 'bg-amber-400/25 text-amber-600 dark:bg-amber-400/30 dark:text-amber-300'
+                    : selectedCount > 0
+                      ? 'bg-primary/15 text-primary'
+                      : canInteract
+                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-slate-500/10 text-slate-500 dark:text-slate-400',
+                  turnBadgeAnim === 'pulse' && !atMax ? 'turn-badge-pulse' : ''
                 ].join(' ')}
               >
-                {boardHudTitle}
+                {atMax ? '¡Máximo!' : boardHudTitle}
               </span>
               <span className="rounded-full border border-brown/15 bg-sand/55 px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#6b5d4f] dark:border-white/10 dark:bg-dark-surface dark:text-dark-muted">
                 max {turnLimit}
@@ -2482,7 +2487,9 @@ export function GameBoard({
             </p>
             {selectedCount > 0 ? (
               <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">
-                Amplía tocando más canicas; toca un extremo para reducir.
+                {atMax
+                  ? 'Confirma abajo o toca un extremo del bloque para reducir.'
+                  : 'Amplía tocando más canicas; toca un extremo para reducir.'}
               </p>
             ) : canInteract ? (
               <p className="mt-1 text-[10px] leading-snug text-[#8c7d6b] dark:text-dark-muted">

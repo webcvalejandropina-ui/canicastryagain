@@ -794,6 +794,28 @@ main {
     display: none !important;
 }
 
+/* When game-info or selection-controls have hidden-cards, add transition */
+.game-info,
+.selection-controls {
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+    overflow: hidden;
+}
+
+.game-info.hidden-cards,
+.selection-controls.hidden-cards {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+}
+
+/* Ensure board is always visible */
+.board {
+    display: block !important;
+}
+
 #history-list {
     display: grid;
     gap: 8px;
@@ -1102,20 +1124,22 @@ main {
 #info-toggle-btn {
     background: linear-gradient(145deg, #4a90e2 0%, #2d6dc2 100%) !important;
     color: #fff !important;
-    font-size: 0.88rem !important;
+    font-size: 0.9rem !important;
     font-weight: 700 !important;
-    min-height: 40px !important;
-    padding: 0 18px !important;
-    border: 2px solid #60aaff !important;
-    border-radius: 22px !important;
-    box-shadow: 0 3px 12px rgba(74, 144, 226, 0.35) !important;
+    min-height: 44px !important;
+    padding: 0 20px !important;
+    border: 3px solid #60aaff !important;
+    border-radius: 24px !important;
+    box-shadow: 0 4px 14px rgba(74, 144, 226, 0.4) !important;
     transition: all 0.2s ease !important;
+    position: relative;
+    z-index: 50;
 }
 
 #info-toggle-btn:hover:not(:disabled) {
     background: linear-gradient(145deg, #60aaff 0%, #4a90e2 100%) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 5px 16px rgba(74, 144, 226, 0.45) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5) !important;
 }
 
 #info-toggle-btn:active:not(:disabled) {
@@ -1126,18 +1150,18 @@ main {
 /* Pulsing attention ring when info panels are hidden during active gameplay */
 @keyframes info-toggle-pulse {
     0%, 100% {
-        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15) !important, 0 0 0 0 rgba(74, 144, 226, 0.4);
+        box-shadow: 0 3px 10px rgba(74, 144, 226, 0.25) !important, 0 0 0 0 rgba(74, 144, 226, 0.5);
     }
     50% {
-        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15) !important, 0 0 0 6px rgba(74, 144, 226, 0);
+        box-shadow: 0 3px 10px rgba(74, 144, 226, 0.25) !important, 0 0 0 8px rgba(74, 144, 226, 0);
     }
 }
 
 #info-toggle-btn.info-collapsed {
     background: linear-gradient(145deg, #d0dcea 0%, #b8c9e0 100%) !important;
-    color: #2d6dc2 !important;
+    color: #1a5ab8 !important;
     border-color: #a0bce0 !important;
-    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15) !important;
+    box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2) !important;
     animation: info-toggle-pulse 2.5s ease-in-out infinite !important;
 }
 
@@ -1145,11 +1169,27 @@ main {
     background: linear-gradient(145deg, #c0d0e8 0%, #a8b8d8 100%) !important;
     color: #1a5ab8 !important;
     animation: none !important;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(74, 144, 226, 0.3) !important;
 }
 
 /* When info panels are VISIBLE during gameplay, stop the pulse — user knows the button works */
 #info-toggle-btn:not(.info-collapsed) {
     animation: none !important;
+}
+
+/* Mobile: bigger toggle button for easier touch */
+@media (max-width: 640px) {
+    #info-toggle-btn {
+        min-height: 50px !important;
+        font-size: 1rem !important;
+        padding: 0 24px !important;
+        border-width: 3px !important;
+    }
+
+    #info-toggle-btn.info-collapsed {
+        min-height: 46px !important;
+    }
 }
 
 /* ── Dark Mode ─────────────────────────────────────────────────── */
@@ -1423,8 +1463,15 @@ main {
 
     #info-toggle-btn.info-collapsed {
         background: linear-gradient(145deg, #2a3a50 0%, #1a2a40 100%) !important;
-        border-color: #3a4a60 !important;
-        color: var(--ink-500) !important;
+        border-color: #4a5a70 !important;
+        color: #8fa4b5 !important;
+        animation: info-toggle-pulse 2.5s ease-in-out infinite !important;
+    }
+
+    #info-toggle-btn.info-collapsed:hover:not(:disabled) {
+        background: linear-gradient(145deg, #3a4a60 0%, #2a3a50 100%) !important;
+        color: #a0b8d0 !important;
+        animation: none !important;
     }
 
     /* Ball colors in dark mode */
@@ -1442,10 +1489,13 @@ main {
     /* Dark mode: keep the red X clearly visible on removed balls */
     .ball.removed-ball::before,
     .ball.removed-ball::after {
-        background: #f87171 !important;
-        box-shadow: 0 0 6px rgba(248, 113, 113, 0.8), 0 1px 4px rgba(248, 113, 113, 0.6) !important;
-        width: 84% !important;
-        height: 5px !important;
+        background: #ef4444 !important;
+        box-shadow:
+            0 0 14px rgba(239, 68, 68, 1),
+            0 0 8px rgba(220, 38, 38, 0.9),
+            0 2px 4px rgba(0, 0, 0, 0.5) !important;
+        width: 86% !important;
+        height: 6px !important;
     }
 
     /* Dark mode: enhanced red tint for removed balls */
@@ -1453,7 +1503,28 @@ main {
         box-shadow:
             inset 0 3px 8px rgba(0, 0, 0, 0.5),
             0 2px 4px rgba(0, 0, 0, 0.2),
-            inset 0 0 16px rgba(239, 68, 68, 0.2) !important;
+            inset 0 0 20px rgba(239, 68, 68, 0.3) !important;
+    }
+
+    /* Mobile: extra prominent red X */
+    @media (max-width: 768px) {
+        .ball.removed-ball::before,
+        .ball.removed-ball::after {
+            background: #ff5555 !important;
+            box-shadow:
+                0 0 16px rgba(255, 85, 85, 1),
+                0 0 10px rgba(255, 68, 68, 0.95),
+                0 2px 4px rgba(0, 0, 0, 0.5) !important;
+            width: 88% !important;
+            height: 7px !important;
+        }
+
+        .ball.removed-ball {
+            box-shadow:
+                inset 0 3px 10px rgba(0, 0, 0, 0.5),
+                0 2px 6px rgba(0, 0, 0, 0.25),
+                inset 0 0 24px rgba(239, 68, 68, 0.35) !important;
+        }
     }
 
     /* Game over modal overlay */
@@ -1565,15 +1636,23 @@ main {
 
         #info-toggle-btn {
             background: linear-gradient(145deg, #1a3a5a 0%, #0f2a4a 100%) !important;
-            border-color: #2a5a8a !important;
-            color: #7ab8f5 !important;
+            border-color: #3a6a9f !important;
+            color: #93c5fd !important;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.35) !important;
         }
 
         #info-toggle-btn.info-collapsed {
-            background: linear-gradient(145deg, #2a3a50 0%, #1a2a40 100%) !important;
+            background: linear-gradient(145deg, #1e2d42 0%, #162032 100%) !important;
             border-color: #3a4a60 !important;
-            color: var(--ink-500) !important;
+            color: #7ab8f5 !important;
             animation: info-toggle-pulse 2.5s ease-in-out infinite !important;
+            box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2) !important;
+        }
+
+        #info-toggle-btn.info-collapsed:hover:not(:disabled) {
+            background: linear-gradient(145deg, #2a3a50 0%, #1e2d42 100%) !important;
+            color: #a0c8f8 !important;
+            animation: none !important;
         }
 
         #info-toggle-btn:not(.info-collapsed) {
@@ -1593,21 +1672,31 @@ main {
 
         /* Mobile game-over button dark mode — high contrast green with glow */
         #modal-restart-btn {
-            background: linear-gradient(145deg, #166534 0%, #14532d 100%) !important;
-            border-color: #4ade80 !important;
-            border-width: 3px !important;
+            background: linear-gradient(145deg, #15803d 0%, #166534 50%, #14532d 100%) !important;
+            border: 4px solid #4ade80 !important;
+            border-width: 4px !important;
             color: #ffffff !important;
+            font-size: 1.2rem !important;
             box-shadow:
-                0 4px 20px rgba(21, 128, 61, 0.6),
-                0 0 20px rgba(74, 222, 128, 0.2) !important;
+                0 4px 24px rgba(21, 128, 61, 0.7),
+                0 0 30px rgba(74, 222, 128, 0.4),
+                0 0 0 2px rgba(74, 222, 128, 0.3) inset !important;
         }
 
         #modal-restart-btn:hover:not(:disabled) {
-            background: linear-gradient(145deg, #15803d 0%, #166534 100%) !important;
+            background: linear-gradient(145deg, #22c55e 0%, #15803d 50%, #166534 100%) !important;
             box-shadow:
-                0 6px 28px rgba(21, 128, 61, 0.7),
-                0 0 30px rgba(74, 222, 128, 0.35) !important;
-            transform: translateY(-2px);
+                0 6px 32px rgba(21, 128, 61, 0.8),
+                0 0 40px rgba(74, 222, 128, 0.5),
+                0 0 0 3px rgba(74, 222, 128, 0.4) inset !important;
+            transform: translateY(-3px);
+        }
+
+        #modal-restart-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow:
+                0 3px 16px rgba(21, 128, 61, 0.6),
+                0 0 20px rgba(74, 222, 128, 0.3) !important;
         }
     }
 
@@ -2271,26 +2360,36 @@ html.dark .turn-info-pulse {
 @media (max-width: 640px) {
     /* "Nueva partida" button — more prominent on small screens */
     .victory-new-game-btn {
-        min-height: 56px !important;
-        font-size: 1rem !important;
-        padding: 0 28px !important;
+        min-height: 60px !important;
+        font-size: 1.05rem !important;
+        padding: 0 32px !important;
         border-radius: 16px !important;
+        border-width: 3px !important;
         box-shadow:
-            0 6px 24px rgba(52, 211, 153, 0.55),
-            0 0 20px rgba(52, 211, 153, 0.25) !important;
+            0 6px 28px rgba(52, 211, 153, 0.65),
+            0 0 24px rgba(52, 211, 153, 0.35),
+            0 0 0 2px rgba(52, 211, 153, 0.2) inset !important;
     }
 
     /* "Volver al lobby" button — balanced secondary style */
     .victory-exit-btn {
-        min-height: 48px !important;
-        font-size: 0.9rem !important;
+        min-height: 52px !important;
+        font-size: 0.95rem !important;
+        border-width: 2.5px !important;
+        box-shadow:
+            0 4px 16px rgba(251, 191, 36, 0.4),
+            0 0 12px rgba(251, 191, 36, 0.2) !important;
     }
 
     /* "Compartir y retar" — compact on mobile */
     .victory-share-btn {
-        min-height: 48px !important;
-        font-size: 0.85rem !important;
-        padding: 0 20px !important;
+        min-height: 52px !important;
+        font-size: 0.9rem !important;
+        padding: 0 24px !important;
+        border-width: 2.5px !important;
+        box-shadow:
+            0 4px 20px rgba(251, 191, 36, 0.5),
+            0 0 14px rgba(251, 191, 36, 0.25) !important;
     }
 }
 
@@ -2299,23 +2398,24 @@ html.dark .turn-info-pulse {
     .victory-new-game-btn {
         border-color: #6ee7b7 !important;
         box-shadow:
-            0 6px 28px rgba(52, 211, 153, 0.7),
-            0 0 24px rgba(52, 211, 153, 0.4),
-            0 0 48px rgba(52, 211, 153, 0.15) !important;
+            0 6px 32px rgba(52, 211, 153, 0.75),
+            0 0 28px rgba(52, 211, 153, 0.45),
+            0 0 56px rgba(52, 211, 153, 0.2),
+            0 0 0 3px rgba(52, 211, 153, 0.25) inset !important;
     }
 
     .victory-exit-btn {
         border-color: #fcd34d !important;
         box-shadow:
-            0 4px 20px rgba(251, 191, 36, 0.5),
-            0 0 16px rgba(251, 191, 36, 0.2) !important;
+            0 4px 24px rgba(251, 191, 36, 0.6),
+            0 0 20px rgba(251, 191, 36, 0.3) !important;
     }
 
     .victory-share-btn {
         border-color: #fcd34d !important;
         box-shadow:
-            0 4px 20px rgba(251, 191, 36, 0.5),
-            0 0 16px rgba(251, 191, 36, 0.2) !important;
+            0 4px 24px rgba(251, 191, 36, 0.6),
+            0 0 20px rgba(251, 191, 36, 0.3) !important;
     }
 }
 
@@ -2323,22 +2423,23 @@ html.dark .turn-info-pulse {
     .victory-new-game-btn {
         border-color: #6ee7b7 !important;
         box-shadow:
-            0 6px 28px rgba(52, 211, 153, 0.7),
-            0 0 24px rgba(52, 211, 153, 0.4),
-            0 0 48px rgba(52, 211, 153, 0.15) !important;
+            0 6px 32px rgba(52, 211, 153, 0.75),
+            0 0 28px rgba(52, 211, 153, 0.45),
+            0 0 56px rgba(52, 211, 153, 0.2),
+            0 0 0 3px rgba(52, 211, 153, 0.25) inset !important;
     }
 
     .victory-exit-btn {
         border-color: #fcd34d !important;
         box-shadow:
-            0 4px 20px rgba(251, 191, 36, 0.5),
-            0 0 16px rgba(251, 191, 36, 0.2) !important;
+            0 4px 24px rgba(251, 191, 36, 0.6),
+            0 0 20px rgba(251, 191, 36, 0.3) !important;
     }
 
     .victory-share-btn {
         border-color: #fcd34d !important;
         box-shadow:
-            0 4px 20px rgba(251, 191, 36, 0.5),
-            0 0 16px rgba(251, 191, 36, 0.2) !important;
+            0 4px 24px rgba(251, 191, 36, 0.6),
+            0 0 20px rgba(251, 191, 36, 0.3) !important;
     }
 }

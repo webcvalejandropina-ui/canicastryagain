@@ -775,6 +775,9 @@ function animateFrame(context: SceneContext, timeMs: number): void {
         }
         marble.active = false;
         marble.dying = false;
+        // Return so subsequent frames (dying=false, active=false) do not lerp
+        // the dead mesh back to scale 1 and make it briefly reappear.
+        return;
       }
       continue;
     }

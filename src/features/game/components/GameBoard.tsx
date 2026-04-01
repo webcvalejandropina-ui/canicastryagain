@@ -1483,34 +1483,33 @@ function LegacyBoardGrid({
                   const isP1 = cellOwner === 1;
                   const isP2 = cellOwner === 2;
                   const initial = isP1 ? p1Initial : isP2 ? p2Initial : '';
-                  // Distinct dark backgrounds per owner — unmistakably "dead" balls
-                  // Light mode: very dark backgrounds for contrast
-                  // Dark mode: darker/more neutral so X mark pops; X mark also brighter in dark
+                  // Removed ball backgrounds: vivid/saturated to clearly distinguish from active balls
+                  // Light mode: medium-light backgrounds so colored X pops clearly
+                  // Dark mode: very dark backgrounds so bright colored X stands out
                   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
                   const bgClass = isP1
                     ? isDark
-                      ? 'border-rose-500/70 bg-gradient-to-br from-rose-950 to-rose-990/95 dark:border-rose-400/60 dark:from-rose-950 dark:to-rose-900/95'
-                      : 'border-rose-600/90 bg-gradient-to-br from-rose-950 to-rose-999 dark:from-rose-900 dark:to-rose-950 dark:border-rose-500/70'
+                      ? 'border-rose-600/80 bg-gradient-to-br from-rose-950 to-rose-900/95 dark:border-rose-400/60 dark:from-rose-950 dark:to-rose-900/95'
+                      : 'border-rose-400/90 bg-gradient-to-br from-rose-200 to-rose-300/80 dark:from-rose-900 dark:to-rose-950 dark:border-rose-500/70'
                     : isP2
                       ? isDark
-                        ? 'border-orange-500/70 bg-gradient-to-br from-orange-950 to-orange-990/95 dark:border-orange-400/60 dark:from-orange-950 dark:to-orange-900/95'
-                        : 'border-orange-600/90 bg-gradient-to-br from-orange-950 to-orange-999 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
+                        ? 'border-orange-600/80 bg-gradient-to-br from-orange-950 to-orange-900/95 dark:border-orange-400/60 dark:from-orange-950 dark:to-orange-900/95'
+                        : 'border-orange-400/90 bg-gradient-to-br from-orange-200 to-orange-300/80 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
                       : isDark
-                        ? 'border-slate-500/70 bg-gradient-to-br from-slate-900 to-slate-950/95 dark:border-slate-400/60 dark:from-slate-900 dark:to-slate-950/95'
-                        : 'border-slate-600/90 bg-gradient-to-br from-slate-950 to-zinc-999 dark:from-slate-700 dark:to-slate-900 dark:border-slate-500/70';
-                  // X mark color: vivid/bright in dark mode so it unmistakably reads as "removed"
-                  // Red for J1, blue for J2, white for neutral — very high contrast
+                        ? 'border-slate-500/80 bg-gradient-to-br from-slate-800 to-slate-900/95 dark:border-slate-400/60 dark:from-slate-800 dark:to-slate-900/95'
+                        : 'border-slate-400/90 bg-gradient-to-br from-slate-200 to-slate-300/80 dark:from-slate-700 dark:to-slate-800 dark:border-slate-500/70';
+                  // X mark color: vivid colored in both modes for unmistakable "removed" look
+                  // P1 → red, P2 → blue, neutral → slate — bright in dark mode, dark in light mode
                   const xColor = isP1
-                    ? isDark ? '#ffffff' : '#ef4444'
+                    ? isDark ? '#ff6b6b' : '#dc2626'
                     : isP2
-                      ? isDark ? '#ffffff' : '#3b82f6'
-                      : isDark ? '#ffffff' : '#94a3b8';
+                      ? isDark ? '#74c0fc' : '#2563eb'
+                      : isDark ? '#e2e8f0' : '#475569';
                   const xGlow = isP1
-                    ? isDark ? 'rgba(255,120,120,1)' : 'rgba(239,68,68,1)'
+                    ? isDark ? 'rgba(255,107,107,0.9)' : 'rgba(220,38,38,0.8)'
                     : isP2
-                      ? isDark ? 'rgba(120,180,255,1)' : 'rgba(59,130,246,1)'
-                      : isDark ? 'rgba(255,255,255,1)' : 'rgba(148,163,184,0.9)';
-
+                      ? isDark ? 'rgba(116,192,252,0.9)' : 'rgba(37,99,235,0.8)'
+                      : isDark ? 'rgba(226,232,240,0.8)' : 'rgba(71,85,105,0.7)';
                   return (
                     <button
                       key={`ball-${rowIndex}-${ballIndex}`}
@@ -2418,7 +2417,7 @@ export function GameBoard({
               {canInteract ? (() => {
                 const base = diceAvailable
                   ? 'border-amber-400/40 bg-amber-50/70 text-amber-600 dark:border-amber-400/35 dark:bg-amber-400/10 dark:text-amber-300'
-                  : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-dark-muted/60';
+                  : 'border-slate-300/40 bg-slate-100/60 text-slate-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 line-through';
                 // NOTE: diceResultArrived && lastDiceResult must be checked BEFORE the diceChipAnim
                 // spent branch — otherwise the || short-circuits on truthy 'dice-spent-chip' and
                 // the dice-result-arrived animation never fires when the dice is already spent.

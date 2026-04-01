@@ -1106,9 +1106,9 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   if (!THREE) return null;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 0x0d0c09 : 0xf5f0e8
-  );
+  // Use the app's dark mode class, not system preference — the app controls its own theme
+  const isDarkModeScene = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  scene.background = new THREE.Color(isDarkModeScene ? 0x0d0c09 : 0xf5f0e8);
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
   camera.position.set(0, 0.5, 16);
@@ -1117,13 +1117,14 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     antialias: true,
     alpha: true
   });
-  const initialBgDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  renderer.setClearColor(initialBgDark ? 0x0d0c09 : 0xf5f0e8, 1);
+  // Use app dark mode class, not system preference
+  const rendererBgDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  renderer.setClearColor(rendererBgDark ? 0x0d0c09 : 0xf5f0e8, 1);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.domElement.className = 'h-full w-full';
   renderer.domElement.style.touchAction = 'none';
   // Inline background prevents white flash on mobile dark mode before Three.js renders
-  renderer.domElement.style.backgroundColor = initialBgDark ? '#0d0c09' : '#f5f0e8';
+  renderer.domElement.style.backgroundColor = rendererBgDark ? '#0d0c09' : '#f5f0e8';
 
   const ambient = new THREE.AmbientLight(0xffffff, 0.72);
   const keyLight = new THREE.DirectionalLight(0xffffff, 0.95);
@@ -1253,10 +1254,14 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     reducedMotionMql?.removeEventListener?.('change', onReducedMotionChange);
   });
 
-  // Listen for color-scheme changes so the 3D scene background updates on mobile when the system theme switches
+  // Listen for color-scheme changes so the 3D scene background updates when the system/app theme switches
+  // We listen to the 'canicas:theme-change' event (dispatched by HomePage) rather than system preference
+  // so the 3D canvas stays in sync with the app's own dark mode toggle.
+  // Kept here for the rare case of system-level theme changes leaking through.
   const colorSchemeMql = window.matchMedia?.('(prefers-color-scheme: dark)');
   const onColorSchemeChange = (): void => {
-    const isDark = colorSchemeMql?.matches ?? false;
+    // Always use app's dark mode class — system preference is not authoritative
+    const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
     const bgColor = isDark ? 0x0d0c09 : 0xf5f0e8;
     const bgColorCss = isDark ? '#0d0c09' : '#f5f0e8';
     if (context.scene) {
@@ -1274,7 +1279,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   // so the 3D canvas updates when the user manually switches light/dark mode
   const onManualThemeChange = (e: Event): void => {
     const isDark = (e as CustomEvent<{ isDark: boolean }>).detail?.isDark
-      ?? colorSchemeMql?.matches ?? false;
+      ?? (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
     const bgColor = isDark ? 0x0d0c09 : 0xf5f0e8;
     const bgColorCss = isDark ? '#0d0c09' : '#f5f0e8';
     if (context.scene) {
@@ -1487,28 +1492,31 @@ function LegacyBoardGrid({
                   // Light mode: medium-light backgrounds so colored X pops clearly
                   // Dark mode: very dark backgrounds so bright colored X stands out
                   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+                  // Removed ball backgrounds: vivid/saturated to clearly distinguish from active balls
+                  // Light mode: medium-light backgrounds so colored X pops clearly
+                  // Dark mode: brighter/more saturated backgrounds so X mark is clearly visible
                   const bgClass = isP1
                     ? isDark
-                      ? 'border-rose-600/80 bg-gradient-to-br from-rose-950 to-rose-900/95 dark:border-rose-400/60 dark:from-rose-950 dark:to-rose-900/95'
+                      ? 'border-rose-500/80 bg-gradient-to-br from-rose-800 to-rose-900/95 dark:border-rose-400/60 dark:from-rose-800 dark:to-rose-900/95'
                       : 'border-rose-400/90 bg-gradient-to-br from-rose-200 to-rose-300/80 dark:from-rose-900 dark:to-rose-950 dark:border-rose-500/70'
                     : isP2
                       ? isDark
-                        ? 'border-orange-600/80 bg-gradient-to-br from-orange-950 to-orange-900/95 dark:border-orange-400/60 dark:from-orange-950 dark:to-orange-900/95'
+                        ? 'border-orange-500/80 bg-gradient-to-br from-orange-800 to-orange-900/95 dark:border-orange-400/60 dark:from-orange-800 dark:to-orange-900/95'
                         : 'border-orange-400/90 bg-gradient-to-br from-orange-200 to-orange-300/80 dark:from-orange-900 dark:to-orange-950 dark:border-orange-500/70'
                       : isDark
-                        ? 'border-slate-500/80 bg-gradient-to-br from-slate-800 to-slate-900/95 dark:border-slate-400/60 dark:from-slate-800 dark:to-slate-900/95'
+                        ? 'border-slate-400/70 bg-gradient-to-br from-slate-700 to-slate-800/95 dark:border-slate-400/60 dark:from-slate-700 dark:to-slate-800/95'
                         : 'border-slate-400/90 bg-gradient-to-br from-slate-200 to-slate-300/80 dark:from-slate-700 dark:to-slate-800 dark:border-slate-500/70';
                   // X mark color: vivid colored in both modes for unmistakable "removed" look
                   // P1 → red, P2 → blue, neutral → amber — bright in dark mode, warm in light mode
                   const xColor = isP1
-                    ? isDark ? '#ff6b6b' : '#dc2626'
+                    ? isDark ? '#ff5555' : '#dc2626'
                     : isP2
-                      ? isDark ? '#74c0fc' : '#2563eb'
+                      ? isDark ? '#58a6ff' : '#2563eb'
                       : isDark ? '#fbbf24' : '#d97706';
                   const xGlow = isP1
-                    ? isDark ? 'rgba(255,107,107,1)' : 'rgba(220,38,38,0.9)'
+                    ? isDark ? 'rgba(255,85,85,1)' : 'rgba(220,38,38,0.9)'
                     : isP2
-                      ? isDark ? 'rgba(116,192,252,1)' : 'rgba(37,99,235,0.9)'
+                      ? isDark ? 'rgba(88,166,255,1)' : 'rgba(37,99,235,0.9)'
                       : isDark ? 'rgba(251,191,36,1)' : 'rgba(217,119,6,0.9)';
                   return (
                     <button

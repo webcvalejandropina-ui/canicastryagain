@@ -122,6 +122,8 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
   const [turnPulse, setTurnPulse] = useState(false);
   // Collapse secondary info cards during active play for distraction-free gaming
   const [detailsExpanded, setDetailsExpanded] = useState(false);
+  // Collapse ALL info panel content during active play — user taps "Ver panel" to expand
+  const [panelHidden, setPanelHidden] = useState(false);
   const prevCanInteractRef = useRef<boolean | null>(null);
   useEffect(() => {
     if (game.status !== 'playing') return;
@@ -179,8 +181,51 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
     }
   }, [game.status]);
 
+  // Auto-collapse info panel during active play — less distraction while gaming
+  useEffect(() => {
+    if (game.status === 'playing') {
+      setPanelHidden(true);
+    } else {
+      setPanelHidden(false);
+    }
+  }, [game.status]);
+
+  // During active play, the full info panel is hidden by default to reduce distraction.
+  // A single "Ver panel" button is shown instead. User taps to expand.
+  if (game.status === 'playing' && panelHidden) {
+    return (
+      <button
+        type="button"
+        onClick={() => setPanelHidden(false)}
+        className="w-full rounded-full border border-primary/30 bg-sand/60 px-4 py-2 text-center text-xs font-bold uppercase tracking-[0.14em] text-brown/70 shadow backdrop-blur transition hover:border-primary/60 hover:bg-sand/80 active:scale-[0.97] dark:border-primary/30 dark:bg-dark-surface/80 dark:text-dark-muted dark:hover:border-primary/40 dark:hover:bg-dark-surface"
+        aria-label="Mostrar panel de información durante la partida"
+      >
+        <span className="inline-flex items-center gap-2">
+          <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12h6M9 16h6M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Ver panel de juego
+        </span>
+      </button>
+    );
+  }
+
   return (
     <section className="glass-panel rounded-2xl p-5 md:p-6" aria-live="polite" role="status">
+      {/* Collapse button — shown when panel is expanded during active play */}
+      {game.status === 'playing' && (
+        <button
+          type="button"
+          onClick={() => setPanelHidden(true)}
+          className="mb-3 flex w-full items-center justify-center gap-1.5 rounded-full border border-brown/20 bg-sand/40 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-brown/60 transition hover:border-primary/40 hover:bg-sand/60 dark:border-white/10 dark:bg-dark-surface/60 dark:text-dark-muted dark:hover:border-primary/30 dark:hover:bg-dark-surface/80"
+          aria-label="Ocultar panel de información"
+        >
+          <svg aria-hidden="true" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 15l-6-6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Ocultar panel
+        </button>
+      )}
       <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr] md:items-center">
         <article className={playerCardClass(game.yourPlayerNumber === 1, game.currentTurn === 1)}>
           <div className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-primary">
@@ -236,7 +281,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
             <button
               type="button"
               onClick={onNewGame}
-              className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-amber-400 bg-primary px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] shadow-xl shadow-amber-600/40 transition-all hover:brightness-110 hover:shadow-amber-600/60 active:scale-[0.97] dark:border-amber-400 dark:bg-amber-400 dark:text-[#1c0f00] dark:shadow-[0_8px_32px_rgba(251,191,36,0.55)] dark:hover:brightness-110 dark:hover:shadow-[0_8px_40px_rgba(251,191,36,0.7)]"
+              className="mt-3 inline-flex items-center gap-2 rounded-full border-2 border-amber-400 bg-primary px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] shadow-xl shadow-amber-600/40 transition-all hover:brightness-110 hover:shadow-amber-600/60 active:scale-[0.97] dark:border-amber-500 dark:bg-amber-400 dark:text-amber-950 dark:shadow-[0_8px_32px_rgba(251,191,36,0.55)] dark:hover:brightness-110 dark:hover:shadow-[0_8px_40px_rgba(251,191,36,0.7)]"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="inline h-4 w-4" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="12" cy="16" rx="6" ry="7" fill="#f4c542" stroke="#d4a82e" strokeWidth="1.25"/>

@@ -808,7 +808,7 @@ export function HomePage(): React.ReactElement {
   const [turnBannerKey, setTurnBannerKey] = useState(0);
   const [showTurnSpotlight, setShowTurnSpotlight] = useState(false);
   // Turn coach/spotlight banners hidden by default during active play — user can expand via quick-access button
-  const [turnCoachVisible, setTurnCoachVisible] = useState(false);
+  const [turnCoachVisible, setTurnCoachVisible] = useState(true);
   const [boardAttentionPulse, setBoardAttentionPulse] = useState(false);
   const [lastDiceResult, setLastDiceResult] = useState<DiceResult | null>(null);
   // Manual dark mode — persists to localStorage, falls back to system preference

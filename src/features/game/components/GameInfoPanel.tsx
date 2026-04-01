@@ -2,6 +2,23 @@ import { useEffect, useRef, useState } from 'react';
 
 import { DiceResult, GameState } from '@/features/game/types';
 
+// Chevron icon for expand/collapse button
+function ChevronDownIcon({ className }: { className?: string }): React.ReactElement {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className={className ?? 'inline h-4 w-4'} xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function ChevronUpIcon({ className }: { className?: string }): React.ReactElement {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className={className ?? 'inline h-4 w-4'} xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 15l-6-6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 type Props = {
   game: GameState;
   yourDiceAvailable: boolean;
@@ -73,6 +90,8 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
 
   // Animate the turn-status box when the turn changes to "you"
   const [turnPulse, setTurnPulse] = useState(false);
+  // Collapse secondary info cards during active play for distraction-free gaming
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const prevCanInteractRef = useRef<boolean | null>(null);
   useEffect(() => {
     if (game.status !== 'playing') return;
@@ -122,6 +141,13 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
     }
     prevTotalBallsRef.current = totalBalls;
   }, [totalBalls]);
+
+  // Reset expanded state when game ends so info panel starts collapsed on new game
+  useEffect(() => {
+    if (game.status === 'finished') {
+      setDetailsExpanded(false);
+    }
+  }, [game.status]);
 
   return (
     <section className="glass-panel rounded-2xl p-5 md:p-6" aria-live="polite" role="status">
@@ -240,20 +266,138 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
         </div>
       </div>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Filas tomadas</p>
-          <p className="mt-1 text-sm font-semibold text-leaf dark:text-leaf-soft">{takenRows}</p>
-        </div>
-        <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Última fila jugada</p>
-          <p className="mt-1 text-sm font-semibold text-primary">
-            {game.lastTouchedRowIndex !== null ? `Fila ${game.lastTouchedRowIndex + 1}` : 'Sin jugadas'}
-          </p>
-        </div>
-      </div>
-
+      {/* Expandable secondary info — hidden during active play to reduce distraction */}
       {game.status === 'playing' ? (
+        <div className="mt-3">
+          {/* Toggle button — always visible during play so user knows more info is available */}
+          <button
+            type="button"
+            onClick={() => setDetailsExpanded((v) => !v)}
+            className="w-full rounded-xl border border-brown/20 bg-sand/40 px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.14em] text-brown/70 transition-all hover:border-primary/40 hover:bg-sand/60 dark:border-white/10 dark:bg-dark-surface/60 dark:text-dark-muted dark:hover:border-primary/30 dark:hover:bg-dark-surface/80"
+            aria-expanded={detailsExpanded}
+            aria-controls="game-info-details"
+          >
+            {detailsExpanded ? (
+              <span className="inline-flex items-center gap-1.5">
+                <ChevronUpIcon className="h-4 w-4" /> Ocultar detalles
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <ChevronDownIcon className="h-4 w-4" /> Ver más ({takenRows} filas · dado · historial)
+              </span>
+            )}
+          </button>
+
+          {/* Collapsible details panel */}
+          <div
+            id="game-info-details"
+            className={[
+              'grid gap-3 overflow-hidden transition-all duration-300 ease-in-out',
+              detailsExpanded ? 'mt-3 max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+            ].join(' ')}
+            aria-hidden={!detailsExpanded}
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Filas tomadas</p>
+                <p className="mt-1 text-sm font-semibold text-leaf dark:text-leaf-soft">{takenRows}</p>
+              </div>
+              <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Última fila jugada</p>
+                <p className="mt-1 text-sm font-semibold text-primary">
+                  {game.lastTouchedRowIndex !== null ? `Fila ${game.lastTouchedRowIndex + 1}` : 'Sin jugadas'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 px-4 py-3">
+              <div className="text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Tu dado especial</p>
+                {yourDiceAvailable ? (
+                  <p className="mt-1 flex items-center justify-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                    <SparkIcon /> Disponible
+                  </p>
+                ) : lastDiceResult ? (
+                  <p className="dice-result-pop mt-1 flex items-center justify-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                    {DICE_POWER_SVG[lastDiceResult.power] ?? lastDiceResult.power}
+                  </p>
+                ) : (
+                  <p className="mt-1 text-sm font-semibold text-brown/50 dark:text-dark-muted">— Gastado</p>
+                )}
+              </div>
+              <div className="h-8 w-px bg-amber-500/20" />
+              <div className="text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Dado del rival</p>
+                {(() => {
+                  const rivalDiceMove = [...game.moveHistory].reverse().find((m) => m.fromDice && m.player !== game.yourPlayerNumber);
+                  return rivalDiceMove ? (
+                    <p className="mt-1 flex items-center justify-center gap-1 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                      {DICE_POWER_SVG[rivalDiceMove.dicePower ?? ''] ?? rivalDiceMove.dicePower ?? '—'}
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-sm font-semibold text-brown/50 dark:text-dark-muted">Sin uso</p>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {game.moveHistory.length > 0 && (
+              <div className="rounded-xl border border-brown/15 dark:border-white/10 bg-sand/30 p-3 dark:border-white/8 dark:bg-dark-surface/60">
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-brown/60 dark:text-dark-muted">
+                  Historial
+                </p>
+                <div
+                  className="flex flex-col gap-1.5 max-h-28 overflow-y-auto custom-scrollbar"
+                  style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(140,98,57,0.3) rgba(0,0,0,0.05)' }}
+                >
+                  {game.moveHistory.slice(-10).map((move, i) => {
+                    const isYou = move.player === game.yourPlayerNumber;
+                    const moveNum = Math.max(0, game.moveHistory.length - 10) + i + 1;
+                    const actorLabel = isYou ? 'Tú' : `J${move.player}`;
+                    const actorClass = isYou
+                      ? 'shrink-0 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-bold text-primary'
+                      : 'shrink-0 rounded-full bg-slate-500/15 px-1.5 py-0.5 text-[9px] font-bold text-slate-500';
+
+                    const detail = move.fromDice ? (
+                      <span className={`text-[10px] font-semibold ${DICE_POWER_COLORS[move.dicePower ?? ''] ?? 'text-amber-500'}`}>
+                        {DICE_POWER_SVG[move.dicePower ?? ''] ?? move.dicePower}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-brown/70 dark:text-dark-muted">
+                        −{move.count} <span className="text-[9px]">fila {move.rowIndex + 1}</span>
+                      </span>
+                    );
+
+                    return (
+                      <div key={`${moveNum}-${i}`} className="flex items-center gap-2 text-[11px]">
+                        <span className={actorClass}>{actorLabel}</span>
+                        <span className="text-[9px] text-slate-400/70 dark:text-slate-500">#{moveNum}</span>
+                        {detail}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Non-playing states (waiting, finished): always show all info */
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Filas tomadas</p>
+            <p className="mt-1 text-sm font-semibold text-leaf dark:text-leaf-soft">{takenRows}</p>
+          </div>
+          <div className="rounded-xl border border-brown/20 bg-sand/50 p-3 text-center dark:border-white/10 dark:bg-dark-surface">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brown/70 dark:text-dark-muted">Última fila jugada</p>
+            <p className="mt-1 text-sm font-semibold text-primary">
+              {game.lastTouchedRowIndex !== null ? `Fila ${game.lastTouchedRowIndex + 1}` : 'Sin jugadas'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {game.status !== 'playing' ? (
         <div className="mt-3 flex items-center justify-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/8 px-4 py-3">
           <div className="text-center">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Tu dado especial</p>
@@ -286,7 +430,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
         </div>
       ) : null}
 
-      {game.moveHistory.length > 0 && game.status !== 'finished' && (
+      {game.status !== 'playing' && game.moveHistory.length > 0 && (
         <div className="mt-3 rounded-xl border border-brown/15 dark:border-white/10 bg-sand/30 p-3 dark:border-white/8 dark:bg-dark-surface/60">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-brown/60 dark:text-dark-muted">
             Historial

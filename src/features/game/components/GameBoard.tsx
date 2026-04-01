@@ -1506,10 +1506,10 @@ function LegacyBoardGrid({
                       ? isDark ? '#74c0fc' : '#2563eb'
                       : isDark ? '#fbbf24' : '#d97706';
                   const xGlow = isP1
-                    ? isDark ? 'rgba(255,107,107,0.9)' : 'rgba(220,38,38,0.8)'
+                    ? isDark ? 'rgba(255,107,107,1)' : 'rgba(220,38,38,0.9)'
                     : isP2
-                      ? isDark ? 'rgba(116,192,252,0.9)' : 'rgba(37,99,235,0.8)'
-                      : isDark ? 'rgba(251,191,36,0.9)' : 'rgba(217,119,6,0.8)';
+                      ? isDark ? 'rgba(116,192,252,1)' : 'rgba(37,99,235,0.9)'
+                      : isDark ? 'rgba(251,191,36,1)' : 'rgba(217,119,6,0.9)';
                   return (
                     <button
                       key={`ball-${rowIndex}-${ballIndex}`}
@@ -1527,9 +1527,9 @@ function LegacyBoardGrid({
                     >
                       {/* Bold SVG X mark — unmistakable "removed" indicator, matches 3D texture */}
                       <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center select-none">
-                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: `drop-shadow(0 0 8px ${xGlow}) drop-shadow(0 0 3px ${xGlow}) drop-shadow(0 0 1px ${xGlow})` }}>
-                          <line x1="3" y1="3" x2="21" y2="21" stroke={xColor} strokeWidth="5.5" strokeLinecap="round"/>
-                          <line x1="21" y1="3" x2="3" y2="21" stroke={xColor} strokeWidth="5.5" strokeLinecap="round"/>
+                        <svg viewBox="0 0 24 24" className="w-full h-full" xmlns="http://www.w3.org/2000/svg" style={{ filter: `drop-shadow(0 0 10px ${xGlow}) drop-shadow(0 0 5px ${xGlow}) drop-shadow(0 0 2px ${xGlow})` }}>
+                          <line x1="4" y1="4" x2="20" y2="20" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
+                          <line x1="20" y1="4" x2="4" y2="20" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
                         </svg>
                       </span>
                       {/* Player initial at bottom-right corner for reference */}

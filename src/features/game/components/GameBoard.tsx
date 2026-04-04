@@ -94,8 +94,8 @@ type SceneContext = {
   flashTexture: HTMLCanvasElement | null;
   removedP1Texture: any;
   removedP2Texture: any;
-  cachedP1Initial: string;
-  cachedP2Initial: string;
+  cachedP1Color: string;
+  cachedP2Color: string;
   lastFrameTime: number;
   boardWidth: number;
   baseCameraZ: number;
@@ -376,23 +376,21 @@ function buildBoardMeshes(
   context.pickableMeshes = [];
 
   const cellOwnerMap = buildCellOwnerMap(game.moveHistory);
-  const p1Initial = (game.player1?.name?.[0] ?? 'J').toUpperCase();
-  const p2Initial = (game.player2?.name?.[0] ?? 'J').toUpperCase();
 
   // Detect dark mode for X-mark brightness — bright colors work in both modes vs dark ball background
   const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   const p1XColor = isDarkMode ? '#ff8080' : '#ef4444'; // brighter red in dark mode
   const p2XColor = isDarkMode ? '#93c5fd' : '#3b82f6'; // blue already good in dark mode
 
-  if (context.cachedP1Initial !== p1Initial || !context.removedP1Texture) {
+  if (context.cachedP1Color !== p1XColor || !context.removedP1Texture) {
     context.removedP1Texture?.dispose?.();
     context.removedP1Texture = createRemovedMarbleTexture(THREE, p1XColor);
-    context.cachedP1Initial = p1Initial;
+    context.cachedP1Color = p1XColor;
   }
-  if (context.cachedP2Initial !== p2Initial || !context.removedP2Texture) {
+  if (context.cachedP2Color !== p2XColor || !context.removedP2Texture) {
     context.removedP2Texture?.dispose?.();
     context.removedP2Texture = createRemovedMarbleTexture(THREE, p2XColor);
-    context.cachedP2Initial = p2Initial;
+    context.cachedP2Color = p2XColor;
   }
 
   const density = getDensity(game.numRows);
@@ -1191,8 +1189,8 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     flashTexture: createFlashCanvas(),
     removedP1Texture: null,
     removedP2Texture: null,
-    cachedP1Initial: '',
-    cachedP2Initial: '',
+    cachedP1Color: '',
+    cachedP2Color: '',
     lastFrameTime: 0,
     boardWidth: 0,
     baseCameraZ: 0,
@@ -1404,8 +1402,6 @@ function LegacyBoardGrid({
 }: Props): React.ReactElement {
   const density = getDensity(game.numRows);
   const cellOwnerMap = useMemo(() => buildCellOwnerMap(game.moveHistory), [game.moveHistory]);
-  const p1Initial = (game.player1?.name?.[0] ?? 'J').toUpperCase();
-  const p2Initial = (game.player2?.name?.[0] ?? 'J').toUpperCase();
   const [blockedShakeRow, setBlockedShakeRow] = useState<number | null>(null);
   const blockedShakeTimerRef = useRef<number | null>(null);
 
@@ -1490,7 +1486,6 @@ function LegacyBoardGrid({
                   const cellOwner = cellOwnerMap.get(`${rowIndex}:${ballIndex}`);
                   const isP1 = cellOwner === 1;
                   const isP2 = cellOwner === 2;
-                  const initial = isP1 ? p1Initial : isP2 ? p2Initial : '';
                   // Removed ball backgrounds: vivid/saturated to clearly distinguish from active balls
                   // Light mode: medium-light backgrounds so colored X pops clearly
                   // Dark mode: BRIGHTER backgrounds so the colored X mark is clearly visible
@@ -1541,15 +1536,6 @@ function LegacyBoardGrid({
                           <line x1="20" y1="4" x2="4" y2="20" stroke={xColor} strokeWidth="5" strokeLinecap="round"/>
                         </svg>
                       </span>
-                      {/* Player initial at bottom-right corner for reference */}
-                      {initial ? (
-                        <span
-                          aria-hidden="true"
-                          className="absolute bottom-px right-px text-[0.55em] font-bold text-white/50"
-                        >
-                          {initial}
-                        </span>
-                      ) : null}
                     </button>
                   );
                 }
@@ -2514,10 +2500,10 @@ export function GameBoard({
               disabled={isRollingDice}
               aria-label={isRollingDice ? 'Lanzando dado especial' : 'Usar dado especial'}
               className={[
-                'inline-flex min-h-11 items-center gap-2 rounded-full border bg-black/60 px-3 py-2 text-xs font-black uppercase tracking-[0.16em] shadow-lg shadow-amber-950/30 backdrop-blur transition hover:border-amber-200/70 hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-70',
+                'inline-flex min-h-11 items-center gap-2 rounded-2xl border bg-black/65 px-3.5 py-2.5 text-xs font-black uppercase tracking-[0.16em] shadow-lg shadow-amber-950/30 backdrop-blur transition hover:border-amber-200/70 hover:bg-black/75 disabled:cursor-not-allowed disabled:opacity-70',
                 'border-amber-300/45 text-amber-100',
                 isRollingDice
-                  ? 'dice-rolling-active border-amber-400/70 text-amber-200'
+                  ? 'dice-rolling-active border-amber-400/70 text-amber-200 scale-[1.03]'
                   : ''
               ].join(' ')}
             >
@@ -2536,11 +2522,10 @@ export function GameBoard({
               )}
               <span>{isRollingDice ? 'Lanzando...' : 'Dado x1'}</span>
             </button>
-            <p className="rounded-full bg-black/45 px-2.5 py-1 text-right text-[10px] font-semibold leading-tight text-white/80 backdrop-blur">
-              {renderMode === 'fallback'
-                ? 'El dado está disponible aquí abajo.'
-                : 'Toca para lanzar el dado.'}
-            </p>
+            <div className="max-w-[13rem] rounded-2xl border border-amber-300/30 bg-black/45 px-3 py-2 text-right text-[10px] font-semibold leading-tight text-white/85 backdrop-blur">
+              <p>{renderMode === 'fallback' ? 'El dado está disponible aquí abajo.' : 'Toca para lanzar el dado y activar un poder especial.'}</p>
+              <p className="mt-1 text-[9px] text-amber-200/90">1 uso por jugador · consume el turno · puede cambiar por completo la partida</p>
+            </div>
           </div>
         </div>
       ) : null}

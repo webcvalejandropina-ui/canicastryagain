@@ -197,7 +197,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
       <button
         type="button"
         onClick={() => setPanelHidden(false)}
-        className="w-full rounded-2xl border-2 border-primary/40 bg-gradient-to-r from-primary/15 to-accent/10 px-5 py-2.5 text-center text-sm font-bold uppercase tracking-[0.14em] text-primary shadow-lg shadow-primary/20 backdrop-blur transition-all hover:border-primary/70 hover:from-primary/25 hover:to-accent/15 hover:shadow-primary/35 hover:scale-[1.02] active:scale-[0.98] dark:border-primary/50 dark:from-primary/20 dark:to-accent/15 dark:bg-dark-surface/90 dark:text-primary/90 dark:shadow-primary/30 dark:hover:border-primary/70 dark:hover:from-primary/30 dark:hover:to-accent/20 dark:hover:shadow-primary/40"
+        className="w-full rounded-2xl border-2 border-primary/40 bg-gradient-to-r from-primary/15 to-accent/10 px-5 py-2.5 text-center text-sm font-bold uppercase tracking-[0.14em] text-primary shadow-lg shadow-primary/20 backdrop-blur transition-all hover:border-primary/70 hover:from-primary/25 hover:to-accent/15 hover:shadow-primary/35 hover:scale-[1.02] active:scale-[0.98] dark:border-primary/50 dark:from-slate-900 dark:to-slate-800 dark:bg-slate-900/95 dark:text-amber-100 dark:shadow-primary/20 dark:hover:border-primary/70 dark:hover:from-slate-800 dark:hover:to-slate-700"
         aria-label="Mostrar panel de información durante la partida"
       >
         <span className="inline-flex items-center gap-2">
@@ -217,7 +217,7 @@ export function GameInfoPanel({ game, yourDiceAvailable, lastDiceResult, onNewGa
         <button
           type="button"
           onClick={() => setPanelHidden(true)}
-          className="mb-3 flex w-full items-center justify-center gap-1.5 rounded-full border border-brown/20 bg-sand/40 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-brown/60 transition hover:border-primary/40 hover:bg-sand/60 dark:border-white/10 dark:bg-dark-surface/60 dark:text-dark-muted dark:hover:border-primary/30 dark:hover:bg-dark-surface/80"
+          className="mb-3 flex w-full items-center justify-center gap-1.5 rounded-full border border-brown/20 bg-sand/40 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-brown/60 transition hover:border-primary/40 hover:bg-sand/60 dark:border-white/15 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:border-primary/40 dark:hover:bg-slate-800/90"
           aria-label="Ocultar panel de información"
         >
           <svg aria-hidden="true" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -724,7 +724,7 @@ function VictoryOverlay({
             onClick={() => void handleShareResult()}
             aria-label="Compartir resultado"
             title="Compartir resultado"
-            className="victory-share-btn inline-flex items-center justify-center gap-2 rounded-2xl border-[3px] border-amber-400 bg-gradient-to-b from-amber-500 to-amber-800 px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-xl shadow-amber-900/70 backdrop-blur transition-all hover:border-amber-200 hover:from-amber-400 hover:to-amber-700 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-700 dark:text-[#1c0f00] dark:shadow-[0_4px_32px_rgba(251,191,36,0.7)] dark:hover:border-amber-100 dark:hover:from-amber-300 dark:hover:to-amber-600 dark:hover:shadow-[0_4px_40px_rgba(251,191,36,0.85)]"
+            className="victory-share-btn inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl border-[3px] border-amber-400 bg-gradient-to-b from-amber-500 to-amber-800 px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-xl shadow-amber-900/70 backdrop-blur transition-all hover:border-amber-200 hover:from-amber-400 hover:to-amber-700 active:scale-[0.97] sm:min-w-[220px] dark:border-amber-300 dark:from-amber-400 dark:to-amber-700 dark:text-[#1c0f00] dark:shadow-[0_4px_32px_rgba(251,191,36,0.7)] dark:hover:border-amber-100 dark:hover:from-amber-300 dark:hover:to-amber-600 dark:hover:shadow-[0_4px_40px_rgba(251,191,36,0.85)]"
           >
             <IconShare className="h-5 w-5 shrink-0" />
             <span>Compartir y retar</span>
@@ -735,7 +735,7 @@ function VictoryOverlay({
             aria-label="Volver al lobby"
             title="Volver al lobby"
             className={[
-              'victory-exit-btn inline-flex items-center justify-center gap-2 rounded-2xl border-[3px] px-8 py-4 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97]',
+              'victory-exit-btn inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl border-[3px] px-8 py-4 text-sm font-black uppercase tracking-wider transition-all active:scale-[0.97] sm:min-w-[220px]',
               isWin
                 ? 'border-amber-400 bg-gradient-to-b from-amber-400 to-amber-700 text-[#1c0f00] shadow-xl shadow-amber-900/50 hover:border-amber-200 hover:from-amber-300 hover:to-amber-600 hover:shadow-amber-800/60 dark:border-amber-300 dark:from-amber-400 dark:to-amber-600 dark:text-[#1c0f00] dark:shadow-[0_4px_24px_rgba(251,191,36,0.6)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-500 dark:hover:shadow-[0_4px_32px_rgba(251,191,36,0.75)]'
                 : 'border-amber-400 bg-gradient-to-b from-amber-500 to-amber-700 text-white shadow-xl shadow-amber-900/50 hover:border-amber-200 hover:from-amber-400 hover:to-amber-600 active:scale-[0.97] dark:border-amber-300 dark:from-amber-400 dark:to-amber-600 dark:text-white dark:shadow-[0_4px_24px_rgba(251,191,36,0.6)] dark:hover:border-amber-200 dark:hover:from-amber-300 dark:hover:to-amber-500 dark:hover:shadow-[0_4px_32px_rgba(251,191,36,0.75)]'
@@ -750,7 +750,7 @@ function VictoryOverlay({
               onClick={onNewGame}
               aria-label="Nueva partida"
               title="Nueva partida"
-              className="victory-new-game-btn animate-pulse inline-flex items-center justify-center gap-2 rounded-2xl border-[3px] border-emerald-400 bg-gradient-to-b from-emerald-500 to-emerald-800 px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-xl shadow-emerald-900/60 transition-all hover:border-emerald-200 hover:from-emerald-400 hover:to-emerald-700 hover:shadow-emerald-800/70 hover:animate-none active:scale-[0.97] dark:border-emerald-300 dark:from-emerald-400 dark:to-emerald-700 dark:text-[#022c22] dark:shadow-[0_4px_28px_rgba(52,211,153,0.7)] dark:hover:border-emerald-100 dark:hover:from-emerald-300 dark:hover:to-emerald-600 dark:hover:shadow-[0_4px_36px_rgba(52,211,153,0.85)] dark:hover:animate-none"
+              className="victory-new-game-btn inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl border-[3px] border-emerald-400 bg-gradient-to-b from-emerald-500 to-emerald-800 px-8 py-4 text-sm font-black uppercase tracking-wider text-white shadow-xl shadow-emerald-900/60 transition-all hover:border-emerald-200 hover:from-emerald-400 hover:to-emerald-700 hover:shadow-emerald-800/70 active:scale-[0.97] sm:min-w-[220px] dark:border-emerald-300 dark:from-emerald-400 dark:to-emerald-700 dark:text-[#022c22] dark:shadow-[0_4px_28px_rgba(52,211,153,0.7)] dark:hover:border-emerald-100 dark:hover:from-emerald-300 dark:hover:to-emerald-600 dark:hover:shadow-[0_4px_36px_rgba(52,211,153,0.85)]"
             >
               <IconPlus className="h-5 w-5 shrink-0" />
               <span>Nueva partida</span>

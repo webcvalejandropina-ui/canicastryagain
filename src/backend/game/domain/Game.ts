@@ -192,10 +192,7 @@ export class Game {
 
     this.state.moveHistory.push(move);
 
-    const totalBalls = this.state.rows.reduce(
-      (sum, row) => sum + row.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
-      0
-    );
+    const totalBalls = this.getTotalBalls();
     if (totalBalls === 0) {
       this.state.status = 'finished';
       this.state.winner = playerNumber === 1 ? 2 : 1;
@@ -203,11 +200,22 @@ export class Game {
       return { gameOver: true, winner: this.state.winner };
     }
 
-    // Solo marcar la fila como "tocada por el rival" si se VACIÓ (quedan 0 canicas).
-    // Esto permite la estrategia misère: si el rival solo "tocó" sin vaciar, puedes completar la fila.
     const marblesAfter = marblesBefore - input.removeCount;
     this.state.lastTouchedRowIndex = marblesAfter === 0 ? input.rowIndex : null;
-    this.state.currentTurn = this.state.currentTurn === 1 ? 2 : 1;
+
+    const nextPlayer = this.state.currentTurn === 1 ? 2 : 1;
+    const forcedWinner = this.computeForcedWinner(nextPlayer);
+    if (forcedWinner !== null) {
+      this.state.status = 'finished';
+      this.state.winner = forcedWinner;
+      this.state.currentTurn = nextPlayer;
+      this.state.forcedRowIndex = null;
+      this.state.turnDieValue = null;
+      this.touch();
+      return { gameOver: true, winner: forcedWinner };
+    }
+
+    this.state.currentTurn = nextPlayer;
     this.state.forcedRowIndex = null;
     this.state.turnDieValue = null;
     this.touch();
@@ -296,10 +304,7 @@ export class Game {
       affectedCount: affected.length
     });
 
-    const totalBalls = this.state.rows.reduce(
-      (sum, row) => sum + row.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
-      0
-    );
+    const totalBalls = this.getTotalBalls();
 
     if (totalBalls === 0) {
       this.state.status = 'finished';
@@ -315,8 +320,21 @@ export class Game {
       return { gameOver: true, winner: this.state.winner, dice: { power, affected } };
     }
 
+    const nextPlayer = this.state.currentTurn === 1 ? 2 : 1;
+    const forcedWinner = this.computeForcedWinner(nextPlayer);
+    if (forcedWinner !== null) {
+      this.state.status = 'finished';
+      this.state.winner = forcedWinner;
+      this.state.currentTurn = nextPlayer;
+      this.state.lastTouchedRowIndex = null;
+      this.state.forcedRowIndex = null;
+      this.state.turnDieValue = null;
+      this.touch();
+      return { gameOver: true, winner: this.state.winner, dice: { power, affected } };
+    }
+
     this.state.lastTouchedRowIndex = null;
-    this.state.currentTurn = this.state.currentTurn === 1 ? 2 : 1;
+    this.state.currentTurn = nextPlayer;
     this.state.forcedRowIndex = null;
     this.state.turnDieValue = null;
     this.touch();
@@ -452,7 +470,6 @@ export class Game {
       throw new AppError('Rango fuera de la fila', 400, 'OUT_OF_ROW_RANGE');
     }
 
-    // Todas las canicas seleccionadas deben existir y ser contiguas (sin huecos)
     for (let offset = 0; offset < removeCount; offset += 1) {
       const cellIndex = startIndex + offset;
       if (row[cellIndex] !== 1) {
@@ -460,13 +477,8 @@ export class Game {
       }
     }
 
-    // Regla de fila bloqueada (misère): no puedes vaciar una fila que el rival tocó en el turno anterior.
-    // EXCEPCIÓN: si es la última canica del tablero, sí se puede (el que la toma pierde).
     const rowRemainingAfterMove = row.filter((c) => c === 1).length - removeCount;
-    const totalBalls = this.state.rows.reduce(
-      (sum, r) => sum + r.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
-      0
-    );
+    const totalBalls = this.getTotalBalls();
     const isLastBall = totalBalls === removeCount && rowRemainingAfterMove === 0;
     if (this.state.lastTouchedRowIndex === rowIndex && rowRemainingAfterMove === 0 && !isLastBall) {
       throw new AppError(
@@ -477,8 +489,80 @@ export class Game {
     }
   }
 
+  private computeForcedWinner(nextPlayer: PlayerNumber): PlayerNumber | null {
+    if (!this.hasAnyLegalMove()) {
+      return nextPlayer === 1 ? 2 : 1;
+    }
+    return null;
+  }
+
+  private hasAnyLegalMove(): boolean {
+    const turnLimit = toTurnLimit(this.state.moveHistory.length);
+    const totalBalls = this.getTotalBalls();
+
+    for (let rowIndex = 0; rowIndex < this.state.rows.length; rowIndex += 1) {
+      const row = this.state.rows[rowIndex];
+      const activeIndexes = row
+        .map((cell, index) => (cell === 1 ? index : -1))
+        .filter((index) => index >= 0);
+
+      if (activeIndexes.length === 0) continue;
+
+      let segStart = -1;
+      let prev = -1;
+      const segments: Array<{ start: number; end: number }> = [];
+      for (const index of activeIndexes) {
+        if (segStart === -1) {
+          segStart = index;
+          prev = index;
+          continue;
+        }
+        if (index === prev + 1) {
+          prev = index;
+          continue;
+        }
+        segments.push({ start: segStart, end: prev });
+        segStart = index;
+        prev = index;
+      }
+      if (segStart !== -1) {
+        segments.push({ start: segStart, end: prev });
+      }
+
+      const activeCount = activeIndexes.length;
+      for (const segment of segments) {
+        const maxLen = Math.min(turnLimit, segment.end - segment.start + 1);
+        for (let len = 1; len <= maxLen; len += 1) {
+          const lastStart = segment.end - len + 1;
+          for (let start = segment.start; start <= lastStart; start += 1) {
+            const emptiesRow = activeCount === len;
+            const takesLastBall = emptiesRow && totalBalls === len;
+            const blockedByLastTouched =
+              this.state.lastTouchedRowIndex === rowIndex &&
+              emptiesRow &&
+              !takesLastBall;
+
+            if (blockedByLastTouched) {
+              continue;
+            }
+
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private getTotalBalls(): number {
+    return this.state.rows.reduce(
+      (sum, row) => sum + row.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
+      0
+    );
+  }
+
   private touch(): void {
     this.state.updatedAt = nowIsoDate();
   }
-
 }

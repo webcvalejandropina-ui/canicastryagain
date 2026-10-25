@@ -42,7 +42,7 @@
     "test:transport": "node --import tsx scripts/test-game-delta.ts",
     "test:pwa": "node scripts/test-pwa.mjs",
     "test:inactivity": "node --import tsx scripts/test-inactivity.ts",
-    "test:security": "node --import tsx scripts/test-multigame-security.ts && node --import tsx scripts/test-multigame-race.ts",
+    "test:security": "node --import tsx scripts/test-invitation-secret.ts && node --import tsx scripts/test-multigame-security.ts && node --import tsx scripts/test-multigame-race.ts",
     "video:render": "node docs/video/recursos/preparar.mjs && python3 docs/video/recursos/montar.py",
     "video:preview": "python3 docs/video/recursos/servir.py"
   },

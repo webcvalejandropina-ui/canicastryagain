@@ -2,6 +2,8 @@
 
 **Deja la última canica a tu rival.** Un duelo de estrategia para dos, con canicas de cristal, un dado de ocho poderes y escenarios que acompañan las estaciones y tus celebraciones.
 
+Repositorio oficial: **[webcvalejandropina-ui/canicastryagain](https://github.com/webcvalejandropina-ui/canicastryagain)**.
+
 Juega desde el móvil, la tableta o el ordenador. Invita a una persona por enlace o código, o practica contra el ordenador sin registrarte.
 
 ![Partida en ordenador con el escenario de La Línea y Gibraltar](docs/images/partida-gibraltar.jpg)
@@ -290,6 +292,7 @@ El puerto de producción es **3000** por defecto. Puedes cambiarlo con `PORT`. L
 | `PUBLIC_ORIGIN` | Origen público completo, por ejemplo `https://canicas.example.com`. Necesario tras un proxy HTTPS y para enlaces públicos coherentes. Vacío solo para desarrollo HTTP local. |
 | `SQLITE_PATH` | Ruta a SQLite en almacenamiento local persistente. En Docker se utiliza `/app/data/game.db`. |
 | `GAME_STREAM_LIMIT` | Máximo de conexiones SSE por proceso; el ejemplo utiliza `1000`. Al alcanzar el límite se emplea transporte HTTP alternativo. No equivale a una garantía de mil jugadores. |
+| `INVITE_TOKEN_SECRET` | Opcional: clave de firma de al menos 32 bytes aleatorios. Si se omite, se genera una clave privada por instalación, persistida en SQLite y compartida entre procesos. |
 | `PORT` | Puerto HTTP del proceso en producción; `3000` por defecto. |
 
 Usa [.env.example](.env.example) como referencia. No subas `.env.local`, contraseñas, sesiones ni bases reales al repositorio.

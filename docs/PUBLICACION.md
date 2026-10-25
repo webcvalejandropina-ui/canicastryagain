@@ -2,7 +2,11 @@
 
 El código, recursos originales, documentación y vídeo se versionan. No se incluyen bases SQLite, sesiones, variables privadas, compilaciones `.next*`, archivos ZIP del ordenador ni capturas/logs de QA fuera de los ejemplos seleccionados para la documentación.
 
-El remoto configurado es `https://github.com/webcvalejandropina-ui/juego-bolitas.git`. Se conserva su visibilidad privada; publicar cambios no hace público el repositorio.
+El repositorio de publicación es [webcvalejandropina-ui/canicastryagain](https://github.com/webcvalejandropina-ui/canicastryagain), de visibilidad pública. Solo se publica código y material seleccionado: nunca la base de datos ni la configuración privada de una instalación.
+
+## Protecciones del repositorio
+
+Se verificaron la detección de secretos y la protección de subidas de GitHub, ambas activas. Las alertas de vulnerabilidades de dependencias están activadas. Estas protecciones complementan las pruebas locales; no sustituyen la revisión del código ni la configuración segura del servidor.
 
 ## Integración continua
 

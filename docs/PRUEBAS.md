@@ -41,3 +41,11 @@ El test entre procesos recibe `CONNECTIVITY_URL` y `CONNECTIVITY_OTHER_URL`, que
 Se verificó también `npm ci` y `npm run build` sobre una exportación limpia de los archivos preparados para GitHub, sin `.env`, bases de datos ni tipos generados del ordenador. La auditoría de dependencias de producción indicó cero vulnerabilidades.
 
 La configuración Docker supera su comprobación automatizada. La imagen no se ha construido ni ejecutado en esta revisión porque el daemon de Docker estaba apagado; esto no se presenta como una validación del contenedor en ejecución.
+
+## Revisión de seguridad y publicación: 25 de octubre de 2026
+
+- Clave de firma de invitaciones por instalación: generación criptográfica, persistencia privada, validación de la variable opcional y rechazo de firmas con la antigua clave pública. Prueba incluida en `test:security`.
+- Superadas las comprobaciones de sesiones, roles de administración, CSRF, límites de petición, carreras entre procesos, invitaciones privadas y perfiles.
+- Superadas las demás áreas de `npm test`; los smoke tests que abren puertos locales se repitieron con permiso de red local y pasaron en desarrollo y producción. Compilación de producción completada.
+- `npm audit --omit=dev --audit-level=high`: cero vulnerabilidades conocidas en dependencias de producción en esta revisión.
+- Revisión de archivos versionados: sin bases SQLite, archivos de entorno privados ni coincidencias con los patrones de claves privadas y tokens comprobados. No sustituye una auditoría independiente ni garantiza ausencia de vulnerabilidades.

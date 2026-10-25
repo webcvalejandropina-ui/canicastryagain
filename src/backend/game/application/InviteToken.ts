@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 import { AppError } from '@/backend/shared/domain/AppError';
+import { invitationSecret } from '@/backend/shared/infrastructure/invitationSecret';
 
 type InviteTokenPayload = {
   code: string;
@@ -8,11 +9,6 @@ type InviteTokenPayload = {
 };
 
 const TOKEN_PREFIX = 'cta1';
-const DEFAULT_SECRET = 'canicas-try-again-dev-secret-change-me';
-
-function getSecret(): string {
-  return process.env.INVITE_TOKEN_SECRET?.trim() || DEFAULT_SECRET;
-}
 
 function toBase64Url(input: string): string {
   return Buffer.from(input, 'utf8').toString('base64url');
@@ -23,7 +19,7 @@ function fromBase64Url(input: string): string {
 }
 
 function sign(payloadSegment: string): string {
-  const secret = getSecret();
+  const secret = invitationSecret();
   return createHmac('sha256', secret).update(payloadSegment).digest('base64url');
 }
 

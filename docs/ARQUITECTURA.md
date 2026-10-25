@@ -34,3 +34,9 @@ La sincronización de las partidas conserva SSE con deltas, revisiones, rechazo 
 `src/backend/game/domain` define reglas, poderes y física. Los casos de uso validan cada acción y la infraestructura persiste en SQLite. Las rutas HTTP autentican al actor mediante cookies HttpOnly; un identificador enviado en JSON no concede acceso. El cliente se organiza por funcionalidades y aplica snapshots/deltas con revisiones para evitar retrocesos o dobles jugadas.
 
 La sesión de registro y el perfil privado recuperan el cumpleaños; la fecha local antigua no es una fuente de identidad. Solo se guarda MM-DD. La celebración utiliza el calendario civil de Madrid y nunca modifica las reglas ni las probabilidades del dado.
+
+## Cristal habitual y materiales de eventos
+
+La canica general usa celeste y blanco, inspirados en La Línea. `artwork/glass/marble-linea.png` genera el WebP habitual y los iconos de marca; `marble-source.png` conserva el material base de los eventos. El manifiesto `glassAssets.json` separa `crystal` y `eventCrystal`: logo y satélite usan siempre el habitual, mientras que tablero, tirada antigua y dado pueden adoptar el material estacional. La vista general y la exploración 3D comparten la paleta habitual. Las áreas de interacción y los colores que identifican a cada jugador no cambian.
+
+`npm run assets:glass` codifica los dos materiales (menos de 16 KB cada uno); `node scripts/generate-brand-assets.mjs` actualiza favicon, iconos instalables y vista previa para compartir. No hay procesamiento de imágenes durante la partida.

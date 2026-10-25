@@ -25,7 +25,7 @@ export const WORLDS = {
     motifs: ["none", "none"], dice: "none", magic: [],
     light: ["#e5efe4", "#cadfce", "#a0c2af", "#789c80", "#a4c678", "#9c8467", "#c7ae80", "#786d60", "#fff0ba"],
     dark: ["#101e24", "#23383c", "#334f4c", "#3a5b48", "#809d59", "#443c32", "#7d7151", "#4c5148", "#d6e4ac"],
-    material: {"orb":["#f1fffa","#88bfc1","#244c6670","#132b3e","#79c6bc","#e3e9c2","#031a26","#7ab9cc26","#10281f"],"lightOrb":["#fff","#c4ddd0","#7fa496","#305d59","#8dc0a6","#ecf5d8","#2c615b","#326f5520","#10281f"],"die":["#d1dabd","#adc5a0","#354d39","#102519","#080c0a","#e7ee55","#c8e350","#51301d"],"ui":{"dark":["#08090b","#101411","#151c17","#e7ee55","#182008"],"light":["#f4f5ef","#fbfcf6","#e5eadf","#bfcc35","#182008"]}},
+    material: {"orb":["#fff","#83c9ed","#388fc0","#17445f","#d7f3ff","#fff","#10314b","#83d1f12b","#153d56"],"lightOrb":["#fff","#b4e2f7","#68b5dc","#28688d","#e5f8ff","#fff","#315f7b","#76bee524","#153d56"],"die":["#d1dabd","#adc5a0","#354d39","#102519","#080c0a","#e7ee55","#c8e350","#51301d"],"ui":{"dark":["#08090b","#101411","#151c17","#e7ee55","#182008"],"light":["#f4f5ef","#fbfcf6","#e5eadf","#bfcc35","#182008"]}},
   },
   halloween: {
     label: "Halloween", description: "Islas embrujadas, una mansión y niebla de medianoche.", caption: "Truco o trato", landscape: "haunted",

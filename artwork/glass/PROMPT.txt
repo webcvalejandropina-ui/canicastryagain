@@ -1,2 +1,7 @@
 Created with the built-in imagegen tool, using the user's supplied glass-marble image as material reference.
 Prompt: Exactly one photorealistic spherical emerald-teal glass marble, transparent alpha outside the circle, delicate flowing internal refracted ribbons, warm sunlit meadow reflections, golden rim caustics, white specular highlights, centered front view, 94% of square canvas. No floor, cast shadow, scene outside the sphere, text or other objects. Match the emerald marble in the reference. Asset optimized offline to 160px WebP, with color variants rendered in CSS; no live rendering on the server.
+
+
+Default La Línea marble (marble-linea.png): edited with the built-in imagegen tool from marble-source.png.
+Prompt: Preserve one centered photorealistic spherical glass marble on a transparent alpha background. Replace emerald green and gold with sky blue (#81cbed) and pearl white. Two clear flowing internal ribbons, tiny air bubbles, realistic refraction, crisp white highlights and icy blue shaded edges. Preserve the premium glass silhouette; recognizable at 40px. No green/gold material, floor, external shadow, text or extra objects.
+The emerald source remains the base for seasonal materials. Both runtime assets are encoded offline as immutable 160px WebP.

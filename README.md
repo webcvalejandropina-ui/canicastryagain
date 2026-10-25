@@ -1,12 +1,12 @@
 # Canicas Try Again
 
-**Deja la última canica a tu rival.** Un duelo de estrategia para dos, con canicas de cristal, un dado de ocho poderes y escenarios que acompañan las estaciones y tus celebraciones.
+**Deja la última canica a tu rival.** Un duelo de estrategia para dos, con canicas de cristal celeste y blanco inspiradas en La Línea, un dado de ocho poderes y escenarios que acompañan las estaciones y tus celebraciones.
 
 Repositorio oficial: **[webcvalejandropina-ui/canicastryagain](https://github.com/webcvalejandropina-ui/canicastryagain)**.
 
 Juega desde el móvil, la tableta o el ordenador. Invita a una persona por enlace o código, o practica contra el ordenador sin registrarte.
 
-![Partida en ordenador con el escenario de La Línea y Gibraltar](docs/images/partida-gibraltar.jpg)
+![Partida en ordenador con el escenario de La Línea y Gibraltar](docs/images/partida-linea.png)
 
 **[Ver cómo se juega en 59 segundos](docs/video/CANICAS_COMO_JUGAR_59s.mp4)** · [Guion y subtítulos](docs/video/guion/) · [Arquitectura](docs/ARQUITECTURA.md) · [Pruebas](docs/PRUEBAS.md)
 

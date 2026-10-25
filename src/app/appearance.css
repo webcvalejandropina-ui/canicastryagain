@@ -20,14 +20,14 @@
   --app-danger-bg: #33221e;
   --app-disabled: #202620;
   --app-disabled-ink: #969f90;
-  --orb-top: #f1fffa;
-  --orb-mid: #88bfc1;
-  --orb-body: #244c6670;
-  --orb-low: #132b3e;
-  --orb-edge: #79c6bc;
-  --orb-glint: #e3e9c2;
-  --orb-shadow: #031a26;
-  --orb-aura: #7ab9cc26;
+  --orb-top: #fff;
+  --orb-mid: #83c9ed;
+  --orb-body: #388fc0;
+  --orb-low: #17445f;
+  --orb-edge: #d7f3ff;
+  --orb-glint: #fff;
+  --orb-shadow: #10314b;
+  --orb-aura: #83d1f12b;
   --orb-ink: #10281f;
 }
 html[data-theme="light"] {
@@ -52,13 +52,13 @@ html[data-theme="light"] {
   --app-disabled: #dce3d5;
   --app-disabled-ink: #616f60;
   --orb-top: #fff;
-  --orb-mid: #c4ddd0;
-  --orb-body: #7fa496;
-  --orb-low: #305d59;
-  --orb-edge: #8dc0a6;
-  --orb-glint: #ecf5d8;
-  --orb-shadow: #2c615b;
-  --orb-aura: #326f5520;
+  --orb-mid: #b4e2f7;
+  --orb-body: #68b5dc;
+  --orb-low: #28688d;
+  --orb-edge: #e5f8ff;
+  --orb-glint: #fff;
+  --orb-shadow: #315f7b;
+  --orb-aura: #76bee524;
 }
 /* Automatic calendar skins only affect living glass. Player colors always retain meaning. */
 html[data-season="halloween"] {

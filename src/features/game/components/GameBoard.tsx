@@ -923,10 +923,10 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2(0, 0);
   const activeTexture = createMarbleTexture(THREE, {
-    base: '#f3a17e',
-    veins: '#ffdec5',
-    highlight: '#fff5e0',
-    shadow: '#713d35'
+    base: '#83c9ed',
+    veins: '#d7f3ff',
+    highlight: '#ffffff',
+    shadow: '#10314b'
   });
   const removedTexture = createMarbleTexture(THREE, {
     base: '#64748b',

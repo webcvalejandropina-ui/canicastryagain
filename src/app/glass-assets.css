@@ -1,1 +1,1 @@
-:root{--glass-image:url("/glass/crystal.aaf794a68863.webp")}
+:root{--glass-base-image:url("/glass/crystal.3946e22c00de.webp");--glass-event-image:url("/glass/crystal.aaf794a68863.webp");--glass-image:var(--glass-base-image)}

@@ -1,0 +1,88 @@
+1
+00:00:00,100 --> 00:00:02,267
+En Canicas, quien quita la última pierde.
+
+2
+00:00:03,100 --> 00:00:06,080
+Elige hasta cien filas. Invita por WhatsApp o código.
+
+3
+00:00:07,100 --> 00:00:08,815
+Acerca la mesa o pulsa Ver todo.
+
+4
+00:00:11,100 --> 00:00:13,521
+Alternad turnos. Elige canicas seguidas de una
+
+5
+00:00:13,521 --> 00:00:14,905
+fila y pulsa Quitar.
+
+6
+00:00:17,100 --> 00:00:20,528
+Primero hasta una, luego dos, tres. Puedes quitar menos.
+
+7
+00:00:21,100 --> 00:00:23,349
+No puedes saltar huecos en una jugada normal.
+
+8
+00:00:24,100 --> 00:00:26,025
+Un dado por persona. Ocho
+
+9
+00:00:26,025 --> 00:00:27,950
+poderes, igual probabilidad. Consume turno.
+
+10
+00:00:28,100 --> 00:00:31,443
+Elimina filas, canicas o diagonales. Avalancha baja por
+
+11
+00:00:31,443 --> 00:00:33,950
+ramas; Fantasma salta huecos; Remolino mezcla.
+
+12
+00:00:34,100 --> 00:00:36,119
+Resurrección devuelve entre una y todas
+
+13
+00:00:36,119 --> 00:00:37,465
+las eliminadas, al azar.
+
+14
+00:00:38,100 --> 00:00:41,544
+Con Tirada antigua, elige una canica. Apunta con dedo o
+
+15
+00:00:41,544 --> 00:00:43,611
+ratón, mantén para cargar y suelta.
+
+16
+00:00:43,611 --> 00:00:44,988
+Los choques gastan fuerza.
+
+17
+00:00:46,100 --> 00:00:48,059
+Hasta cinco partidas. Caducan tras
+
+18
+00:00:48,059 --> 00:00:49,626
+veinticuatro horas sin jugadas.
+
+19
+00:00:50,100 --> 00:00:52,570
+Cambia de paisaje. Con cuenta, tu cumpleaños
+
+20
+00:00:52,570 --> 00:00:53,981
+se celebra tres días.
+
+21
+00:00:55,100 --> 00:00:57,403
+Deja la última al rival. También con
+
+22
+00:00:57,403 --> 00:00:58,719
+poderes, la última pierde.
+

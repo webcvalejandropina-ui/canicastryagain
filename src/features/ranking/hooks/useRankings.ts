@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { getRankings } from '@/features/game/api/gameApi';
+import { ApiRequestError,getRankings } from '@/features/game/api/gameApi';
 import { RankingEntry } from '@/features/game/types';
 
 export function useRankings(): {
@@ -23,7 +23,9 @@ export function useRankings(): {
       const rows = await getRankings();
       setRankings(rows);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo cargar el ranking');
+      setError(err instanceof ApiRequestError && ['NETWORK_ERROR','REQUEST_TIMEOUT'].includes(err.code??'')
+        ? 'No se pudo actualizar la clasificación. Comprueba tu conexión.'
+        : err instanceof Error ? err.message : 'No se pudo cargar la clasificación');
     } finally {
       setLoading(false);
     }

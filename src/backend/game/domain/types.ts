@@ -1,3 +1,7 @@
+import type { DicePowerName, TargetPower, DiceTarget, ShuffledRow } from '@/backend/game/domain/DicePowers';
+export type { DicePowerName, TargetPower, DiceTarget } from '@/backend/game/domain/DicePowers';
+import type { AncientShot, AncientFlight } from "@/backend/game/domain/AncientShot";
+export type { AncientShot } from "@/backend/game/domain/AncientShot";
 export type GameStatus = 'waiting' | 'playing' | 'finished';
 
 export type PlayerNumber = 1 | 2;
@@ -15,19 +19,28 @@ export type Move = {
   timestamp: string;
   /** Una sola entrada por tirada de dado (no una por celda afectada). */
   fromDice?: boolean;
+  dice?: DiceResult;
 };
 
-export type DicePowerName = 'bomba' | 'rayo' | 'diagonal' | 'resurreccion';
+
 
 export type DiceResult = {
   power: DicePowerName;
+  pending?: boolean;
+  shot?: AncientShot;
+  flight?: AncientFlight;
+  target?: DiceTarget;
+  shuffledRows?: ShuffledRow[];
   affected: Array<{ row: number; col: number }>;
 };
 
 export type GamePrimitives = {
+  revision?: number;
   id: string;
   code: string;
   inviteVersion: number;
+  privateInviteToken?: string | null;
+  privateInviteExpiresAt?: string | null;
   numRows: number;
   /**
    * Representa cada fila como un array de celdas.
@@ -37,6 +50,8 @@ export type GamePrimitives = {
   rows: number[][];
   status: GameStatus;
   currentTurn: PlayerNumber;
+  pendingAncientShot?: boolean;
+  pendingTargetPower?: TargetPower | null;
   forcedRowIndex: number | null;
   turnDieValue: number | null;
   lastTouchedRowIndex: number | null;

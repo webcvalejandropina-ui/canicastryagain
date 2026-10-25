@@ -1,0 +1,970 @@
+/* Shared surfaces keep the lobby, the table and its drawers in the same color mode. */
+:root {
+  --app-scheme: dark;
+  --app-bg: #08090b;
+  --app-ink: #f5f5ed;
+  --app-muted: #a6ada5;
+  --app-surface: #151c17;
+  --app-panel: #101411;
+  --app-raised: #222c21;
+  --app-line: #ffffff1c;
+  --app-accent: #e7ee55;
+  --app-accent-ink: #182008;
+  --app-shadow: #0009;
+  --app-overlay: #08090bf2;
+  --app-p1: #62d8f3;
+  --app-p1-deep: #1a6a9d;
+  --app-p2: #ff9b86;
+  --app-p2-deep: #a73544;
+  --app-danger: #ffaf95;
+  --app-danger-bg: #33221e;
+  --app-disabled: #202620;
+  --app-disabled-ink: #969f90;
+  --orb-top: #f1fffa;
+  --orb-mid: #88bfc1;
+  --orb-body: #244c6670;
+  --orb-low: #132b3e;
+  --orb-edge: #79c6bc;
+  --orb-glint: #e3e9c2;
+  --orb-shadow: #031a26;
+  --orb-aura: #7ab9cc26;
+  --orb-ink: #10281f;
+}
+html[data-theme="light"] {
+  --app-scheme: light;
+  --app-bg: #f4f5ef;
+  --app-ink: #19251e;
+  --app-muted: #56675c;
+  --app-surface: #e5eadf;
+  --app-panel: #fbfcf6;
+  --app-raised: #fff;
+  --app-line: #233c2726;
+  --app-accent: #bfcc35;
+  --app-accent-ink: #182008;
+  --app-shadow: #1d3c2926;
+  --app-overlay: #f4f5eff5;
+  --app-p1: #006f89;
+  --app-p1-deep: #03495f;
+  --app-p2: #b83f2e;
+  --app-p2-deep: #782b24;
+  --app-danger: #9c3426;
+  --app-danger-bg: #f7e0d8;
+  --app-disabled: #dce3d5;
+  --app-disabled-ink: #616f60;
+  --orb-top: #fff;
+  --orb-mid: #c4ddd0;
+  --orb-body: #7fa496;
+  --orb-low: #305d59;
+  --orb-edge: #8dc0a6;
+  --orb-glint: #ecf5d8;
+  --orb-shadow: #2c615b;
+  --orb-aura: #326f5520;
+}
+/* Automatic calendar skins only affect living glass. Player colors always retain meaning. */
+html[data-season="halloween"] {
+  --orb-top: #fff4d1;
+  --orb-mid: #e8a763;
+  --orb-body: #b76a2c;
+  --orb-low: #5c301d;
+  --orb-edge: #ec9c48;
+  --orb-glint: #ffdc8a;
+  --orb-shadow: #57321e;
+  --orb-aura: #de8b3328;
+  --orb-ink: #48271b;
+}
+html[data-season="christmas"] {
+  --orb-top: #fffdf0;
+  --orb-mid: #d3ece2;
+  --orb-body: #488b80;
+  --orb-low: #173e44;
+  --orb-edge: #91d0b7;
+  --orb-glint: #f7edd0;
+  --orb-shadow: #153b41;
+  --orb-aura: #a4e4d326;
+  --orb-ink: #fff8dd;
+}
+html[data-season="summer"] {
+  --orb-top: #fffad5;
+  --orb-mid: #f0d486;
+  --orb-body: #be983d;
+  --orb-low: #58662c;
+  --orb-edge: #f7d775;
+  --orb-glint: #fff3ae;
+  --orb-shadow: #75672c;
+  --orb-aura: #f6d97328;
+  --orb-ink: #233b31;
+}
+.pocket-app .pocket-marble,
+.canicas-shell .preview-marble,
+.appearance-preview-orb {
+  background: radial-gradient(
+    ellipse at 29% 19%,
+    var(--orb-top) 0%,
+    var(--orb-top) 5%,
+    var(--orb-mid) 16%,
+    var(--orb-body) 38%,
+    var(--orb-low) 63%,
+    var(--orb-edge) 84%,
+    var(--orb-glint) 99%
+  );
+  box-shadow:
+    inset 0 0 0 0.7px #e2eee480,
+    inset -3px -5px 7px var(--orb-shadow),
+    0 6px 10px var(--app-shadow);
+}
+.pocket-app .marble-target.is-selected .pocket-marble,
+.canicas-shell .preview-marble.is-selected {
+  background: radial-gradient(
+    ellipse at 29% 19%,
+    #fff,
+    #ffffffa0 8%,
+    var(--self, var(--app-p1)) 30%,
+    var(--self-dark, var(--app-p1-deep)) 70%,
+    var(--self, var(--app-p1)) 99%
+  );
+}
+.pocket-app .marble-target.is-selected::after {
+  background: var(--self);
+  color: #091917;
+}
+html[data-theme="light"] .pocket-app .marble-target.is-selected::after {
+  color: #fff;
+}
+.seasonal-detail {
+  display: block;
+  position: absolute;
+  inset: 11%;
+  z-index: 2;
+  pointer-events: none;
+  color: var(--orb-ink);
+}
+.seasonal-detail svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.season-stem {
+  color: #506532;
+}
+.season-snow {
+  color: #fff9e3;
+  filter: drop-shadow(0 1px 1px #174a4555);
+}
+.season-sun {
+  color: #fff2ac;
+}
+.marble-target.is-selected .seasonal-detail {
+  opacity: 0.2;
+}
+.preview-marble {
+  position: relative;
+  overflow: hidden;
+}
+html[data-theme="light"] .pocket-app::before {
+  background:
+    radial-gradient(ellipse at 80% 45%, #a9c6bc30, transparent 60%),
+    radial-gradient(ellipse at 10% 85%, #e2d9b430, transparent 55%);
+}
+html[data-theme="light"] .pocket-board::before {
+  background: linear-gradient(90deg, transparent, #607e6630, transparent);
+  box-shadow: none;
+}
+html[data-theme="light"] .pocket-board::after {
+  background: radial-gradient(ellipse, #91b29d20, transparent 65%);
+}
+html[data-theme="light"] .thumb-dock {
+  background: linear-gradient(#f4f5ef00, var(--app-bg) 20%);
+}
+html[data-theme="light"] .remaining-counter strong {
+  color: var(--app-ink);
+  -webkit-text-stroke: 0;
+}
+html[data-theme="light"] .legend-live {
+  background: var(--orb-mid);
+  box-shadow: inset 0 0 0 1px #345a4c66;
+}
+html[data-theme="light"] .network-chip.state-live i,
+html[data-theme="light"] .network-chip.state-polling i {
+  background: #487a35;
+  box-shadow: none;
+}
+html[data-theme="light"] .thumb-dock::before {
+  -webkit-text-stroke-color: #63775b;
+}
+html[data-theme="light"] .thumb-dock.has-selection::before {
+  -webkit-text-stroke: 0;
+}
+html[data-theme="light"] .pocket-app .pocket-icon:hover {
+  color: #5c6818;
+}
+html[data-theme="light"] .dice-kicker {
+  color: #5e6815;
+}
+html[data-theme="light"] .dice-gesture {
+  color: #687d3d;
+}
+html[data-theme="light"] .dice-orbit {
+  border-color: #6c875b45;
+  box-shadow: none;
+}
+html[data-theme="light"] .dice-spark {
+  background: #697c22;
+  box-shadow: 0 0 5px #b3c75e;
+}
+html[data-theme="light"] .dice-scene::before {
+  background: radial-gradient(ellipse, #98b36c26, transparent 68%);
+}
+html[data-theme="light"] .power-card > svg {
+  color: #a14f35;
+}
+html[data-theme="light"] .power-rayo > svg {
+  color: #126782;
+}
+html[data-theme="light"] .power-diagonal > svg {
+  color: #775186;
+}
+html[data-theme="light"] .power-resurreccion > svg {
+  color: #55722a;
+}
+html[data-theme="light"] .power-impact {
+  color: #677b19;
+}
+html[data-theme="light"] .rule-hero strong {
+  color: #65731d;
+}
+html[data-theme="light"] .pocket-sheet::backdrop,
+html[data-theme="light"] .match-result::backdrop {
+  background: #22342342;
+}
+html[data-theme="light"] .match-result .result-medallion.is-win {
+  color: #677b19;
+}
+html[data-theme="light"] .pocket-app .network-notice {
+  color: #80501e;
+}
+.canicas-shell .ui-label {
+  color: var(--app-muted);
+}
+.canicas-shell .ui-input {
+  background: var(--app-raised);
+  color: var(--app-ink);
+  border-color: var(--app-line);
+}
+.canicas-shell .ui-input::placeholder {
+  color: var(--app-muted);
+}
+.canicas-shell .ui-button-secondary {
+  background: var(--app-surface);
+  color: var(--app-ink);
+  border-color: var(--app-line);
+  box-shadow: none;
+}
+.canicas-shell .ui-chip {
+  color: var(--app-muted);
+  border-color: var(--app-line);
+}
+.canicas-shell .ui-button-primary {
+  background: var(--app-accent);
+  color: var(--app-accent-ink);
+  box-shadow: none;
+}
+.canicas-shell .landing-login > p {
+  color: var(--app-muted);
+}
+.canicas-shell .landing-experience :focus-visible {
+  outline-color: var(--app-p1);
+}
+.canicas-shell .glass-panel [class*="text-brown"],
+.canicas-shell .glass-panel [class*="dark:text-dark"] {
+  color: var(--app-ink);
+}
+html[data-theme="light"] .canicas-shell .lobby-welcome-label,
+html[data-theme="light"] .canicas-shell .eyebrow {
+  color: #5d6f23;
+}
+html[data-theme="light"] .canicas-shell .header-play:hover,
+html[data-theme="light"] .canicas-shell .login-field button:hover {
+  background: #d3dc67;
+}
+html[data-theme="light"] .canicas-shell .brand-symbol i {
+  background: #819143;
+}
+/* Preferences use real pressed controls, not a hidden OS setting. */
+.appearance-trigger {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 44px;
+  padding: 0 !important;
+  color: var(--app-ink) !important;
+  background: transparent !important;
+  border: 0 !important;
+  cursor: pointer;
+}
+.appearance-trigger svg {
+  width: 22px;
+  height: 22px;
+}
+.appearance-trigger:focus-visible,
+.appearance-settings :focus-visible,
+.appearance-dialog :focus-visible {
+  outline: 2px solid var(--app-p1);
+  outline-offset: 3px;
+}
+.landing-header .appearance-trigger {
+  margin-left: auto;
+}
+.appearance-dialog {
+  width: calc(100% - 24px);
+  max-width: 480px;
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 24px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--app-panel);
+  color: var(--app-ink);
+  font:
+    14px Archivo,
+    sans-serif;
+  box-shadow: 0 16px 80px var(--app-shadow);
+  overflow: auto;
+  color-scheme: var(--app-scheme);
+}
+.appearance-dialog::backdrop {
+  background: #17201a77;
+  backdrop-filter: blur(8px);
+}
+.appearance-dialog > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.appearance-dialog h2 {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.appearance-dialog > header > button {
+  width: 40px;
+  height: 40px;
+  font-size: 28px;
+  background: transparent;
+  color: var(--app-ink);
+  border: 0;
+  cursor: pointer;
+}
+.appearance-settings fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 25px;
+  min-width: 0;
+}
+.appearance-settings legend {
+  margin-bottom: 13px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.appearance-colors {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.appearance-colors button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 6px;
+  border: 1px solid var(--app-line);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--app-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.appearance-colors button[aria-pressed="true"] {
+  border-color: var(--app-p1);
+  background: color-mix(in srgb, var(--app-p1) 8%, transparent);
+  color: var(--app-ink);
+}
+.appearance-swatch {
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px #7a837a50;
+}
+.swatch-system {
+  background: linear-gradient(90deg, #f5f5ec 50%, #1a211c 50%);
+}
+.swatch-light {
+  background: #f5f5ec;
+}
+.swatch-dark {
+  background: #1a211c;
+}
+.appearance-settings p {
+  color: var(--app-muted);
+  font-size: 11px;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+.appearance-select-label {
+  display: block;
+  font-size: 11px;
+  color: var(--app-muted);
+  margin-bottom: 8px;
+}
+.appearance-settings select {
+  width: 100%;
+  min-height: 46px;
+  padding: 9px 34px 9px 12px;
+  border: 1px solid var(--app-line);
+  border-radius: 4px;
+  background: var(--app-surface);
+  color: var(--app-ink);
+  font:
+    13px Archivo,
+    sans-serif;
+}
+.appearance-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  min-width: 0;
+}
+.appearance-preview-orb {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.appearance-preview strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+.appearance-preview p {
+  margin-top: 4px;
+}
+.appearance-done {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--app-accent);
+  color: var(--app-accent-ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  .canicas-shell .landing-header {
+    gap: 12px;
+    padding-inline: 18px;
+  }
+  .canicas-shell .landing-brand {
+    font-size: 21px;
+    gap: 7px;
+  }
+  .canicas-shell .header-play {
+    font-size: 10px;
+    padding: 11px 10px;
+    gap: 8px;
+  }
+  .appearance-dialog {
+    padding: 20px;
+  }
+  .appearance-preview-orb {
+    width: 52px;
+    height: 52px;
+  }
+}
+@media (max-width: 350px) {
+  .canicas-shell .landing-brand {
+    font-size: 18px;
+  }
+  .canicas-shell .brand-symbol {
+    display: none;
+  }
+  .canicas-shell .brand-subtitle {
+    font-size: 6px;
+  }
+  .appearance-colors {
+    gap: 6px;
+  }
+  .appearance-preview {
+    gap: 12px;
+  }
+}
+
+html[data-theme] .board-canvas-enter {
+  background: transparent;
+}
+
+/* The event is a material, not a different power: all glyphs stay recognizable. */
+:root {
+  --die-top: #d1dabd;
+  --die-edge: #adc5a0;
+  --die-body: #354d39;
+  --die-deep: #102519;
+  --die-side: #080c0a;
+  --die-pip: #e7ee55;
+  --die-glow: #c8e350;
+  --die-cutout: #51301d;
+}
+html[data-season="halloween"] {
+  --die-top: #f6d297;
+  --die-edge: #e4ae72;
+  --die-body: #995126;
+  --die-deep: #3b211c;
+  --die-side: #21191b;
+  --die-pip: #ffd38c;
+  --die-glow: #ee9954;
+}
+html[data-season="christmas"] {
+  --die-top: #edf9f4;
+  --die-edge: #c2e2de;
+  --die-body: #407b77;
+  --die-deep: #143b41;
+  --die-side: #0e252e;
+  --die-pip: #fff4db;
+  --die-glow: #b0e7dc;
+}
+html[data-season="summer"] {
+  --die-top: #fff0ae;
+  --die-edge: #e4d6a0;
+  --die-body: #388e8d;
+  --die-deep: #125258;
+  --die-side: #143e45;
+  --die-pip: #ffe48a;
+  --die-glow: #efd27f;
+}
+.dice-scene[data-season] .dice-face {
+  color: var(--die-pip);
+  background: linear-gradient(
+    135deg,
+    var(--die-edge),
+    var(--die-body) 24%,
+    var(--die-deep) 70%,
+    var(--die-edge)
+  );
+  box-shadow:
+    inset 1px 1px 1px #fff9,
+    inset -2px -2px 3px #0009,
+    0 0 2px color-mix(in srgb, var(--die-glow) 30%, transparent);
+}
+.dice-scene[data-season] .dice-face.face-front {
+  background: linear-gradient(
+    135deg,
+    var(--die-top),
+    var(--die-body) 22%,
+    var(--die-deep) 64%,
+    var(--die-edge)
+  );
+}
+.dice-scene[data-season] .dice-face.face-right {
+  background: linear-gradient(
+    125deg,
+    var(--die-body),
+    var(--die-deep) 45%,
+    var(--die-side) 85%
+  );
+}
+.dice-scene[data-season] .dice-face.face-top {
+  background: linear-gradient(
+    135deg,
+    var(--die-top),
+    var(--die-edge) 40%,
+    var(--die-body)
+  );
+}
+.dice-scene[data-season] .dice-face::before {
+  border-color: color-mix(in srgb, var(--die-top) 28%, transparent);
+}
+.dice-scene[data-season] .dice-face > svg {
+  filter: drop-shadow(
+    0 0 4px color-mix(in srgb, var(--die-glow) 35%, transparent)
+  );
+}
+.dice-scene[data-season] .dice-pips i {
+  background: var(--die-pip);
+  box-shadow:
+    0 0 7px color-mix(in srgb, var(--die-glow) 30%, transparent),
+    inset 0 1px 2px #fff9;
+}
+.dice-scene[data-season]:not([data-season="none"]) .dice-pips {
+  gap: 3px;
+  width: 62px;
+  height: 62px;
+}
+.dice-scene[data-season]:not([data-season="none"]) .dice-pips i {
+  background: none;
+  box-shadow: none;
+  color: var(--die-pip);
+}
+.dice-pips .event-pip {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: none;
+}
+.dice-scene[data-season]::before {
+  background: radial-gradient(
+    ellipse,
+    color-mix(in srgb, var(--die-glow) 16%, transparent),
+    transparent 68%
+  );
+}
+.dice-scene[data-season] .dice-floor {
+  background: radial-gradient(
+    ellipse,
+    color-mix(in srgb, var(--die-glow) 28%, transparent),
+    transparent 65%
+  );
+}
+.dice-scene[data-season] .dice-orbit {
+  border-color: color-mix(in srgb, var(--die-glow) 24%, transparent);
+  box-shadow: none;
+}
+.dice-scene[data-season] .dice-spark {
+  background: var(--die-pip);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--die-glow) 60%, transparent);
+}
+.dice-scene[data-season].is-rolling .dice-atmosphere::after {
+  background: radial-gradient(
+    ellipse,
+    color-mix(in srgb, var(--die-glow) 28%, transparent),
+    transparent 68%
+  );
+}
+.dice-event-mote {
+  position: absolute;
+  width: 21px;
+  height: 21px;
+  left: 17%;
+  top: 28%;
+  opacity: 0.7;
+  animation: event-mote-drift 5.6s ease-in-out infinite;
+}
+.dice-event-mote .seasonal-detail {
+  inset: 0;
+  color: var(--die-pip);
+}
+.dice-event-mote.mote-1 {
+  left: auto;
+  right: 10%;
+  top: 58%;
+  width: 15px;
+  height: 15px;
+  animation-delay: -2.1s;
+}
+.dice-event-mote.mote-2 {
+  left: 29%;
+  top: 84%;
+  width: 12px;
+  height: 12px;
+  animation-delay: -3.7s;
+}
+.dice-scene.is-rolling .dice-event-mote {
+  animation-duration: 1.1s;
+}
+@keyframes event-mote-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 3px, 0) rotate(-10deg);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(4px, -8px, 0) rotate(12deg);
+    opacity: 0.85;
+  }
+}
+html[data-season]:not([data-season="none"]) .dice-shortcut svg {
+  color: var(--die-glow);
+}
+html[data-theme="light"][data-season]:not([data-season="none"])
+  .dice-shortcut
+  svg {
+  color: var(--die-deep);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dice-event-mote {
+    animation: none !important;
+  }
+}
+
+/* The calendar changes the whole setting. Normal mode inherits the original palette. */
+html[data-season="halloween"] {
+  --app-bg: #100d0c;
+  --app-panel: #19130f;
+  --app-surface: #241c16;
+  --app-accent: #f0bc77;
+  --app-accent-ink: #321e10;
+  --event-art-ink: #cd965b;
+}
+html[data-season="christmas"] {
+  --app-bg: #0b1211;
+  --app-panel: #101d19;
+  --app-surface: #1a2c25;
+  --app-accent: #b7e2cd;
+  --app-accent-ink: #153d30;
+  --event-art-ink: #a3c9b2;
+}
+html[data-season="summer"] {
+  --app-bg: #0b1318;
+  --app-panel: #112027;
+  --app-surface: #19313a;
+  --app-accent: #f2cf70;
+  --app-accent-ink: #293a20;
+  --event-art-ink: #b5d7d0;
+}
+html[data-theme="light"][data-season="halloween"] {
+  --app-bg: #f6f0e4;
+  --app-panel: #fffbf2;
+  --app-surface: #ece2cf;
+  --app-accent: #b4532d;
+  --app-accent-ink: #fff8e8;
+  --event-art-ink: #965d31;
+}
+html[data-theme="light"][data-season="christmas"] {
+  --app-bg: #eef4ef;
+  --app-panel: #f9fcf7;
+  --app-surface: #dce9df;
+  --app-accent: #397c67;
+  --app-accent-ink: #fff;
+  --event-art-ink: #436c5e;
+}
+html[data-theme="light"][data-season="summer"] {
+  --app-bg: #f6f3e7;
+  --app-panel: #fffdf5;
+  --app-surface: #ece7ce;
+  --app-accent: #efc65d;
+  --app-accent-ink: #293a20;
+  --event-art-ink: #407b7d;
+}
+.event-mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.event-mode-options > button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 14px;
+  border-radius: 6px;
+  background: var(--app-surface);
+  min-height: 72px;
+  color: var(--app-ink);
+  text-align: left;
+}
+.event-mode-options > button[aria-pressed="true"] {
+  background: var(--app-accent);
+  color: var(--app-accent-ink);
+}
+.event-mode-options strong {
+  font-size: 13px;
+}
+.event-mode-options span {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.event-calendar,
+.event-manual {
+  margin-top: 16px;
+  color: var(--app-muted);
+  font-size: 11px;
+}
+.event-calendar summary,
+.event-manual summary {
+  cursor: pointer;
+  min-height: 36px;
+  display: list-item;
+  padding-block: 10px;
+  color: var(--app-ink);
+}
+.event-calendar > p {
+  line-height: 1.6;
+  margin: 5px 0 10px;
+}
+.event-calendar ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.event-calendar li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+}
+.event-calendar li strong {
+  font-weight: 600;
+  color: var(--app-ink);
+}
+.event-calendar li[data-active="true"] strong::after {
+  content: " · activo";
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+.event-manual select {
+  margin-top: 7px;
+}
+
+.season-backdrop {
+  position: absolute;
+  inset: 0;
+  color: var(--event-art-ink);
+  pointer-events: none;
+}
+.pocket-app .season-backdrop > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.24;
+}
+.season-backdrop-words {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46%;
+  transform: translateY(-50%) rotate(-8deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.065;
+  font-size: clamp(58px, 17vw, 104px);
+  font-weight: 850;
+  line-height: 0.91;
+  letter-spacing: -4px;
+  text-transform: uppercase;
+}
+.backdrop-christmas .season-backdrop-words {
+  font-size: clamp(48px, 15vw, 86px);
+  letter-spacing: -3px;
+}
+.backdrop-summer .season-backdrop-words {
+  transform: translateY(-50%) rotate(-5deg);
+}
+.season-scene.is-celebration .season-backdrop > svg {
+  opacity: 0.36;
+}
+.season-scene.is-celebration .season-backdrop-words {
+  opacity: 0.085;
+}
+html[data-theme="light"] .season-backdrop > svg {
+  opacity: 0.19;
+}
+html[data-theme="light"] .season-backdrop-words {
+  opacity: 0.07;
+}
+@media (max-width: 350px) {
+  .season-backdrop-words {
+    font-size: 56px;
+    letter-spacing: -3px;
+  }
+  .backdrop-christmas .season-backdrop-words {
+    font-size: 45px;
+  }
+}
+html[data-season]:not([data-season="none"])
+  .pocket-primary:not(:disabled):hover,
+html[data-season]:not([data-season="none"]) .match-button:not(:disabled):hover {
+  background: color-mix(in srgb, var(--app-accent) 88%, var(--app-accent-ink));
+}
+
+/* Illustrated event worlds: transparent centre, richer silhouettes at the edges. */
+html[data-season="halloween"] {
+  --scenery-light: #edbc76; --scenery-far: #524332; --scenery-mid: #453628;
+  --scenery-near: #211b18; --scenery-rim: #97754a; --scenery-pumpkin: #ac5c2e;
+}
+html[data-season="christmas"] {
+  --scenery-light: #d2e4d6; --scenery-far: #344e49; --scenery-mid: #213c34;
+  --scenery-near: #10261f; --scenery-rim: #668576; --scenery-pumpkin: #9b4d45;
+}
+html[data-season="summer"] {
+  --scenery-light: #f0cc84; --scenery-far: #2a5860; --scenery-mid: #45646a;
+  --scenery-near: #1b3538; --scenery-rim: #8fbeae; --scenery-pumpkin: #ba7951;
+}
+html[data-theme="light"][data-season="halloween"] {
+  --scenery-light: #c5853b; --scenery-far: #dfd0b6; --scenery-mid: #c7b18b;
+  --scenery-near: #a18b6d; --scenery-rim: #836a4e; --scenery-pumpkin: #b97440;
+}
+html[data-theme="light"][data-season="christmas"] {
+  --scenery-light: #fffdf0; --scenery-far: #b4c8bd; --scenery-mid: #9ab8a6;
+  --scenery-near: #6f9380; --scenery-rim: #527563; --scenery-pumpkin: #b5776b;
+}
+html[data-theme="light"][data-season="summer"] {
+  --scenery-light: #daae53; --scenery-far: #afd3cf; --scenery-mid: #d9c6a2;
+  --scenery-near: #78a398; --scenery-rim: #467e76; --scenery-pumpkin: #d28d60;
+}
+.pocket-app .season-backdrop > svg.event-landscape,
+html[data-theme="light"] .season-backdrop > svg.event-landscape {
+  opacity: .64;
+}
+.season-scene.is-celebration .season-backdrop > svg.event-landscape { opacity: .8; }
+.season-backdrop-caption {
+  position: absolute; left: 7%; bottom: 7%; display: flex; align-items: center;
+  gap: 10px; opacity: .27; color: var(--event-art-ink);
+  font-size: clamp(9px, 1.2vw, 13px); font-weight: 500;
+  letter-spacing: .2em; text-transform: uppercase; transform: rotate(-3deg);
+}
+.season-backdrop-caption i { width: 22px; height: 1px; background: currentColor; }
+/* Only the die's short throw/reveal mounts these ten composited sprites. */
+.event-dice-magic { position: absolute; inset: 0; pointer-events: none; z-index: 2; color: var(--die-pip); }
+.event-dice-particle {
+  position: absolute; left: 50%; top: 50%; width: 22px; height: 22px;
+  margin: -11px; opacity: 0;
+  animation: event-dice-flight 1.25s cubic-bezier(.12,.65,.3,1) both;
+  animation-delay: var(--flight-delay);
+}
+.pocket-app .event-dice-particle > svg { width: 100%; height: 100%; }
+.magic-halloween .is-spirit { width: 29px; height: 34px; color: #f6e3ba; }
+.magic-halloween .event-dice-particle:not(.is-spirit) { color: var(--die-edge); }
+.magic-christmas .event-dice-particle { width: 18px; height: 18px; }
+.magic-summer .event-dice-particle:not(.is-spirit) { color: #a1dfd4; }
+.event-dice-wave {
+  position: absolute; left: 50%; top: 50%; width: 130px; height: 130px;
+  margin: -65px; border: 1px solid currentColor; border-radius: 50%; opacity: 0;
+  background: radial-gradient(ellipse, transparent 40%, color-mix(in srgb, var(--die-glow) 14%, transparent) 68%, transparent 72%);
+  animation: event-dice-ripple 1.3s ease-out both;
+}
+.event-dice-wave.wave-second { animation-delay: .22s; }
+.magic-throw .event-dice-wave { border-style: dashed; }
+.magic-result .event-dice-particle { animation-duration: 1.5s; }
+.magic-christmas .event-dice-wave { border-style: dotted; }
+@keyframes event-dice-flight {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(.25); }
+  18% { opacity: .9; }
+  65% { opacity: .65; }
+  100% { opacity: 0; transform: translate3d(var(--flight-x), var(--flight-y), 0) rotate(var(--flight-turn)) scale(1.12); }
+}
+@keyframes event-dice-ripple {
+  0% { opacity: 0; transform: scale(.3) rotateX(50deg); }
+  20% { opacity: .55; }
+  100% { opacity: 0; transform: scale(2) rotateX(65deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .event-dice-particle, .event-dice-wave { animation: none !important; display: none; }
+}
+/* Fade the illustration into the board at any aspect ratio, without a rectangular edge. */
+.pocket-app .season-backdrop > svg.event-landscape {
+  mask-image: linear-gradient(90deg, transparent, #000 13%, #000 87%, transparent);
+}
+/* In daylight the particles need ink, rather than the night-time glow. */
+html[data-theme="light"] .event-dice-magic { color: var(--die-body); }
+html[data-theme="light"] .magic-halloween .event-dice-particle { color: var(--die-deep); }
+html[data-theme="light"] .magic-halloween .is-spirit { color: var(--die-body); }
+html[data-theme="light"] .magic-summer .event-dice-particle:not(.is-spirit) { color: #297d79; }
+html[data-theme="light"] .magic-summer .is-spirit { color: #a7771b; }

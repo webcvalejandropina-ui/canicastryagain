@@ -1,3 +1,4 @@
+import { MIN_ROWS, MAX_ROWS, validRowCount } from '@/shared/gameConfig';
 import { randomUUID } from 'node:crypto';
 
 import { Game } from '@/backend/game/domain/Game';
@@ -7,20 +8,13 @@ import { GameView, toGameView } from '@/backend/game/application/GameView';
 import { publishGameUpdated } from '@/backend/game/infrastructure/GameEvents';
 import { AppError } from '@/backend/shared/domain/AppError';
 
-const MAX_ROWS = 50;
 const WAITING_GAME_TTL_MS = 5 * 60 * 1000;
 
-const MIN_ROWS = 3;
-
 function normalizeRows(numRows: number): number {
-  const normalized = Number.isFinite(numRows) ? Math.floor(numRows) : 7;
-  if (normalized < MIN_ROWS) {
-    throw new AppError(`El mínimo de filas es ${MIN_ROWS}`, 400, 'ROWS_BELOW_MINIMUM');
+  if (!validRowCount(numRows)) {
+    throw new AppError(`Elige un número entero de filas entre ${MIN_ROWS} y ${MAX_ROWS}`, 400, 'INVALID_ROW_COUNT');
   }
-  if (normalized > MAX_ROWS) {
-    throw new AppError(`El límite máximo es de ${MAX_ROWS} filas`, 400, 'ROWS_LIMIT_EXCEEDED');
-  }
-  return normalized;
+  return numRows;
 }
 
 function normalizePlayerName(playerName: string): string {
@@ -34,7 +28,7 @@ function normalizePlayerName(playerName: string): string {
 export class CreateGameUseCase {
   constructor(private readonly gameRepository: GameRepository) {}
 
-  async execute(input: { playerId: string; playerName: string; numRows: number }): Promise<GameView> {
+  async execute(input: { playerId: string; playerName: string; numRows: number; privateInvitation?: boolean }): Promise<GameView> {
     const playerId = input.playerId.trim();
     if (!playerId) {
       throw new AppError('playerId es obligatorio', 400, 'PLAYER_ID_REQUIRED');
@@ -47,6 +41,7 @@ export class CreateGameUseCase {
 
     const gameCode = await this.generateUniqueCode();
     const game = Game.create({
+      privateInvitation: input.privateInvitation,
       id: randomUUID(),
       code: gameCode,
       numRows: rows,
@@ -57,7 +52,7 @@ export class CreateGameUseCase {
     });
 
     await this.gameRepository.save(game);
-    publishGameUpdated(game.id, 'create');
+    publishGameUpdated(game.id, 'create', game);
 
     return toGameView(game, playerId);
   }
@@ -67,7 +62,12 @@ export class CreateGameUseCase {
     while (attempts < 30) {
       const candidate = generateRandomGameCode();
       // eslint-disable-next-line no-await-in-loop
-      const existing = await this.gameRepository.getByCode(candidate);
+      let existing;
+      try { existing = await this.gameRepository.getByCode(candidate); }
+      catch(error) {
+        if(error instanceof AppError && error.code === 'GAME_EXPIRED') { attempts++; continue; }
+        throw error;
+      }
       if (!existing) {
         return candidate;
       }

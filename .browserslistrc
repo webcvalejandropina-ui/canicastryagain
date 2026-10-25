@@ -1,0 +1,9 @@
+# Shared baseline for all current desktop and mobile engines.
+Chrome >= 111
+Edge >= 111
+Firefox >= 115
+Safari >= 16.4
+iOS >= 16.4
+ChromeAndroid >= 111
+FirefoxAndroid >= 115
+Samsung >= 22

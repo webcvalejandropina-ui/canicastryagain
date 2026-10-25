@@ -1,0 +1,11 @@
+CANICAS · CÓMO JUGAR EN 59 SEGUNDOS
+
+Vídeo vertical 1080 × 1920, 30 fps, H.264/AAC. Voz española, subtítulos integrados y SRT editable. 13 escenas con las reglas actuales, capturas recientes sobre Gibraltar, el lanzamiento real del dado y ejemplos animados.
+
+Incluye 1–100 filas, zoom, selección consecutiva, límite global, ocho poderes, resurrección aleatoria, tirada antigua, cinco mesas y 24 horas de inactividad. La nueva escena muestra Gibraltar, Tarifa y cumpleaños; Navidad, Halloween y Semana Santa aparecen como alternativas. Cumpleaños personal: tres días, con cuenta registrada y fecha guardada, en modo Automático.
+
+Las escenas no representan una partida continua. El clip del dado se capturó del juego y se interpoló para el montaje. Narración sintetizada localmente y composición sonora original. Las canicas y fondos son recursos originales del proyecto.
+
+Desde la raíz del repositorio: npm run video:preview para reproducir en localhost:13008; npm run video:render para reconstruir. Requiere FFmpeg/ffprobe, Python 3, Node y Sharp. Las voces por escena se conservan en audio/. Instala las fuentes Archivo de public/fonts para mantener la tipografía. CANICAS_VIDEO_TMP permite elegir la carpeta temporal; CANICAS_SHARP_MODULE permite indicar otra instalación de Sharp.
+
+Guion, subtítulos, capturas y recursos incluidos. Los WAV mezclados se regeneran, no es necesario versionarlos. VERIFICACION.json registra duración, resolución y comprobaciones técnicas.

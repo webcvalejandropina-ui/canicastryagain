@@ -1,3 +1,4 @@
+import { isPrivateInvite } from '@/backend/game/domain/PrivateInvitation';
 import { normalizeGameCode } from '@/backend/game/domain/GameCode';
 import { GameRepository } from '@/backend/game/domain/GameRepository';
 import { GameView, toGameView } from '@/backend/game/application/GameView';
@@ -25,7 +26,8 @@ export class JoinGameUseCase {
     }
 
     const normalizedInputCode = normalizeGameCode(input.gameCode ?? '');
-    const decodedToken = input.inviteToken ? decodeInviteToken(input.inviteToken) : null;
+    const privateLink = isPrivateInvite(input.inviteToken ?? '');
+    const decodedToken = input.inviteToken && !privateLink ? decodeInviteToken(input.inviteToken) : null;
     const decodedCode = decodedToken?.code ?? '';
 
     if (normalizedInputCode && decodedCode && normalizedInputCode !== decodedCode) {
@@ -33,15 +35,16 @@ export class JoinGameUseCase {
     }
 
     const normalizedCode = normalizeGameCode(normalizedInputCode || decodedCode);
-    if (!normalizedCode) {
+    if (!normalizedCode && !privateLink) {
       throw new AppError('Debes indicar un código o token de partida', 400, 'GAME_CODE_REQUIRED');
     }
 
     const cutoffIso = new Date(Date.now() - WAITING_GAME_TTL_MS).toISOString();
-    await this.gameRepository.deleteExpiredWaitingGames(cutoffIso);
+    if (!privateLink) await this.gameRepository.deleteExpiredWaitingGames(cutoffIso);
 
-    const game = await this.gameRepository.getByCode(normalizedCode);
+    const game = privateLink ? await this.gameRepository.getByInviteToken(input.inviteToken!) : await this.gameRepository.getByCode(normalizedCode);
     if (!game) {
+      if (privateLink) throw new AppError('Este enlace ha caducado o la mesa se ha cancelado.',410,'INVITE_EXPIRED');
       throw new AppError('Código de partida no encontrado', 404, 'GAME_NOT_FOUND');
     }
 
@@ -55,19 +58,21 @@ export class JoinGameUseCase {
     };
 
     const isAlreadyInGame = game.getPlayerNumber(playerId) !== null;
-    if (!isAlreadyInGame && game.status !== 'waiting') {
-      const recovered = game.reconnectPlayerByName(normalizedPlayer);
-      if (recovered) {
-        await this.gameRepository.save(game);
-        publishGameUpdated(game.id, 'join');
-        return toGameView(game, playerId);
+    if (isAlreadyInGame) return toGameView(game, playerId);
+    // A display name never grants ownership. Only the authenticated member can resume.
+    const codeInvitation = normalizedInputCode && normalizedInputCode === game.code;
+    game.join(normalizedPlayer, input.inviteToken ?? (codeInvitation ? game.toPrimitives().privateInviteToken ?? undefined : undefined));
+
+    try { await this.gameRepository.save(game); }
+    catch (error) {
+      if (privateLink && error instanceof AppError && error.code === 'STALE_GAME_STATE') {
+        const latest = await this.gameRepository.getById(game.id);
+        if (latest?.getPlayerNumber(playerId)) return toGameView(latest, playerId);
+        throw new AppError('El enlace ya ha sido utilizado. La mesa tiene rival.',409,'INVITE_ALREADY_USED');
       }
+      throw error;
     }
-
-    game.join(normalizedPlayer);
-
-    await this.gameRepository.save(game);
-    publishGameUpdated(game.id, 'join');
+    publishGameUpdated(game.id, 'join', game);
 
     return toGameView(game, playerId);
   }

@@ -6,6 +6,7 @@ export function validateMove(
   startIndex: number,
   removeCount: number
 ): { valid: boolean; reason?: string } {
+  if (game.pendingAncientShot) return {valid:false,reason:'Completa tu Tirada antigua antes de hacer otra jugada.'};
   if (rowIndex < 0 || rowIndex >= game.rows.length) {
     return { valid: false, reason: 'Fila inválida' };
   }

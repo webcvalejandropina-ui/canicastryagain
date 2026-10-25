@@ -1,7 +1,12 @@
+import { MIN_ROWS, MAX_ROWS, validRowCount } from '@/shared/gameConfig';
+import { DICE_POWER_NAMES, targetPowerCells, type DiceTarget } from './DicePowers';
+import { createPrivateInvite, matchesPrivateInvite, PRIVATE_INVITE_TTL_MS } from './PrivateInvitation';
+import { resolveAncientShot, type AncientShot } from './AncientShot';
 import { AppError } from '@/backend/shared/domain/AppError';
 import { DicePowerName, DiceResult, GamePrimitives, Move, PlayerNumber, PlayerSlot } from '@/backend/game/domain/types';
 
 type CreateGameInput = {
+  privateInvitation?: boolean;
   id: string;
   code: string;
   numRows: number;
@@ -41,6 +46,9 @@ export class Game {
   }
 
   static create(input: CreateGameInput): Game {
+    if (!validRowCount(input.numRows)) {
+      throw new AppError(`Elige un número entero de filas entre ${MIN_ROWS} y ${MAX_ROWS}`, 400, 'INVALID_ROW_COUNT');
+    }
     const rows = Array.from({ length: input.numRows }, (_, rowIndex) =>
       Array.from({ length: rowIndex + 1 }, () => 1)
     );
@@ -50,6 +58,8 @@ export class Game {
       id: input.id,
       code: input.code,
       inviteVersion: 1,
+      privateInviteToken: input.privateInvitation ? createPrivateInvite() : null,
+      privateInviteExpiresAt: input.privateInvitation ? new Date(Date.parse(now)+PRIVATE_INVITE_TTL_MS).toISOString() : null,
       numRows: input.numRows,
       rows,
       status: 'waiting',
@@ -70,6 +80,14 @@ export class Game {
 
   static rehydrate(state: GamePrimitives): Game {
     return new Game(state);
+  }
+
+  get revision(): number {
+    return this.state.revision ?? 0;
+  }
+
+  markPersisted(): void {
+    this.state.revision = this.revision + 1;
   }
 
   get id(): string {
@@ -106,11 +124,19 @@ export class Game {
     return null;
   }
 
-  join(player: PlayerSlot): void {
+  join(player: PlayerSlot, inviteToken?: string): void {
     if (this.state.player1?.id === player.id || this.state.player2?.id === player.id) {
       return;
     }
 
+    if (this.state.privateInviteToken) {
+      if (!inviteToken || !matchesPrivateInvite(this.state.privateInviteToken, inviteToken))
+        throw new AppError('Necesitas el enlace privado de esta mesa.',403,'PRIVATE_INVITE_REQUIRED');
+      if (this.state.status !== 'waiting')
+        throw new AppError('El enlace ya ha sido utilizado. La mesa tiene rival.',409,'INVITE_ALREADY_USED');
+      if (!this.state.privateInviteExpiresAt || Date.parse(this.state.privateInviteExpiresAt) <= Date.now())
+        throw new AppError('El enlace ha caducado. Pide una nueva partida.',410,'INVITE_EXPIRED');
+    }
     if (this.state.status !== 'waiting') {
       throw new AppError('La partida ya está en progreso', 409, 'GAME_ALREADY_STARTED');
     }
@@ -161,6 +187,8 @@ export class Game {
   }
 
   makeMove(input: MakeMoveInput): { gameOver: boolean; winner: PlayerNumber | null } {
+    if (this.state.pendingTargetPower) throw new AppError('Elige el objetivo de tu poder antes de hacer otra jugada.',409,'DICE_TARGET_PENDING');
+    if (this.state.pendingAncientShot) throw new AppError('Completa tu Tirada antigua antes de hacer otra jugada.',409,'ANCIENT_SHOT_PENDING');
     if (this.state.status !== 'playing') {
       throw new AppError('La partida no está en curso', 409, 'GAME_NOT_PLAYING');
     }
@@ -191,14 +219,7 @@ export class Game {
 
     this.state.moveHistory.push(move);
 
-    const totalBalls = this.state.rows.reduce(
-      (sum, row) => sum + row.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
-      0
-    );
-    if (totalBalls === 0) {
-      this.state.status = 'finished';
-      this.state.winner = playerNumber === 1 ? 2 : 1;
-      this.touch();
+    if (this.finishIfEmpty(playerNumber)) {
       return { gameOver: true, winner: this.state.winner };
     }
 
@@ -225,6 +246,8 @@ export class Game {
     const winner: PlayerNumber | null = gameWasPlayable ? (playerNumber === 1 ? 2 : 1) : null;
 
     this.state.status = 'finished';
+    this.state.pendingAncientShot = false;
+    this.state.pendingTargetPower = null;
     this.state.winner = winner;
     this.state.forcedRowIndex = null;
     this.state.turnDieValue = null;
@@ -251,7 +274,7 @@ export class Game {
     return playerNumber === 1 ? !this.state.player1DiceUsed : !this.state.player2DiceUsed;
   }
 
-  useDice(playerId: string): { gameOver: boolean; winner: PlayerNumber | null; dice: DiceResult } {
+  useDice(playerId: string, draw: () => number = Math.random): { gameOver: boolean; winner: PlayerNumber | null; dice: DiceResult } {
     if (this.state.status !== 'playing') {
       throw new AppError('La partida no está en curso', 409, 'GAME_NOT_PLAYING');
     }
@@ -275,47 +298,86 @@ export class Game {
       this.state.player2DiceUsed = true;
     }
 
-    const powers: DicePowerName[] = ['bomba', 'rayo', 'diagonal', 'resurreccion'];
-    const power = powers[Math.floor(Math.random() * powers.length)];
+    const powers = DICE_POWER_NAMES;
+    const power = powers[Math.floor(draw() * powers.length)];
+    if(power==='avalancha'||power==='fantasma') {
+      this.state.pendingTargetPower=power;this.touch();
+      return {gameOver:false,winner:null,dice:{power,affected:[],pending:true}};
+    }
+    if(power==='remolino') {
+      const shuffledRows:Array<{row:number;order:number[]}>=[],affected:Array<{row:number;col:number}>=[];
+      this.state.rows.forEach((row,r)=>{
+        if(!row.includes(0)||!row.includes(1))return;
+        const order=row.map((_,i)=>i);
+        for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+        if(order.every((from,c)=>row[from]===row[c])) {
+          const live=row.indexOf(1),hole=row.indexOf(0);[order[live],order[hole]]=[order[hole],order[live]];
+        }
+        const next=order.map(from=>row[from]);
+        next.forEach((value,c)=>{if(value!==row[c])affected.push({row:r,col:c});});
+        this.state.rows[r]=next;shuffledRows.push({row:r,order});
+      });
+      return this.completeDice(playerNumber,{power,affected,shuffledRows});
+    }
+    if (power === 'antigua') {
+      this.state.pendingAncientShot = true;
+      this.touch();
+      return {gameOver:false,winner:null,dice:{power,affected:[],pending:true}};
+    }
     const affected = this.applyDicePower(power);
 
-    const diceTimestamp = nowIsoDate();
-    const first = affected[0];
-    this.state.moveHistory.push({
-      player: playerNumber,
-      rowIndex: first?.row ?? 0,
-      startIndex: first?.col ?? 0,
-      count: 1,
-      timestamp: diceTimestamp,
-      fromDice: true
-    });
+    return this.completeDice(playerNumber,{power,affected});
+  }
 
-    const totalBalls = this.state.rows.reduce(
-      (sum, row) => sum + row.reduce((rowSum, cell) => rowSum + (cell === 1 ? 1 : 0), 0),
-      0
-    );
+  launchAncientShot(playerId:string, shot:AncientShot): {gameOver:boolean;winner:PlayerNumber|null;dice:DiceResult} {
+    if(this.state.status!=='playing') throw new AppError('La partida no está en curso',409,'GAME_NOT_PLAYING');
+    const player=this.getPlayerNumber(playerId);
+    if(!player) throw new AppError('Jugador no pertenece a esta partida',403,'PLAYER_NOT_IN_GAME');
+    if(player!==this.state.currentTurn) throw new AppError('No es tu turno',409,'NOT_YOUR_TURN');
+    if(!this.state.pendingAncientShot) throw new AppError('El dado no ha activado una Tirada antigua',409,'ANCIENT_SHOT_NOT_PENDING');
+    const resolved=resolveAncientShot(this.state.rows,shot);
+    for(const cell of resolved.affected)this.state.rows[cell.row][cell.col]=0;
+    this.state.pendingAncientShot=false;
+    return this.completeDice(player,{power:'antigua',...resolved});
+  }
 
-    if (totalBalls === 0) {
-      this.state.status = 'finished';
-      this.state.winner = playerNumber === 1 ? 2 : 1;
-      this.touch();
-      return { gameOver: true, winner: this.state.winner, dice: { power, affected } };
-    }
+  resolveDiceTarget(playerId:string,target:DiceTarget): {gameOver:boolean;winner:PlayerNumber|null;dice:DiceResult} {
+    if(this.state.status!=='playing')throw new AppError('La partida no está en curso',409,'GAME_NOT_PLAYING');
+    const player=this.getPlayerNumber(playerId);
+    if(!player)throw new AppError('Jugador no pertenece a esta partida',403,'PLAYER_NOT_IN_GAME');
+    if(player!==this.state.currentTurn)throw new AppError('No es tu turno',409,'NOT_YOUR_TURN');
+    const power=this.state.pendingTargetPower;
+    if(!power)throw new AppError('No hay un poder pendiente de objetivo',409,'DICE_TARGET_NOT_PENDING');
+    if(!Number.isInteger(target.row)||!Number.isInteger(target.col)||this.state.rows[target.row]?.[target.col]!==1)
+      throw new AppError('Elige una canica viva como objetivo.',400,'INVALID_DICE_TARGET');
+    const affected=targetPowerCells(this.state.rows,power,target);
+    for(const cell of affected)this.state.rows[cell.row][cell.col]=0;
+    this.state.pendingTargetPower=null;
+    return this.completeDice(player,{power,target:{...target},affected});
+  }
 
-    if (totalBalls === 1) {
-      this.state.status = 'finished';
-      this.state.winner = playerNumber;
-      this.touch();
-      return { gameOver: true, winner: this.state.winner, dice: { power, affected } };
-    }
-
-    this.state.lastTouchedRowIndex = null;
-    this.state.currentTurn = this.state.currentTurn === 1 ? 2 : 1;
-    this.state.forcedRowIndex = null;
-    this.state.turnDieValue = null;
+  private completeDice(playerNumber:PlayerNumber, dice:DiceResult): {gameOver:boolean;winner:PlayerNumber|null;dice:DiceResult} {
+    const first=dice.affected[0];
+    this.state.moveHistory.push({player:playerNumber,rowIndex:first?.row??0,startIndex:first?.col??0,
+      count:1,timestamp:nowIsoDate(),fromDice:true,dice});
+    if(this.finishIfEmpty(playerNumber))return {gameOver:true,winner:this.state.winner,dice};
+    this.state.lastTouchedRowIndex=null;
+    this.state.currentTurn=this.state.currentTurn===1?2:1;
+    this.state.forcedRowIndex=null;
+    this.state.turnDieValue=null;
     this.touch();
+    return {gameOver:false,winner:null,dice};
+  }
 
-    return { gameOver: false, winner: null, dice: { power, affected } };
+  /** A normal move and a power obey the same misère ending. One marble is still playable. */
+  private finishIfEmpty(lastPlayer: PlayerNumber): boolean {
+    if (this.state.rows.some((row) => row.some((cell) => cell === 1))) {
+      return false;
+    }
+    this.state.status = 'finished';
+    this.state.winner = lastPlayer === 1 ? 2 : 1;
+    this.touch();
+    return true;
   }
 
   private applyDicePower(power: DicePowerName): Array<{ row: number; col: number }> {
@@ -328,6 +390,11 @@ export class Game {
         return this.diceDiagonal();
       case 'resurreccion':
         return this.diceResurreccion();
+      case 'antigua':
+      case 'avalancha':
+      case 'fantasma':
+      case 'remolino':
+        return [];
     }
   }
 
@@ -399,17 +466,18 @@ export class Game {
   }
 
   private diceResurreccion(): Array<{ row: number; col: number }> {
-    const rowsWithHoles = this.state.rows
-      .map((row, i) => ({ i, hasHole: row.some((c) => c === 0) }))
-      .filter((r) => r.hasHole);
-    if (rowsWithHoles.length === 0) return [];
-    const target = rowsWithHoles[Math.floor(Math.random() * rowsWithHoles.length)].i;
-    const affected: Array<{ row: number; col: number }> = [];
-    for (let c = 0; c < this.state.rows[target].length; c += 1) {
-      if (this.state.rows[target][c] === 0) {
-        this.state.rows[target][c] = 1;
-        affected.push({ row: target, col: c });
-      }
+    const eliminated: Array<{row:number;col:number}> = [];
+    this.state.rows.forEach((row,r)=>row.forEach((live,c)=>{
+      if(live===0)eliminated.push({row:r,col:c});
+    }));
+    if(eliminated.length===0)return [];
+    // Uniform count from 1 to every eliminated marble, then sample without replacement.
+    const count=1+Math.floor(Math.random()*eliminated.length);
+    const affected: Array<{row:number;col:number}> = [];
+    for(let i=0;i<count;i++) {
+      const pick=i+Math.floor(Math.random()*(eliminated.length-i));
+      [eliminated[i],eliminated[pick]]=[eliminated[pick],eliminated[i]];
+      const cell=eliminated[i];this.state.rows[cell.row][cell.col]=1;affected.push(cell);
     }
     return affected;
   }

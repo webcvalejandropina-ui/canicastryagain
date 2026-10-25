@@ -1,0 +1,9 @@
+Originales creados con la herramienta integrada image_gen. No se generan imágenes en el servidor del juego.
+Base de los cinco prompts: paisaje naturalista de calidad editorial, materiales de terreno reales y perspectiva atmosférica. Composición 4:3 que permita recortar el centro para móvil. Centro y mitad superior tranquilos, sin canicas, interfaz, texto ni personas. Sin contornos de vector ni plataformas flotantes. Luz difusa al atardecer y paleta contenida para integrarse con temas claro y oscuro.
+Normal: valle de praderas y musgo, colinas, bosque lejano, pequeño molino antiguo de piedra a la derecha del centro; verde salvia y bosque, luz marfil.
+Navidad: valle alpino nevado, abetos, montañas y pequeñas casas de madera con ventanas cálidas; azul verdoso, nieve salvia y hora azul.
+Verano: cala mediterránea, laderas rocosas, arena y pequeñas palmeras en los laterales, mar turquesa tranquilo, islas lejanas y luz dorada contenida.
+Cumpleaños: valle de pradera con bosque y colinas, pequeñas guirnaldas rosa empolvado y marfil entre árboles, algunos globos pequeños color champán; sin tartas ni regalos gigantes.
+Halloween: valle de otoño con niebla, pequeña mansión de piedra con pocas ventanas cálidas a la derecha del centro, ramas desnudas y luna tras la niebla; gris verdoso, ciruela carbón y cobre contenido. Sin horror, cementerios, calabazas de dibujo ni murciélagos en primer plano.
+
+Los PNG originales se conservan aquí para editar/reemplazar las ilustraciones. Solo se sirven las versiones WebP de public/worlds, a 640 y 1280 píxeles. Para regenerarlas ejecutar assets:world-photos con Sharp disponible como herramienta de desarrollo (CANICAS_SHARP_MODULE permite indicar su módulo). Después ejecutar assets:worlds para actualizar el catálogo de rutas y primeros planos.

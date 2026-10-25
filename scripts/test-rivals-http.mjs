@@ -1,0 +1,32 @@
+// Run only against a disposable QA server seeded with scripts/seed-rivals-qa.ts.
+import assert from 'node:assert/strict';
+const origin=process.env.RIVALS_QA_ORIGIN;
+if(!origin || !/^http:\/\/127\.0\.0\.1:\d+$/.test(origin))throw new Error('RIVALS_QA_ORIGIN must be the isolated local QA server');
+async function login(alias){const response=await fetch(`${origin}/api/auth/login`,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({alias,password:'PruebaLocal2026'})});assert.equal(response.status,200);return {cookie:response.headers.get('set-cookie').split(';')[0],...(await response.json())};}
+const [a,b,c]=await Promise.all(['RivalQA Alba','RivalQA Bruno','RivalQA Carla'].map(login));
+const get=user=>fetch(`${origin}/api/rivals`,{headers:{Cookie:user.cookie}});
+const post=(user,body,source=origin)=>fetch(`${origin}/api/rivals`,{method:'POST',headers:{Cookie:user.cookie,Origin:source,'Content-Type':'application/json'},body:JSON.stringify(body)});
+assert.equal((await fetch(`${origin}/api/rivals?playerId=${a.playerId}`)).status,401);
+const history=await get(a);assert.match(history.headers.get('cache-control'),/private, no-store/);
+const before=await history.json();assert.equal(before.rivals[0].id,b.playerId);assert.equal(before.rivals[0].games,3);assert.equal(before.rivals[0].wins,2);
+assert.equal((await (await get(c)).json()).rivals.length,0);
+assert.equal((await post(a,{action:'hide',rivalId:b.playerId},'https://other.example')).status,403);
+assert.equal((await post(a,{action:'hide',rivalId:b.playerId},origin.replace('http:','https:'))).status,403);
+assert.equal((await post(a,{action:'invite',rivalId:b.playerId,playerId:c.playerId})).status,400);
+assert.equal((await post(c,{action:'invite',rivalId:b.playerId})).status,403);
+assert.equal((await post(a,{action:'invite',rivalId:b.playerId,numRows:5})).status,200);
+const pending=(await (await get(b)).json()).invitations[0];assert.equal(pending.incoming,true);
+assert.equal((await post(c,{action:'accept',invitationId:pending.id})).status,404);
+assert.equal((await post(a,{action:'accept',invitationId:pending.id})).status,403);
+const [one,two]=await Promise.all([post(b,{action:'accept',invitationId:pending.id}),post(b,{action:'accept',invitationId:pending.id})]);
+assert.equal(one.status,200);assert.equal(two.status,200);
+const first=await one.json();assert.equal(first.gameCode,(await two.json()).gameCode);
+const sender=(await (await get(a)).json()).invitations[0];assert.equal(sender.gameCode,first.gameCode);
+const join=await fetch(`${origin}/api/games/join`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({playerId:a.playerId,playerName:a.alias,gameCode:first.gameCode})});
+assert.equal(join.status,200);const joined=(await join.json()).game;assert.equal(joined.status,'playing');assert.equal(joined.numRows,5);assert.equal(joined.player2.id,b.playerId);
+assert.equal((await post(a,{action:'hide',rivalId:b.playerId})).status,200);
+assert.equal((await (await get(a)).json()).rivals.length,0);
+assert.equal((await (await get(b)).json()).rivals[0].id,a.playerId);
+assert.equal((await post(a,{action:'restore',rivalId:b.playerId})).status,200);
+assert.equal((await (await get(a)).json()).rivals[0].games,3);
+console.log('HTTP rivals: sessions, private cache, strict origin, ownership, no impersonation, invitations, concurrent acceptance and reconnect OK');

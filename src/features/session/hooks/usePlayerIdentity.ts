@@ -27,39 +27,25 @@ export function usePlayerIdentity(): {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const legacyRaw = raw ? null : LEGACY_STORAGE_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
-    const source = raw ?? legacyRaw;
-
-    if (source) {
-      try {
-        const parsed = JSON.parse(source) as StoredSession;
-        if (parsed.playerId && parsed.playerName) {
-          setPlayerId(parsed.playerId);
-          setPlayerName(parsed.playerName);
-          setIsAdmin(parsed.isAdmin === true);
-          localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({
-              playerId: parsed.playerId,
-              playerName: parsed.playerName,
-              isAdmin: parsed.isAdmin === true
-            } satisfies StoredSession)
-          );
-          LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
-          setReady(true);
-          return;
-        }
-      } catch {
-        // Se ignora sesión corrupta
-      }
-    }
-
-    LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
-    setPlayerId('');
-    setPlayerName('');
-    setIsAdmin(false);
-    setReady(true);
+    let cancelled=false;
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),7000);
+    void (async()=>{
+      let stored:StoredSession|null=null;
+      try{stored=JSON.parse(localStorage.getItem(STORAGE_KEY)??'null') as StoredSession|null;}catch{/* Optional cache. */}
+      try{
+        const response=await fetch('/api/auth/session',{cache:'no-store',signal:controller.signal});
+        if(!response.ok)throw new Error('Session unavailable');
+        const {actor}=await response.json() as {actor:{playerId:string;playerName:string;isAdmin?:boolean}|null};
+        stored=actor?{playerId:actor.playerId,playerName:actor.playerName,isAdmin:Boolean(actor.isAdmin)}:null;
+      }catch{/* Offline practice can retain its local display identity; all server actions still require a cookie. */}
+      finally{clearTimeout(timer);}
+      if(cancelled)return;
+      setPlayerId(stored?.playerId??'');setPlayerName(stored?.playerName??'');setIsAdmin(Boolean(stored?.isAdmin));
+      try{if(stored)localStorage.setItem(STORAGE_KEY,JSON.stringify(stored));else localStorage.removeItem(STORAGE_KEY);LEGACY_STORAGE_KEYS.forEach(key=>localStorage.removeItem(key));}catch{/* Optional storage. */}
+      setReady(true);
+    })();
+    return()=>{cancelled=true;clearTimeout(timer);controller.abort();};
   }, []);
 
   const persistPlayer = useCallback(
@@ -86,6 +72,7 @@ export function usePlayerIdentity(): {
     setPlayerId(serverPlayerId);
     setPlayerName(normalized);
     setIsAdmin(admin);
+    window.dispatchEvent(new Event('canicas-identity'));
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
@@ -97,6 +84,7 @@ export function usePlayerIdentity(): {
   }, []);
 
   const logout = useCallback((): void => {
+    void fetch('/api/auth/logout', {method:'POST'}).catch(() => undefined).finally(() => window.dispatchEvent(new Event('canicas-identity')));
     setPlayerId('');
     setPlayerName('');
     setIsAdmin(false);

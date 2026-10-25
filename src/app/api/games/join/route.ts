@@ -1,3 +1,6 @@
+import { limitAction } from '@/backend/shared/infrastructure/requestSecurity';
+import { readSmallJson } from '@/backend/shared/infrastructure/requestSecurity';
+import { gameActor,requirePrivateJoinActor } from '@/backend/game/infrastructure/PrivateGameSession';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -16,8 +19,10 @@ const joinGameSchema = z.object({
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const payload = joinGameSchema.parse(await request.json());
-    const game = await container.joinGameUseCase.execute(payload);
+    const payload = joinGameSchema.parse(await readSmallJson(request));
+    requirePrivateJoinActor(request,payload.playerId,payload.inviteToken,payload.gameCode);
+    limitAction(payload.playerId,"join");
+    const game = await container.joinGameUseCase.execute({...payload,playerName:gameActor(request)!.playerName});
     return NextResponse.json({ game });
   } catch (error) {
     const httpError = toHttpError(error);

@@ -1,0 +1,85 @@
+import assert from 'node:assert/strict';
+import Database from 'better-sqlite3';
+import { runMigrations } from '../src/backend/shared/infrastructure/db/migrations';
+import { RivalStore } from '../src/backend/social/RivalStore';
+const db = new Database(':memory:'); db.pragma('foreign_keys=ON'); runMigrations(db);
+for (const id of ['a','b','c']) db.prepare('INSERT INTO players(id,alias,password_hash) VALUES(?,?,?)').run(id,`Jugador ${id}`,'hash');
+const game = db.prepare(`INSERT INTO games(id,code,num_rows,rows_json,status,current_turn,winner,player1_id,player1_name,player2_id,player2_name,move_history_json,created_at,updated_at) VALUES(?,?,3,'[[0],[0,0],[0,0,0]]','finished',1,?,?,?,?,?,'[]',?,?)`);
+game.run('old1','OLD001',1,'a','A','b','B','2026-10-20T12:00:00Z','2026-10-20T12:00:00Z');
+game.run('old2','OLD002',1,'b','B','a','A','2026-10-21T12:00:00Z','2026-10-21T12:00:00Z');
+let now = Date.parse('2026-10-24T12:00:00Z');
+// Upgrade the previous constraint without losing invitations, indexes or triggers.
+db.exec(`CREATE TABLE rival_invitations (
+ id TEXT PRIMARY KEY, sender TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+ recipient TEXT NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+ num_rows INTEGER NOT NULL CHECK(num_rows BETWEEN 3 AND 50),
+ status TEXT NOT NULL CHECK(status IN ('pending','accepted','declined','cancelled')),
+ created INTEGER NOT NULL,expires INTEGER NOT NULL,game_id TEXT REFERENCES games(id) ON DELETE SET NULL,CHECK(sender<>recipient));
+ CREATE INDEX legacy_rival_lookup ON rival_invitations(created);
+ CREATE TRIGGER legacy_rival_trigger AFTER INSERT ON rival_invitations BEGIN SELECT 1; END;`);
+db.prepare("INSERT INTO rival_invitations VALUES('legacy','a','b',7,'declined',?,?,NULL)").run(now,now+86400000);
+const legacySql=(db.prepare("SELECT sql FROM sqlite_master WHERE name='rival_invitations'").get() as {sql:string}).sql;
+const store = new RivalStore(db, () => now);
+assert.equal((db.prepare("SELECT num_rows FROM rival_invitations WHERE id='legacy'").get() as {num_rows:number}).num_rows,7);
+assert.ok(db.prepare("SELECT name FROM sqlite_master WHERE name='legacy_rival_lookup'").get());
+assert.ok(db.prepare("SELECT name FROM sqlite_master WHERE name='legacy_rival_trigger'").get());
+assert.deepEqual(db.pragma('foreign_key_check'),[]);
+new RivalStore(db,()=>now); // Migration is idempotent.
+const big=store.invite('a','b',100);
+const bigGame=store.respond('b',big.id,'accept');
+assert.equal((db.prepare('SELECT num_rows FROM games WHERE code=?').get(bigGame.gameCode) as {num_rows:number}).num_rows,100);
+db.prepare('DELETE FROM rival_invitations WHERE id=?').run(big.id);
+db.prepare('DELETE FROM games WHERE code=?').run(bigGame.gameCode);
+const small=store.invite('a','b',1);
+store.respond('a',small.id,'cancel');
+assert.throws(()=>db.prepare("INSERT INTO rival_invitations VALUES('bad','a','b',101,'pending',0,1,NULL)").run());
+assert.equal(store.list('a').rivals[0].games,2);
+assert.equal(store.list('a').rivals[0].wins,1);
+assert.equal(store.list('c').rivals.length,0);
+assert.throws(()=>store.invite('a','c',7));
+assert.throws(()=>store.invite('a','a',7));
+assert.throws(()=>store.invite('a','b',101));
+const invitation = store.invite('a','b',7);
+assert.equal(store.invite('a','b',7).id,invitation.id,'Duplicate requests reuse pending invite');
+assert.equal(store.list('c').invitations.length,0);
+assert.throws(()=>store.respond('c',invitation.id,'accept'));
+assert.throws(()=>store.respond('a',invitation.id,'accept'));
+const accepted = store.respond('b',invitation.id,'accept');
+assert.ok(accepted.gameCode);
+assert.equal(store.respond('b',invitation.id,'accept').gameCode,accepted.gameCode,'Accept is idempotent');
+assert.equal(db.prepare("SELECT COUNT(*) n FROM games WHERE status='playing'").get() && (db.prepare("SELECT COUNT(*) n FROM games WHERE status='playing'").get() as {n:number}).n,1);
+assert.equal(store.list('a').invitations[0].gameCode,accepted.gameCode);
+store.hide('a','b');
+assert.equal(store.list('a').rivals.length,0);
+assert.equal(store.list('b').rivals.length,1);
+assert.equal((db.prepare('SELECT COUNT(*) n FROM players').get() as {n:number}).n,3);
+assert.equal((db.prepare('SELECT COUNT(*) n FROM games').get() as {n:number}).n,3);
+assert.throws(()=>store.invite('b','a',7),'Hidden rivals cannot send new invitations');
+store.restore('a','b'); assert.equal(store.list('a').rivals.length,1);
+db.prepare("UPDATE games SET status='finished' WHERE status='playing'").run();
+const next=store.invite('b','a',5); store.respond('a',next.id,'decline');
+assert.throws(()=>store.respond('a',next.id,'accept'));
+const expiry=store.invite('a','b',3); now+=24*60*60*1000+1;
+assert.throws(()=>store.respond('b',expiry.id,'accept'));
+assert.equal(store.list('b').invitations.length,0);
+store.restore('a','b'); const cancel=store.invite('a','b',3);
+assert.throws(()=>store.respond('b',cancel.id,'cancel'));
+store.respond('a',cancel.id,'cancel'); assert.equal(store.list('b').invitations.length,0);
+const atomic=store.invite('a','b',3);
+const gameCount=(db.prepare('SELECT COUNT(*) n FROM games').get() as {n:number}).n;
+db.exec(`CREATE TRIGGER reject_test_accept BEFORE UPDATE ON rival_invitations WHEN NEW.status='accepted' BEGIN SELECT RAISE(ABORT,'QA rollback'); END`);
+assert.throws(()=>store.respond('b',atomic.id,'accept'));
+assert.equal((db.prepare('SELECT COUNT(*) n FROM games').get() as {n:number}).n,gameCount,'Failed invitation update rolls back game creation');
+assert.equal(store.list('b').invitations[0].status,'pending');
+db.exec('DROP TRIGGER reject_test_accept');
+assert.ok(store.respond('b',atomic.id,'accept').gameCode);
+const broken=new Database(':memory:');runMigrations(broken);broken.exec(legacySql);broken.pragma('foreign_keys=OFF');
+broken.prepare("INSERT INTO rival_invitations VALUES('orphan','missing-a','missing-b',7,'pending',0,1,NULL)").run();
+broken.pragma('foreign_keys=ON');
+assert.throws(()=>new RivalStore(broken),'Foreign key failure aborts the whole schema upgrade');
+assert.match((broken.prepare("SELECT sql FROM sqlite_master WHERE name='rival_invitations'").get() as {sql:string}).sql,/BETWEEN 3 AND 50/);
+assert.equal((broken.prepare('SELECT COUNT(*) n FROM rival_invitations').get() as {n:number}).n,1);
+assert.equal(broken.prepare("SELECT name FROM sqlite_master WHERE name='rival_invitations_row100'").get(),undefined);
+broken.close();
+console.log('Rivals: private history, stats, hide/restore, invitations, permissions, expiry and atomic/idempotent acceptance OK');
+db.close();

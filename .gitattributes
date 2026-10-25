@@ -1,0 +1,12 @@
+* text=auto
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.mp4 binary
+*.mkv binary
+*.aiff binary
+# Preserve upstream license notices exactly as distributed.
+public/fonts/*-OFL.txt -whitespace
+# SRT conventionally ends with an empty separator line.
+docs/video/guion/*.srt whitespace=-blank-at-eof

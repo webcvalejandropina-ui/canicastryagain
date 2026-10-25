@@ -11,6 +11,7 @@ export class MakeMoveUseCase {
   ) {}
 
   async execute(input: {
+    expectedRevision?: number;
     gameId: string;
     playerId: string;
     rowIndex: number;
@@ -22,6 +23,10 @@ export class MakeMoveUseCase {
       throw new AppError('Partida no encontrada', 404, 'GAME_NOT_FOUND');
     }
 
+    if (input.expectedRevision !== undefined && input.expectedRevision !== game.revision) {
+      throw new AppError('La partida ha cambiado. Comprueba el turno actual.', 409, 'STALE_GAME_STATE');
+    }
+
     const result = game.makeMove({
       playerId: input.playerId,
       rowIndex: input.rowIndex,
@@ -30,7 +35,7 @@ export class MakeMoveUseCase {
     });
 
     await this.gameRepository.save(game);
-    publishGameUpdated(game.id, 'move');
+    publishGameUpdated(game.id, 'move', game);
 
     if (result.gameOver) {
       const winner = result.winner === 1 ? game.player1 : game.player2;

@@ -1,0 +1,42 @@
+{
+  "programs": [],
+  "stream_groups": [],
+  "streams": [
+    {
+      "codec_name": "h264",
+      "width": 1080,
+      "height": 1920,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "30/1"
+    },
+    {
+      "codec_name": "aac",
+      "r_frame_rate": "0/0"
+    }
+  ],
+  "format": {
+    "duration": "59.000000",
+    "size": "8030394"
+  },
+  "decode": "complete, no errors",
+  "sha256": "f521ca671e355f72d907bc186b053c1f2c3aea80d68fa3cbcc750f4c8540b330",
+  "audio": {
+    "mean_volume_db": -15.9,
+    "max_volume_db": -2,
+    "peak_note": "No clipping detected in rendered mix"
+  },
+  "scenes": 13,
+  "includes": [
+    "Gibraltar",
+    "Tarifa",
+    "seasonal events",
+    "registered birthday: previous day, birthday and following day"
+  ],
+  "browser": {
+    "duration": 59,
+    "videoWidth": 1080,
+    "videoHeight": 1920,
+    "error": null,
+    "chapter50": "playback verified"
+  }
+}

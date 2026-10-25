@@ -1,25 +1,28 @@
 node_modules/
-npm-debug.log
-rankings.json
-data/*.db
-data/*.db-shm
-data/*.db-wal
-.next-smoke-prod/
-.next-smoke-dev/
-.DS_Store
-*.log
-bolas.zip
-bolas-17.zip
-data/public-share-origin.json
-.next-dev-public/
-.next-dev/
-.next/
-.env
-.env.local
-.env*.local
+.next*/
+next-env.d.ts
 tsconfig.tsbuildinfo
-
-# GitHub Actions: plantilla versionada en scripts/ci-github-actions.yml.
-# Para activar CI: gh auth refresh -h github.com -s workflow, copia ese YAML a
-# .github/workflows/ci.yml, borra la línea siguiente y haz commit.
+npm-debug.log
+*.log
+.DS_Store
+.env*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+data/*
+!data/.gitkeep
+rankings.json
+*.zip
+entregables/
+coverage/
+playwright-report/
+test-results/
+.codex/
+# Generated audio mixes can be rebuilt from the included scene narration.
+docs/video/audio/*.wav
+# CI template is versioned in scripts/ci-github-actions.yml. Activating a workflow
+# through the current OAuth credential requires its workflow permission.
 .github/

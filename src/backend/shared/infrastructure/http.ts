@@ -22,6 +22,11 @@ export function toHttpError(error: unknown): { status: number; body: { error: st
     };
   }
 
+  if (error instanceof Error && 'code' in error &&
+      ['SQLITE_BUSY', 'SQLITE_LOCKED'].includes(String(error.code))) {
+    return { status: 503, body: { error: 'El servidor está ocupado. Comprobamos el estado antes de repetir la jugada.', code: 'SERVER_BUSY' } };
+  }
+
   if (process.env.NODE_ENV === 'development') {
     console.error('Unhandled API error:', error);
   }

@@ -1,0 +1,22 @@
+// Use a disposable QA database, never the live game database.
+import assert from 'node:assert/strict';
+const origin=process.env.PROFILE_QA_ORIGIN;
+if(!origin||!origin.startsWith('http://127.0.0.1:'))throw new Error('Set PROFILE_QA_ORIGIN to the temporary QA server');
+const alias=`PerfilQA-${Date.now()}`;
+const request=body=>fetch(`${origin}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json',Origin:origin},body:JSON.stringify(body)});
+const credentials={alias,password:'PruebaLocal2026'};
+for(const age of [-1,121,20.5,'30'])assert.equal((await request({...credentials,age})).status,400);
+assert.equal((await request({...credentials,locality:'a'.repeat(81)})).status,400);
+const signup=await request({...credentials,age:28,locality:'  Pamplona  '});assert.equal(signup.status,200);
+const data=await signup.json();assert.equal(data.isNew,true);assert.equal(data.age,28);assert.equal(data.locality,'Pamplona');
+assert.match(signup.headers.get('cache-control'),/no-store/);
+const cookie=signup.headers.get('set-cookie').split(';')[0];
+const me=await fetch(`${origin}/api/appearance/me`,{headers:{Cookie:cookie}});assert.equal((await me.json()).profile.locality,'Pamplona');
+const invalid=await request({...credentials,password:'incorrecta',age:99,locality:'Otra ciudad'});assert.equal(invalid.status,401);
+const returning=await (await request(credentials)).json();assert.equal(returning.isNew,false);assert.equal(returning.age,28);assert.equal(returning.locality,'Pamplona');
+const blank=await (await request({...credentials,locality:'  '})).json();assert.equal(blank.locality,'Pamplona');
+const updated=await (await request({...credentials,age:29,locality:'A Coruña'})).json();assert.equal(updated.age,29);assert.equal(updated.locality,'A Coruña');
+const without=await (await request({alias:`SinDatosQA-${Date.now()}`,password:'PruebaLocal2026'})).json();assert.equal(without.age,null);assert.equal(without.locality,null);
+const publicBody=JSON.stringify(await (await fetch(`${origin}/api/appearance`)).json());assert(!publicBody.includes(data.playerId));assert(!publicBody.includes(alias));
+assert.equal((await (await fetch(`${origin}/api/appearance/me`)).json()).profile,null);
+console.log('HTTP profile: optional signup, validation, persistence, login updates, failed-password protection and private locality OK');

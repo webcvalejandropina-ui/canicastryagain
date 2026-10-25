@@ -1,5 +1,8 @@
 'use client';
 
+import { BirthdayFields } from '@/features/session/BirthdayFields';
+import type { Birthday } from '@/shared/birthday';
+import { useAppearance } from '@/features/appearance/AppearanceProvider';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 function IconLock({ className }: { className?: string }): React.ReactElement {
@@ -39,14 +42,31 @@ type PasswordModalProps = {
 
 export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps): React.ReactElement {
   const [password, setPassword] = useState('');
+  const [birthday,setBirthday]=useState<Birthday|null>(null);
+  const [birthdayEdited,setBirthdayEdited]=useState(false);
+  const [age, setAge] = useState('');
+  const [locality, setLocality] = useState('');
+  const {events, update: updateAppearance} = useAppearance();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => inputRef.current?.focus(), 100);
-    return () => clearTimeout(timer);
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    inputRef.current?.focus();
+    const trapFocus = (event: KeyboardEvent): void => {
+      if (event.key !== 'Tab') return;
+      const controls = dialogRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex="0"]');
+      if (!controls?.length) return;
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', trapFocus);
+    return () => { document.removeEventListener('keydown', trapFocus); previousFocus?.focus(); };
   }, []);
 
   useEffect(() => {
@@ -63,6 +83,12 @@ export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps
       return;
     }
 
+    const parsedAge = age === '' ? undefined : Number(age);
+    if (parsedAge !== undefined && (!Number.isInteger(parsedAge) || parsedAge < 0 || parsedAge > 120)) {
+      setError('La edad debe ser un número entero entre 0 y 120 años');
+      return;
+    }
+    const profile = {...(birthdayEdited?{birthday}:{}),age:parsedAge, locality:locality.trim() || undefined};
     setIsLoading(true);
     setError(null);
 
@@ -70,10 +96,10 @@ export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alias, password })
+        body: JSON.stringify({ alias, password, ...profile })
       });
 
-      const data = await response.json() as { playerId?: string; alias?: string; isNew?: boolean; isAdmin?: boolean; error?: string; code?: string };
+      const data = await response.json() as { playerId?: string; alias?: string; isNew?: boolean; isAdmin?: boolean; locality?: string | null; error?: string; code?: string };
 
       if (!response.ok) {
         setError(data.error ?? 'Error al iniciar sesión');
@@ -81,6 +107,7 @@ export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps
       }
 
       if (data.playerId && data.alias) {
+        updateAppearance({area:data.locality??undefined});
         onSuccess(data.playerId, data.alias, data.isAdmin === true);
       }
     } catch {
@@ -88,23 +115,23 @@ export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps
     } finally {
       setIsLoading(false);
     }
-  }, [alias, password, onSuccess]);
+  }, [alias, password, age, locality, birthday, birthdayEdited, onSuccess, updateAppearance]);
 
   return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget && !isLoading) onCancel(); }}
     >
-      <div className="relative mx-4 w-full max-w-sm overflow-hidden rounded-2xl border border-primary/20 bg-white/95 shadow-2xl shadow-primary/15 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:shadow-primary/5">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="password-dialog-title" aria-describedby="password-dialog-description" className="club-auth relative mx-4 w-full max-w-sm overflow-hidden rounded-2xl border border-primary/20 bg-white/95 shadow-2xl shadow-primary/15 backdrop-blur-xl dark:border-primary/25 dark:bg-dark-card/95 dark:shadow-primary/5">
         <div className="px-6 pb-6 pt-7 sm:px-8 sm:pt-8">
           <div className="mb-5 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/15">
               <IconLock className="h-6 w-6 text-primary" />
             </div>
-            <h2 className="text-lg font-black tracking-tight text-[#4a3f32] dark:text-dark-text">
-              Contraseña
+            <h2 id="password-dialog-title" className="text-lg font-black tracking-tight text-[#4a3f32] dark:text-dark-text">
+              Tu cuenta
             </h2>
-            <p className="mt-1 text-xs text-[#8c7d6b] dark:text-dark-muted">
+            <p id="password-dialog-description" className="mt-1 text-xs text-[#8c7d6b] dark:text-dark-muted">
               Ingresa la contraseña para <span className="font-bold text-primary">{alias}</span>
             </p>
           </div>
@@ -138,7 +165,6 @@ export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps
                 />
                 <button
                   type="button"
-                  tabIndex={-1}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#b5a898] transition-colors hover:text-primary"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
@@ -150,8 +176,26 @@ export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps
               </div>
             </div>
 
+            <fieldset className="signup-profile">
+              <legend>Completa tu perfil <span>Opcional</span></legend>
+              <div className="signup-profile-fields">
+                <label htmlFor="signup-age">Edad
+                  <input id="signup-age" type="number" inputMode="numeric" min={0} max={120} step={1}
+                    placeholder="Años" value={age} onChange={e=>setAge(e.target.value)} disabled={isLoading} aria-describedby="signup-profile-help"/>
+                </label>
+                <label htmlFor="signup-locality">Localidad
+                  <input id="signup-locality" type="text" autoComplete="address-level2" list="signup-localities" maxLength={80}
+                    placeholder="Tu ciudad o pueblo" value={locality} onChange={e=>setLocality(e.target.value)} disabled={isLoading} aria-describedby="signup-profile-help"/>
+                </label>
+              </div>
+              <datalist id="signup-localities">{Array.from(new Set(events.map(e=>e.area).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'es')).map(area=><option key={area} value={area}/>)}</datalist>
+              <p id="signup-profile-help">Puedes dejarlos en blanco. La localidad activa las fiestas de tu ciudad en modo Automático.</p>
+            </fieldset>
+
+            <details className="signup-birthday"><summary>Cumpleaños · opcional</summary><BirthdayFields value={birthday} disabled={isLoading} onChange={value=>{setBirthday(value);setBirthdayEdited(true);}}/></details>
+
             {error ? (
-              <p className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+              <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
                 {error}
               </p>
             ) : null}
@@ -179,7 +223,7 @@ export function PasswordModal({ alias, onSuccess, onCancel }: PasswordModalProps
             </div>
 
             <p className="text-center text-[10px] text-[#b5a898] dark:text-dark-muted">
-              Si es tu primera vez, se creará tu cuenta automáticamente
+              Cuenta nueva: mínimo 8 caracteres. Si ya tienes cuenta, utiliza tu contraseña habitual.
             </p>
           </form>
         </div>

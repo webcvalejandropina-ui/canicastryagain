@@ -1,33 +1,27 @@
-# Copia este archivo a .github/workflows/ci.yml y haz commit (requiere permiso
-# "workflow" en GitHub: gh auth refresh -h github.com -s workflow).
+# Plantilla: copiar a .github/workflows/ci.yml para activar GitHub Actions.
+# Un token OAuth usado para subir workflows debe disponer del permiso workflow.
 name: CI
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-
-      - name: Install
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Game rules
-        run: npm run test:rules
-
-      - name: Build
-        run: npm run build
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high

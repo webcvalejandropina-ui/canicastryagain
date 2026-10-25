@@ -11,29 +11,50 @@
     "dev:reset": "cross-env CLEAN_ALL_NEXT_DIRS=1 node scripts/clean-next-cache.mjs && cross-env NEXT_DIST_DIR=.next-dev next dev --hostname 0.0.0.0 --port 13000",
     "dev:docker": "docker compose -f docker-compose.dev.yml up --build",
     "dev:docker:down": "docker compose -f docker-compose.dev.yml down",
-    "build": "next build",
+    "build": "next build && node scripts/generate-pwa-assets.mjs",
     "start": "next start",
     "lint": "next lint",
     "test:runtime": "node scripts/test-runtime-guard.mjs --mode=all",
     "test:runtime:prod": "node scripts/test-runtime-guard.mjs --mode=prod",
     "test:runtime:dev": "node scripts/test-runtime-guard.mjs --mode=dev",
-    "test:rules": "tsx scripts/test-game-rules.ts",
-    "test": "npm run lint && npm run test:rules && npm run test:docker && npm run test:runtime",
+    "test:rows": "node --import tsx scripts/test-row-count.ts && node --import tsx scripts/test-board-viewport.ts",
+    "test:rules": "node --import tsx scripts/test-game-rules.ts",
+    "test:powers": "node --import tsx scripts/test-dice-geometry.ts && node --import tsx scripts/test-dice-powers.ts && node --import tsx scripts/test-dice-persistence.ts",
+    "test": "npm run lint && npm run test:security && npm run test:pwa && npm run test:inactivity && npm run test:ancient && npm run test:powers && npm run test:rivals && npm run test:profile && npm run test:rules && npm run test:rows && npm run test:appearance && npm run test:replay && npm run test:demo && npm run test:private && npm run test:transport && npm run test:connectivity && npm run test:streams && npm run test:docker && npm run test:runtime",
     "test:docker": "node scripts/check-docker-prod.mjs",
     "db:migrate": "node scripts/migrate-db.mjs",
     "docker:build": "docker build -t canicas-try-again:latest .",
-    "docker:build:tag": "docker build -t canicas-try-again:$(node -p \"require('./package.json').version\") ."
+    "docker:build:tag": "docker build -t canicas-try-again:$(node -p \"require('./package.json').version\") .",
+    "test:connectivity": "node --import tsx scripts/test-connectivity.ts",
+    "test:appearance": "node --import tsx scripts/test-appearance.ts && node --import tsx scripts/test-world-assets.ts && node --import tsx scripts/test-managed-events.ts && node --import tsx scripts/test-backgrounds.ts && node --import tsx scripts/test-glass-assets.ts && node --import tsx scripts/test-sceneries.ts",
+    "test:replay": "node --import tsx scripts/test-replay.ts",
+    "test:demo": "node --import tsx scripts/test-demo.ts",
+    "assets:sceneries": "node --import tsx scripts/optimize-sceneries.mjs",
+    "assets:worlds": "node --import tsx scripts/generate-world-scenes.ts",
+    "assets:world-photos": "node scripts/optimize-world-images.mjs",
+    "test:profile": "node --import tsx scripts/test-player-profile.ts && node --import tsx scripts/test-birthday.ts",
+    "assets:glass": "node scripts/optimize-glass.mjs",
+    "test:rivals": "node --import tsx scripts/test-rivals.ts",
+    "test:ancient": "node --import tsx scripts/test-ancient-shot.ts && node --import tsx scripts/test-ancient-persistence.ts",
+    "test:streams": "node --import tsx scripts/test-stream-capacity.ts",
+    "test:load": "node scripts/load-connectivity.mjs",
+    "test:private": "node --import tsx scripts/test-private-invites.ts && node --import tsx scripts/test-private-invites-http.ts",
+    "test:transport": "node --import tsx scripts/test-game-delta.ts",
+    "test:pwa": "node scripts/test-pwa.mjs",
+    "test:inactivity": "node --import tsx scripts/test-inactivity.ts",
+    "test:security": "node --import tsx scripts/test-multigame-security.ts && node --import tsx scripts/test-multigame-race.ts",
+    "video:render": "node docs/video/recursos/preparar.mjs && python3 docs/video/recursos/montar.py",
+    "video:preview": "python3 docs/video/recursos/servir.py"
   },
   "dependencies": {
     "better-sqlite3": "^11.8.1",
-    "next": "15.2.0",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "next": "15.5.28",
+    "react": "19.0.9",
+    "react-dom": "19.0.9",
     "three": "^0.183.2",
-    "zod": "^3.24.2"
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.10",
     "@types/better-sqlite3": "^7.6.12",
@@ -42,11 +63,23 @@
     "@types/react-dom": "^19.0.4",
     "@types/three": "^0.183.1",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "eslint": "^9.21.0",
-    "eslint-config-next": "15.2.0",
-    "postcss": "^8.5.3",
+    "eslint-config-next": "15.5.28",
+    "postcss": "^8.5.31",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "overrides": {
+    "next": {
+      "postcss": "$postcss"
+    },
+    "postcss-selector-parser": "^7.1.6",
+    "esbuild": "^0.28.1"
+  },
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0"
   }
 }

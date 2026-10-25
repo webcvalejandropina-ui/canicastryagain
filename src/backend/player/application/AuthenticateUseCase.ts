@@ -1,3 +1,5 @@
+import { decodeBirthday, type Birthday } from '@/shared/birthday';
+import { playerProfileSchema, type PlayerProfileInput } from '@/features/session/profile';
 import { SqlitePlayerRepository } from '@/backend/player/infrastructure/SqlitePlayerRepository';
 import { hashPassword, verifyPassword } from '@/backend/player/domain/PasswordHasher';
 import { AppError } from '@/backend/shared/domain/AppError';
@@ -23,12 +25,16 @@ export type AuthResult = {
   alias: string;
   isNew: boolean;
   isAdmin: boolean;
+  birthday: Birthday | null;
+  age: number | null;
+  locality: string | null;
 };
 
 export class AuthenticateUseCase {
   constructor(private readonly playerRepository: SqlitePlayerRepository) {}
 
-  async execute(input: { alias: string; password: string }): Promise<AuthResult> {
+  async execute(input: { alias: string; password: string } & PlayerProfileInput): Promise<AuthResult> {
+    const profile = playerProfileSchema.parse(input);
     const alias = input.alias.trim().slice(0, 32);
     if (!alias) {
       throw new AppError('El alias es obligatorio', 400, 'ALIAS_REQUIRED');
@@ -42,36 +48,26 @@ export class AuthenticateUseCase {
     const existing = this.playerRepository.findByAlias(alias);
 
     if (existing) {
-      if (existing.password_reset === 1) {
-        const newHash = await hashPassword(password);
-        this.playerRepository.updatePasswordHash(existing.id, newHash);
-      } else {
-        const valid = await verifyPassword(password, existing.password_hash);
-        if (!valid) {
-          throw new AppError('Contraseña incorrecta', 401, 'INVALID_PASSWORD');
-        }
-      }
+      const valid = await verifyPassword(password, existing.password_hash);
+      if (!valid) throw new AppError('Contraseña incorrecta',401,'INVALID_PASSWORD');
 
-      const isAdmin = this.syncAdminFlag(existing.id, alias);
-      return { playerId: existing.id, alias: existing.alias, isNew: false, isAdmin };
+      if (profile.age !== undefined || profile.locality !== undefined || profile.birthday !== undefined) this.playerRepository.updateProfile(existing.id, profile);
+      const isAdmin = this.syncAdminFlag(existing.id);
+      return { playerId: existing.id, alias: existing.alias, isNew: false, isAdmin, birthday:profile.birthday===undefined?decodeBirthday(existing.birthday):profile.birthday, age:profile.age??existing.age, locality:profile.locality??existing.locality };
     }
 
+    if(password.length<8)throw new AppError('Para una cuenta nueva utiliza al menos 8 caracteres.',400,'PASSWORD_TOO_SHORT');
     const playerId = generatePlayerId();
     const passwordHash = await hashPassword(password);
-    this.playerRepository.create(playerId, alias, passwordHash);
+    this.playerRepository.create(playerId, alias, passwordHash, profile);
 
     this.linkExistingRanking(playerId, alias);
 
-    const isAdmin = this.syncAdminFlag(playerId, alias);
-    return { playerId, alias, isNew: true, isAdmin };
+    const isAdmin = this.syncAdminFlag(playerId);
+    return { playerId, alias, isNew: true, isAdmin, birthday:profile.birthday??null, age:profile.age??null, locality:profile.locality??null };
   }
 
-  private syncAdminFlag(playerId: string, alias: string): boolean {
-    const adminAlias = process.env.ADMIN_ALIAS?.trim();
-    if (adminAlias && adminAlias.toLowerCase() === alias.toLowerCase()) {
-      this.playerRepository.setAdmin(playerId, true);
-      return true;
-    }
+  private syncAdminFlag(playerId: string): boolean {
     const player = this.playerRepository.findById(playerId);
     return player?.is_admin === 1;
   }

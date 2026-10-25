@@ -1,44 +1,11 @@
 'use client';
-
-import { useEffect } from 'react';
-
-const LEGACY_CACHE_PREFIXES = ['juego-bolitas', 'canicas-try-again', 'workbox'];
-
-function isLocalNetworkHost(hostname: string): boolean {
-  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') return true;
-  if (/^10\./.test(hostname)) return true;
-  if (/^192\.168\./.test(hostname)) return true;
-  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)) return true;
-  if (/\.local$/i.test(hostname)) return true;
-  return false;
-}
-
-export function LegacyServiceWorkerCleanup(): React.ReactElement | null {
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
-    if (!isLocalNetworkHost(window.location.hostname)) return;
-
-    const clearLegacyRegistrations = async (): Promise<void> => {
-      try {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(registrations.map((registration) => registration.unregister()));
-      } catch {
-        // Si el navegador bloquea SW, continuamos sin romper la app.
-      }
-
-      if (!('caches' in window)) return;
-
-      try {
-        const cacheKeys = await caches.keys();
-        const legacyKeys = cacheKeys.filter((key) => LEGACY_CACHE_PREFIXES.some((prefix) => key.startsWith(prefix)));
-        await Promise.all(legacyKeys.map((key) => caches.delete(key)));
-      } catch {
-        // Ignorar errores de caché en modo dev.
-      }
-    };
-
-    void clearLegacyRegistrations();
-  }, []);
-
-  return null;
+/** Retire only this game's old worker; preserve the new PWA and unrelated caches. */
+export async function removeLegacyServiceWorkers():Promise<void> {
+ if(!('serviceWorker' in navigator))return;
+ const registrations=await navigator.serviceWorker.getRegistrations();
+ await Promise.all(registrations.filter(registration=>{
+  const worker=registration.active||registration.waiting||registration.installing;
+  return worker&&new URL(worker.scriptURL).origin===window.location.origin&&new URL(worker.scriptURL).pathname==='/service-worker.js';
+ }).map(registration=>registration.unregister()));
+ if('caches' in window){const keys=await caches.keys();await Promise.all(keys.filter(key=>['juego-bolitas','canicas-try-again'].some(prefix=>key.startsWith(prefix))).map(key=>caches.delete(key)));}
 }

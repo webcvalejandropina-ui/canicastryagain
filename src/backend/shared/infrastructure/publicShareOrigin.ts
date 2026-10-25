@@ -16,7 +16,8 @@ function normalizeOrigin(rawValue: string | null | undefined): string | null {
 
   try {
     const parsed = new URL(candidate);
-    return `${parsed.protocol}//${parsed.host}`;
+    if(!['http:','https:'].includes(parsed.protocol)||parsed.username||parsed.password)return null;
+    return parsed.origin;
   } catch {
     return null;
   }
@@ -44,6 +45,7 @@ function readRuntimeOriginFromFile(): string | null {
 
 export function getPublicShareOrigin(): string | null {
   return (
+    normalizeOrigin(process.env.PUBLIC_ORIGIN) ??
     normalizeOrigin(process.env.NEXT_PUBLIC_SHARE_ORIGIN) ??
     normalizeOrigin(process.env.PUBLIC_SHARE_ORIGIN) ??
     readRuntimeOriginFromFile()

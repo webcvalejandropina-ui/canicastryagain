@@ -1,3 +1,5 @@
+import { requireAdmin,sameOrigin } from '@/backend/appearance/runtime';
+import { readSmallJson,limitAction } from '@/backend/shared/infrastructure/requestSecurity';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -11,9 +13,10 @@ const resetSchema = z.object({
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const payload = resetSchema.parse(await request.json());
-    container.adminUseCase.resetPassword(payload.adminId, payload.targetId);
-    return NextResponse.json({ success: true });
+    sameOrigin(request);const adminId=requireAdmin(request);limitAction(adminId,"reset-password",10);
+    const payload = resetSchema.parse(await readSmallJson(request));
+    const temporaryPassword=await container.adminUseCase.resetPassword(adminId, payload.targetId);
+    return NextResponse.json({ success: true,temporaryPassword },{headers:{"Cache-Control":"private, no-store"}});
   } catch (error) {
     const httpError = toHttpError(error);
     return NextResponse.json(httpError.body, { status: httpError.status });

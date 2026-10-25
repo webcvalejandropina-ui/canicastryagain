@@ -1,0 +1,22 @@
+{
+  "gibraltar": {
+    "small": "/worlds/gibraltar-640.d3fb85384a.webp",
+    "large": "/worlds/gibraltar-1280.b60d055be0.webp"
+  },
+  "cadiz": {
+    "small": "/worlds/cadiz-640.fa241a1d8a.webp",
+    "large": "/worlds/cadiz-1280.969b04ce17.webp"
+  },
+  "tarifa": {
+    "small": "/worlds/tarifa-640.35f65767a6.webp",
+    "large": "/worlds/tarifa-1280.8a0c5552f4.webp"
+  },
+  "generic": {
+    "small": "/worlds/generic-640.428ef18c2f.webp",
+    "large": "/worlds/generic-1280.6ef90d9e1e.webp"
+  },
+  "holy-week": {
+    "small": "/worlds/holy-week-640.3751468c26.webp",
+    "large": "/worlds/holy-week-1280.c2d4d3025c.webp"
+  }
+}

@@ -3,6 +3,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { useAppearance } from '@/features/appearance/AppearanceProvider';
+import type { Season } from '@/features/appearance/appearance';
+import { buildCellOwnerMap } from '@/features/game/lib/cellOwners';
 import { DiceResult, GameState } from '@/features/game/types';
 
 type Props = {
@@ -167,7 +170,8 @@ function getRowOwner(game: GameState, rowIndex: number): 1 | 2 | null {
 
 function createMarbleTexture(
   THREE: any,
-  colors: { base: string; veins: string; highlight: string; shadow: string }
+  colors: { base: string; veins: string; highlight: string; shadow: string },
+  season: Season = 'none'
 ): any {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
@@ -210,6 +214,24 @@ function createMarbleTexture(
     ctx.fill();
   }
   ctx.globalAlpha = 1;
+
+  if (season !== 'none') {
+    ctx.save();
+    ctx.translate(48, 48);
+    ctx.scale(5, 5);
+    if (season === 'christmas') {
+      ctx.strokeStyle = '#fff9e3';
+      ctx.lineWidth = 1.4;
+      ctx.lineCap = 'round';
+      ctx.stroke(new Path2D('M16 5v22M6.5 10.5l19 11M6.5 21.5l19-11M12 8l4 4 4-4m-8 16 4-4 4 4'));
+    } else {
+      ctx.fillStyle = season === 'halloween' ? '#48271b' : '#233b31';
+      ctx.fill(new Path2D(season === 'halloween'
+        ? 'm7 13 6-4-1 6Zm18 0-6-4 1 6ZM13 18h6l-3-3Zm-7 1 6 3 2-2 2 3 2-3 2 2 6-3-3 7H9Z'
+        : 'M5 12h22v3h-1l-2 6h-7l-1-5-1 5H8l-2-6H5Zm6 11c3 2 7 2 10 0l-1 3h-8Z'));
+    }
+    ctx.restore();
+  }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
@@ -270,18 +292,6 @@ function createRemovedMarbleTexture(
   return texture;
 }
 
-function buildCellOwnerMap(
-  moveHistory: Array<{ player: 1 | 2; rowIndex: number; startIndex: number; count: number }>
-): Map<string, 1 | 2> {
-  const map = new Map<string, 1 | 2>();
-  for (const move of moveHistory) {
-    for (let i = 0; i < move.count; i += 1) {
-      map.set(`${move.rowIndex}:${move.startIndex + i}`, move.player);
-    }
-  }
-  return map;
-}
-
 /* Three.js se carga vía dynamic import (npm) en loadThree() arriba. */
 
 function disposeObject3D(root: any): void {
@@ -340,14 +350,14 @@ function buildBoardMeshes(
   if (context.cachedP1Initial !== p1Initial || !context.removedP1Texture) {
     context.removedP1Texture?.dispose?.();
     context.removedP1Texture = createRemovedMarbleTexture(THREE, p1Initial, {
-      base: '#dc2626', highlight: '#fca5a5', shadow: '#7f1d1d'
+      base: '#38bfe8', highlight: '#bcefff', shadow: '#164a66'
     });
     context.cachedP1Initial = p1Initial;
   }
   if (context.cachedP2Initial !== p2Initial || !context.removedP2Texture) {
     context.removedP2Texture?.dispose?.();
     context.removedP2Texture = createRemovedMarbleTexture(THREE, p2Initial, {
-      base: '#ea580c', highlight: '#fdba74', shadow: '#7c2d12'
+      base: '#f78578', highlight: '#ffd4c7', shadow: '#74362f'
     });
     context.cachedP2Initial = p2Initial;
   }
@@ -363,7 +373,7 @@ function buildBoardMeshes(
 
   const maxRowWidth = (game.numRows - 1) * xSpacing + radius * 2;
   context.boardWidth = maxRowWidth;
-  const baseCamZ = Math.max(11, 8 + game.numRows * 0.75);
+  const baseCamZ = Math.max(9, (boardHeight + radius * 2 + 2) / (2 * Math.tan((42 * Math.PI) / 360)));
   context.baseCameraZ = baseCamZ;
 
   const aspect = camera.aspect || 1;
@@ -400,8 +410,8 @@ function buildBoardMeshes(
         isActive;
       const isClickable = isActive && !isRowDisabled;
 
-      let color = 0x38bdf8;
-      let emissive = 0x082f49;
+      let color = 0xf4f5e8;
+      let emissive = 0x42494c;
       let metalness = 0.44;
       let roughness = 0.22;
       let opacity = 1;
@@ -410,37 +420,37 @@ function buildBoardMeshes(
       if (!isActive) {
         const cellOwner = cellOwnerMap.get(cellKey);
         if (cellOwner === 1) {
-          color = 0xdc2626;
-          emissive = 0x7f1d1d;
+          color = 0x71dfff;
+          emissive = 0x164a66;
         } else if (cellOwner === 2) {
-          color = 0xea580c;
-          emissive = 0x7c2d12;
+          color = 0xff927e;
+          emissive = 0x74362f;
         } else {
           color = 0x64748b;
           emissive = 0x1e293b;
         }
         metalness = 0.38;
         roughness = 0.32;
-        opacity = 0.92;
-        transparent = false;
+        opacity = 0.42;
+        transparent = true;
       } else if (!isClickable) {
-        color = 0x475569;
-        emissive = 0x0f172a;
+        color = 0xf4f5e8;
+        emissive = 0x42494c;
         metalness = 0.12;
         roughness = 0.72;
-        opacity = 0.56;
+        opacity = 0.86;
         transparent = true;
       } else if (isSelected) {
-        color = 0xf4c542;
-        emissive = 0x8a6b1a;
+        color = game.yourPlayerNumber === 1 ? 0x71dfff : 0xff927e;
+        emissive = game.yourPlayerNumber === 1 ? 0x164a66 : 0x74362f;
         metalness = 0.55;
         roughness = 0.14;
       } else if (isBlocked) {
         color = 0xf59e0b;
         emissive = 0x78350f;
       } else if (isOwnedByCurrent) {
-        color = 0x38bdf8;
-        emissive = 0x082f49;
+        color = 0xf4f5e8;
+        emissive = 0x42494c;
       }
 
       let textureMap: any;
@@ -453,8 +463,8 @@ function buildBoardMeshes(
         } else {
           textureMap = context.removedTexture;
         }
-      } else if (isClickable) {
-        textureMap = context.activeTexture;
+      } else if (isActive) {
+        textureMap = isSelected ? null : context.activeTexture;
       } else {
         textureMap = context.removedTexture;
       }
@@ -504,7 +514,7 @@ function buildBoardMeshes(
             : context.removedTexture;
           return new THREE.MeshStandardMaterial({
             color: rColor, emissive: rEmissive, emissiveIntensity: 0.2,
-            metalness: 0.38, roughness: 0.32, transparent: false, opacity: 0.92,
+            metalness: 0.38, roughness: 0.32, transparent: true, opacity: 0.16,
             map: rTex
           });
         })() : null
@@ -525,7 +535,7 @@ function updateRendererSize(context: SceneContext, container: HTMLDivElement): v
   const width = Math.max(280, Math.floor(rect.width));
   const height = Math.max(280, Math.floor(rect.height));
 
-  context.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  context.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 600 ? 1.25 : 1.75));
   context.renderer.setSize(width, height, false);
   context.camera.aspect = width / height;
 
@@ -657,6 +667,7 @@ function spawnFlash(
 }
 
 function animateFrame(context: SceneContext, timeMs: number): void {
+  if (document.visibilityState === 'hidden') { context.rafId = null; return; }
   const { THREE } = context;
   const t = timeMs * 0.001;
   const rawDt = context.lastFrameTime > 0 ? (timeMs - context.lastFrameTime) * 0.001 : 1 / 60;
@@ -678,7 +689,7 @@ function animateFrame(context: SceneContext, timeMs: number): void {
         const marbleColor = marble.mesh.material?.color?.getHex?.() ?? 0x67e8f9;
         context.explosions.push(spawnExplosion(THREE, context.effectsGroup, pos, marbleColor, 30));
         if (context.flashTexture) {
-          context.flashes.push(spawnFlash(THREE, context.effectsGroup, pos, 0x38bdf8, context.flashTexture));
+          context.flashes.push(spawnFlash(THREE, context.effectsGroup, pos, 0xf4f5e8, context.flashTexture));
         }
       }
 
@@ -809,43 +820,35 @@ function animateFrame(context: SceneContext, timeMs: number): void {
   context.rafId = window.requestAnimationFrame((nextTime) => animateFrame(context, nextTime));
 }
 
-function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any } {
+function createDice3D(THREE: any, scene: any, season: Season): { diceGroup: any; diceMesh: any } {
+  const style = getComputedStyle(document.documentElement);
+  const body = style.getPropertyValue('--die-body').trim() || '#354d39';
+  const deep = style.getPropertyValue('--die-deep').trim() || '#102519';
+  const pip = style.getPropertyValue('--die-pip').trim() || '#e7ee55';
+  const glowColor = style.getPropertyValue('--die-glow').trim() || '#c8e350';
   const diceGroup = new THREE.Group();
   const size = 0.55;
 
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d')!;
-
-  const faces: Array<{ bg: string; symbol: string; color: string }> = [
-    { bg: '#f59e0b', symbol: '\u{1F4A3}', color: '#fff' },
-    { bg: '#ef4444', symbol: '\u26A1', color: '#fff' },
-    { bg: '#8b5cf6', symbol: '\u2728', color: '#fef08a' },
-    { bg: '#10b981', symbol: '\u{1F6E1}', color: '#fff' },
-    { bg: '#f97316', symbol: '\u{1F3B2}', color: '#fff' },
-    { bg: '#ec4899', symbol: '?', color: '#fff' }
-  ];
-
-  const textures = faces.map((f) => {
-    ctx.fillStyle = f.bg;
-    ctx.fillRect(0, 0, 256, 256);
-    ctx.fillStyle = f.color;
-    ctx.font = 'bold 120px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(f.symbol, 128, 128);
-    const tex = new THREE.CanvasTexture(canvas.cloneNode(true) as HTMLCanvasElement);
-    const cloneCtx = (tex.image as HTMLCanvasElement).getContext('2d')!;
-    cloneCtx.fillStyle = f.bg;
-    cloneCtx.fillRect(0, 0, 256, 256);
-    cloneCtx.fillStyle = f.color;
-    cloneCtx.font = 'bold 120px sans-serif';
-    cloneCtx.textAlign = 'center';
-    cloneCtx.textBaseline = 'middle';
-    cloneCtx.fillText(f.symbol, 128, 128);
-    tex.needsUpdate = true;
-    return tex;
+  const symbols = ['💣', '⚡', '⤢', '↻', '⚄', '?'];
+  const textures = symbols.map((symbol, index) => {
+    const face = document.createElement('canvas');
+    face.width = face.height = 256;
+    const paint = face.getContext('2d')!;
+    const gradient = paint.createLinearGradient(0, 0, 256, 256);
+    gradient.addColorStop(0, body);
+    gradient.addColorStop(1, deep);
+    paint.fillStyle = gradient;
+    paint.fillRect(0, 0, 256, 256);
+    paint.fillStyle = pip;
+    paint.font = 'bold 120px sans-serif';
+    paint.textAlign = 'center';
+    paint.textBaseline = 'middle';
+    paint.fillText(symbol, 128, 132);
+    if (season !== 'none') {
+      paint.font = '32px sans-serif';
+      paint.fillText(season === 'halloween' ? '🎃' : season === 'christmas' ? '❄' : '☀', index % 2 ? 218 : 38, 36);
+    }
+    return new THREE.CanvasTexture(face);
   });
 
   const materials = textures.map(
@@ -854,7 +857,7 @@ function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any }
         map: tex,
         metalness: 0.3,
         roughness: 0.4,
-        emissive: 0xf59e0b,
+        emissive: glowColor,
         emissiveIntensity: 0.15
       })
   );
@@ -865,13 +868,13 @@ function createDice3D(THREE: any, scene: any): { diceGroup: any; diceMesh: any }
   diceGroup.add(diceMesh);
 
   const edgesGeo = new THREE.EdgesGeometry(geometry);
-  const edgesMat = new THREE.LineBasicMaterial({ color: 0xfde68a, linewidth: 2 });
+  const edgesMat = new THREE.LineBasicMaterial({ color: glowColor, linewidth: 2 });
   const edges = new THREE.LineSegments(edgesGeo, edgesMat);
   diceGroup.add(edges);
 
   const glowGeo = new THREE.SphereGeometry(size * 0.85, 16, 16);
   const glowMat = new THREE.MeshBasicMaterial({
-    color: 0xfbbf24,
+    color: glowColor,
     transparent: true,
     opacity: 0.08
   });
@@ -886,9 +889,7 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   if (!THREE) return null;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 0x0d0c09 : 0xf5f0e8
-  );
+  scene.background = null;
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
   camera.position.set(0, 0.5, 16);
@@ -897,11 +898,8 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
     antialias: true,
     alpha: true
   });
-  renderer.setClearColor(
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 0x0d0c09 : 0xf5f0e8,
-    1
-  );
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 600 ? 1.25 : 1.75));
   renderer.domElement.className = 'h-full w-full';
   renderer.domElement.style.touchAction = 'none';
 
@@ -925,10 +923,10 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2(0, 0);
   const activeTexture = createMarbleTexture(THREE, {
-    base: '#38bdf8',
-    veins: '#bae6fd',
-    highlight: '#e0f2fe',
-    shadow: '#0c4a6e'
+    base: '#f3a17e',
+    veins: '#ffdec5',
+    highlight: '#fff5e0',
+    shadow: '#713d35'
   });
   const removedTexture = createMarbleTexture(THREE, {
     base: '#64748b',
@@ -1018,6 +1016,14 @@ function initializeScene(container: HTMLDivElement, THREE: any): SceneContext | 
   renderer.domElement.addEventListener('pointermove', onPointerMove);
   renderer.domElement.addEventListener('pointerleave', onPointerLeave);
   window.addEventListener('resize', onResize);
+  const onVisible = (): void => {
+    if (document.visibilityState !== 'hidden' && context.rafId === null && context.marbles.length) {
+      context.lastFrameTime = 0;
+      context.rafId = requestAnimationFrame(time => animateFrame(context, time));
+    }
+  };
+  document.addEventListener('visibilitychange', onVisible);
+  context.cleanupHandlers.push(() => document.removeEventListener('visibilitychange', onVisible));
 
   context.cleanupHandlers.push(() => renderer.domElement.removeEventListener('pointermove', onPointerMove));
   context.cleanupHandlers.push(() => renderer.domElement.removeEventListener('pointerleave', onPointerLeave));
@@ -1188,6 +1194,7 @@ export function GameBoard({
   onDiceRoll,
   diceAvailable
 }: Props): React.ReactElement {
+  const { theme, season } = useAppearance();
   const mountRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<SceneContext | null>(null);
   const onBallClickRef = useRef(onBallClick);
@@ -1354,6 +1361,19 @@ export function GameBoard({
   }, []);
 
   useEffect(() => {
+    if (renderMode !== 'three' || !sceneRef.current) return;
+    const context = sceneRef.current;
+    const style = getComputedStyle(document.documentElement);
+    context.activeTexture.dispose?.();
+    context.activeTexture = createMarbleTexture(context.THREE, {
+      base: style.getPropertyValue('--orb-mid').trim(),
+      veins: style.getPropertyValue('--orb-edge').trim(),
+      highlight: style.getPropertyValue('--orb-top').trim(),
+      shadow: style.getPropertyValue('--orb-shadow').trim(),
+    }, season);
+  }, [renderMode, theme, season]);
+
+  useEffect(() => {
     if (renderMode !== 'three') return;
     const context = sceneRef.current;
     if (!context) return;
@@ -1379,7 +1399,7 @@ export function GameBoard({
     if (context.rafId === null) {
       context.rafId = window.requestAnimationFrame((time) => animateFrame(context, time));
     }
-  }, [renderMode, game, selectedRowIndex, selectedStartIndex, selectedEndIndex, canInteract]);
+  }, [renderMode, game, selectedRowIndex, selectedStartIndex, selectedEndIndex, canInteract, theme, season]);
 
   useEffect(() => {
     if (renderMode !== 'three') return;
@@ -1388,8 +1408,19 @@ export function GameBoard({
 
     const showDice = !!diceAvailable && canInteract && game.status === 'playing';
 
+    if (context.diceGroup && (!showDice || context.diceGroup.userData.appearance !== `${theme}:${season}`)) {
+      context.scene.remove(context.diceGroup);
+      context.diceGroup.traverse((object: any) => {
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        materials.forEach((material: any) => material?.map?.dispose?.());
+      });
+      disposeObject3D(context.diceGroup);
+      context.diceGroup = null;
+      context.diceMesh = null;
+    }
     if (showDice && !context.diceGroup) {
-      const { diceGroup, diceMesh } = createDice3D(context.THREE, context.scene);
+      const { diceGroup, diceMesh } = createDice3D(context.THREE, context.scene, season);
+      diceGroup.userData.appearance = `${theme}:${season}`;
 
       const cam = context.camera;
       const fovRad = (cam.fov * Math.PI) / 180;
@@ -1427,14 +1458,15 @@ export function GameBoard({
           });
         }
       : null;
-  }, [renderMode, diceAvailable, canInteract, game.status, game.numRows]);
+  }, [renderMode, diceAvailable, canInteract, game.status, game.numRows, theme, season]);
 
   return (
     <section
       id="board"
       role="grid"
       aria-label={`Tablero de juego. ${statusLabel}`}
-      className="flex flex-1 flex-col bg-background-dark dark:bg-dark-bg min-h-0"
+      className="flex flex-1 flex-col min-h-0"
+      style={{ background: 'var(--app-bg)', color: 'var(--app-muted)' }}
     >
       {renderMode === 'fallback' ? (
         <LegacyBoardGrid

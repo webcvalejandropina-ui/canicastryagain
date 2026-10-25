@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+process.env.SQLITE_PATH=':memory:';
+async function run(){
+  const {Game}=await import('../src/backend/game/domain/Game');
+  const {SqliteGameRepository}=await import('../src/backend/game/infrastructure/SqliteGameRepository');
+  const {UseDiceUseCase}=await import('../src/backend/game/application/UseDiceUseCase');
+  const {MakeMoveUseCase}=await import('../src/backend/game/application/MakeMoveUseCase');
+  const {SqliteRankingRepository}=await import('../src/backend/ranking/infrastructure/SqliteRankingRepository');
+  const {toGameView}=await import('../src/backend/game/application/GameView');
+  const {rowsAtMove}=await import('../src/features/game/lib/replay');
+  const repo=new SqliteGameRepository(),ranking=new SqliteRankingRepository();
+  const dice=new UseDiceUseCase(repo,ranking),move=new MakeMoveUseCase(repo,ranking);
+  const game=Game.create({id:'manual-persistence',code:'MANUAL',numRows:3,creator:{id:'one',name:'Uno'}});game.join({id:'two',name:'Dos'});
+  game.useDice('one',()=>.99);await repo.save(game);
+  const restored=(await repo.getById(game.id))!;
+  assert.equal(restored.toPrimitives().pendingAncientShot,true);
+  assert.equal(toGameView(restored,'one').pendingAncientShot,true);
+  assert.equal(toGameView(restored,'one').yourDiceAvailable,false);
+  await assert.rejects(()=>move.execute({gameId:game.id,playerId:'one',rowIndex:2,startIndex:0,removeCount:1}));
+  await assert.rejects(()=>dice.execute({gameId:game.id,playerId:'two',shot:{row:2,col:0,dx:3,dy:0}}));
+  const launch={gameId:game.id,playerId:'one',expectedRevision:restored.revision,shot:{row:2,col:0,dx:3,dy:0}};
+  const raced=await Promise.allSettled([dice.execute(launch),dice.execute(launch)]);
+  assert.equal(raced.filter(r=>r.status==='fulfilled').length,1,'Only one concurrent release commits');
+  const final=(await repo.getById(game.id))!;
+  assert.equal(final.toPrimitives().pendingAncientShot,false);
+  assert.equal(final.toPrimitives().moveHistory.length,1);
+  const view=toGameView(final,'two');
+  assert.deepEqual(rowsAtMove(3,view.moveHistory,0),view.rows,'History replays the same authoritative hits');
+  assert.equal(view.moveHistory[0].dice?.shot?.dx,1);
+  assert.deepEqual(view.moveHistory[0].dice?.flight,final.toPrimitives().moveHistory[0].dice?.flight);
+  assert.ok(view.moveHistory[0].dice?.flight?.points.length);
+  assert.equal(view.currentTurn,2);
+  console.log('Ancient SQLite: migration, pending reconnect, turn lock, concurrent release and exact history replay OK');
+}
+void run();

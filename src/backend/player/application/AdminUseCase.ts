@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+import { hashPassword } from '../domain/PasswordHasher';
 import { SqlitePlayerRepository } from '@/backend/player/infrastructure/SqlitePlayerRepository';
 import { AppError } from '@/backend/shared/domain/AppError';
 import { sqlite } from '@/backend/shared/infrastructure/db/sqlite';
@@ -52,7 +54,7 @@ export class AdminUseCase {
     this.playerRepository.deleteById(targetId);
   }
 
-  resetPassword(adminId: string, targetId: string): void {
+  async resetPassword(adminId: string, targetId: string): Promise<string> {
     this.assertAdmin(adminId);
 
     const target = this.playerRepository.findById(targetId);
@@ -60,6 +62,11 @@ export class AdminUseCase {
       throw new AppError('Usuario no encontrado', 404, 'USER_NOT_FOUND');
     }
 
-    this.playerRepository.setPasswordReset(targetId, true);
+    const temporaryPassword=randomBytes(18).toString('base64url');
+    const hashed=await hashPassword(temporaryPassword);
+    this.assertAdmin(adminId);
+    this.playerRepository.updatePasswordHash(targetId,hashed);
+    sqlite.prepare('DELETE FROM appearance_sessions WHERE player_id=?').run(targetId);
+    return temporaryPassword;
   }
 }

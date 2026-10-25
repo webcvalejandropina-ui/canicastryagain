@@ -1,3 +1,5 @@
+import { readSmallJson } from '@/backend/shared/infrastructure/requestSecurity';
+import { requirePrivateGameActor } from '@/backend/game/infrastructure/PrivateGameSession';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -14,8 +16,9 @@ export async function POST(
 ): Promise<NextResponse> {
   try {
     const { gameId } = await context.params;
-    const payload = leaveSchema.parse(await request.json());
+    const payload = leaveSchema.parse(await readSmallJson(request));
 
+    requirePrivateGameActor(request,gameId,payload.playerId);
     const game = await container.leaveGameUseCase.execute({
       gameId,
       playerId: payload.playerId

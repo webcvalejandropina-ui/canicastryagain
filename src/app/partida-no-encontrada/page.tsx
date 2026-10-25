@@ -13,7 +13,9 @@ export default async function MissingGamePage({ searchParams }: PageProps): Prom
   const reason = (params.reason ?? '').trim().toUpperCase();
 
   const reasonMessage =
-    reason === 'INVITE_TOKEN_REVOKED'
+    reason === 'GAME_EXPIRED'
+      ? 'Han pasado 24 horas sin jugadas y la partida ha caducado. Puedes crear otra; la clasificación no cambia.'
+      : reason === 'INVITE_TOKEN_REVOKED'
       ? 'Ese enlace fue revocado porque la partida cambió o se cerró.'
       : reason === 'INVALID_INVITE_TOKEN'
         ? 'El enlace de invitación es inválido o está incompleto.'
@@ -32,7 +34,7 @@ export default async function MissingGamePage({ searchParams }: PageProps): Prom
         </div>
 
         <h1 className="text-3xl font-black uppercase tracking-tight text-[#4a3f32] dark:text-dark-text sm:text-4xl">
-          Partida no encontrada
+          {reason === 'GAME_EXPIRED' ? 'Partida caducada' : 'Partida no encontrada'}
         </h1>
 
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-[#6b5d4f] dark:text-dark-muted sm:text-base">

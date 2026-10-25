@@ -1,0 +1,134 @@
+/* Two prebuilt images: the browser composites movement; the server only serves cached files. */
+.world-scene {
+  position: absolute; inset: 0; overflow: hidden; isolation: isolate;
+  pointer-events: none; contain: layout paint;
+  background: linear-gradient(var(--world-sky), var(--world-horizon));
+}
+.world-scene .world-plane {
+  position: absolute; inset: -14px; width: calc(100% + 28px); height: calc(100% + 28px);
+  max-width: none; object-fit: cover; object-position: center bottom; user-select: none;
+}
+.world-far { object-position: 56% 62%; opacity: .64; --drift-x: 4px; --drift-y: -1px; --drift-time: 27s; --drift-delay: -12s; }
+.world-near { opacity: .78; --drift-x: -9px; --drift-y: 2px; --drift-time: 19s; --drift-delay: -4s; }
+.world-scene[data-motion="true"] .world-plane {
+  animation: world-depth var(--drift-time) ease-in-out var(--drift-delay) infinite alternate;
+  will-change: transform;
+}
+@keyframes world-depth {
+  from { transform: translate3d(calc(var(--drift-x) * -1), calc(var(--drift-y) * -1), 0); }
+  to { transform: translate3d(var(--drift-x), var(--drift-y), 0); }
+}
+.world-table-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, var(--app-bg), transparent 12%, transparent 91%, var(--app-bg)),
+    linear-gradient(90deg, var(--app-bg), transparent 7%, transparent 93%, var(--app-bg)),
+    radial-gradient(ellipse at 50% 27%, color-mix(in srgb, var(--app-bg) 66%, transparent), color-mix(in srgb, var(--app-bg) 34%, transparent) 49%, transparent 88%);
+}
+html[data-theme="light"] .world-far { opacity: .44; }
+html[data-theme="light"] .world-near { opacity: .65; }
+.world-preview .world-plane { opacity: 1 !important; }
+.world-preview .world-table-veil { background: linear-gradient(transparent, #00000012); }
+.world-scene[data-motion-paused="true"] .world-plane,
+.world-scene[data-offscreen="true"] .world-plane,
+.pocket-app[data-sheet-open="true"] .world-scene .world-plane {
+  animation-play-state: paused; will-change: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-scene[data-motion="true"] .world-plane { animation: none; transform: none; will-change: auto; }
+}
+.pocket-app .dead-marble { text-shadow: 0 0 5px var(--app-bg), 0 0 2px var(--app-bg); }
+
+/* Match and lobby use exactly the same selection component. */
+.world-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.world-picker > button { min-width: 0; padding: 0; overflow: hidden; border: 1px solid transparent; border-radius: 9px; background: var(--app-surface); text-align: left; color: var(--app-ink); cursor: pointer; }
+.world-picker > button[aria-pressed="true"] { border-color: var(--app-accent); box-shadow: 0 0 0 1px var(--app-accent); }
+.world-picker > button:first-child { grid-column: 1 / -1; }
+.world-choice-art { display: block; position: relative; height: 83px; overflow: hidden; }
+.world-picker > button:first-child .world-choice-art { height: 64px; }
+.world-choice-label { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; gap: 8px; }
+.world-choice-label strong { font-size: 12px; font-weight: 650; }
+.world-choice-label small { font-size: 9px; color: var(--app-muted); }
+.world-picker > button[aria-pressed="true"] .world-choice-label small { color: var(--app-p1); }
+.appearance-settings .event-mode-options { grid-template-columns: 1fr; }
+.appearance-settings .event-mode-options > button { min-height: 54px; padding: 12px 14px; flex-direction: row; align-items: center; justify-content: space-between; }
+.landscape-options { display: flex; gap: 6px; }
+.landscape-options > button { flex: 1; min-width: 0; min-height: 44px; padding: 7px; background: var(--app-surface); color: var(--app-muted); border: 1px solid transparent; border-radius: 5px; font-size: 11px; cursor: pointer; }
+.landscape-options > button[aria-pressed="true"] { color: var(--app-ink); border-color: var(--app-p1); }
+.birthday-settings { border-top: 1px solid var(--app-line); padding-top: 14px; }
+.birthday-settings summary { min-height: 36px; cursor: pointer; font-size: 13px; font-weight: 650; }
+.birthday-enable { display: flex; gap: 10px; align-items: center; min-height: 44px; font-size: 12px; cursor: pointer; }
+.birthday-enable input { width: 19px; height: 19px; accent-color: var(--app-accent); }
+.birthday-date { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+.birthday-date label { font-size: 11px; color: var(--app-muted); }
+.birthday-date select { margin-top: 7px; }
+/* Birthday has its own glass and celebration, also before hydration. */
+html[data-season="birthday"] { --app-bg: #15121b; --app-panel: #251e2a; --app-surface: #322536; --app-accent: #e5ba80; --app-accent-ink: #30201f; --event-art-ink: #d7b28f; }
+html[data-theme="light"][data-season="birthday"] { --app-bg: #f5efe6; --app-panel: #fffbf3; --app-surface: #e9dfd4; --app-accent: #996b41; --app-accent-ink: #fff9ec; --event-art-ink: #9d7160; }
+.magic-birthday .event-dice-particle:nth-child(3n) { color: #e39f9e; }
+.magic-birthday .event-dice-particle:nth-child(3n + 1) { color: #c6c98f; }
+html[data-theme="light"] .magic-birthday .event-dice-particle:nth-child(3n) { color: #a34e64; }
+html[data-theme="light"] .magic-birthday .event-dice-particle:nth-child(3n + 1) { color: #758035; }
+
+/* Editorial calendar controls share the club palette, with touch-friendly fields. */
+.occasion-admin{margin-top:2rem;padding-top:2rem;border-top:1px solid color-mix(in srgb,currentColor 15%,transparent);color:var(--app-text,inherit)}
+.occasion-admin header{display:flex;justify-content:space-between;align-items:start;gap:1rem}
+.occasion-eyebrow{font-size:.65rem;text-transform:uppercase;letter-spacing:.16em;opacity:.6}
+.occasion-admin h3{font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.1;letter-spacing:-.045em;margin:.5rem 0}
+.occasion-admin p{font-size:.85rem;line-height:1.6;opacity:.75}
+.occasion-admin button,.occasion-admin input,.occasion-admin select,.occasion-location select{min-height:44px;border-radius:10px;background:var(--app-surface,#e5eadf);color:inherit;padding:.65rem .85rem;border:1px solid color-mix(in srgb,currentColor 14%,transparent);font:inherit;font-size:.85rem}
+.occasion-admin button{cursor:pointer}.occasion-admin button:disabled{opacity:.5;cursor:wait}
+.occasion-admin button:focus-visible,.occasion-admin input:focus-visible,.occasion-admin select:focus-visible{outline:2px solid var(--app-accent,#bdcc59);outline-offset:3px}
+.occasion-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.25rem}
+.occasion-tabs button[aria-pressed=true],.occasion-actions button:first-child{background:var(--app-accent,#d0df79);color:var(--app-accent-ink,#182008)}
+.occasion-toolbar{display:flex;align-items:end;gap:.75rem}.occasion-toolbar label{flex:1}
+.occasion-admin label,.occasion-location{display:flex;flex-direction:column;gap:.4rem;font-size:.75rem;font-weight:600}
+.occasion-admin input,.occasion-admin select,.occasion-location select{width:100%;min-width:0;font-weight:400}
+.occasion-list{max-height:280px;overflow:auto;margin:1rem 0;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+.occasion-list button{display:flex;align-items:center;justify-content:space-between;text-align:left;background:transparent;gap:.5rem}
+.occasion-list button[aria-pressed=true]{background:var(--app-surface,#e5eadf)}
+.occasion-list small{display:block;font-size:.67rem;opacity:.6;margin-top:.25rem}
+.occasion-dot{width:6px;height:6px;border-radius:50%;background:#9b9b8c;flex:none}.occasion-dot[data-enabled=true]{background:#72a786}
+.occasion-editor{margin-top:1.5rem}.occasion-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1.25rem 0}
+.occasion-check{flex-direction:row!important;align-items:center}.occasion-check input{width:20px;min-height:20px}
+.occasion-landscape{position:relative;height:220px;overflow:hidden;border-radius:16px;isolation:isolate;background:var(--app-bg,#101a18)}
+.occasion-landscape>div:last-child{position:absolute;inset:auto 1.5rem 1.5rem;display:flex;flex-direction:column;color:#fff;text-shadow:0 2px 10px #000}
+.occasion-landscape strong{font-size:1.65rem;line-height:1.15;letter-spacing:-.04em}.occasion-landscape span,.occasion-landscape small{font-size:.75rem;opacity:.85;margin:.35rem 0}
+.occasion-status:not(:empty){padding:.7rem 0;opacity:1}.occasion-actions{display:flex;flex-wrap:wrap;gap:.5rem}.occasion-note{font-size:.72rem!important}
+.occasion-location{margin-top:1rem}
+.world-scene[data-effect=fire] .world-near{background:radial-gradient(ellipse at 18% 100%,#e8922940,transparent 40%),radial-gradient(ellipse at 82% 100%,#ef9a3430,transparent 40%)}
+.world-scene[data-effect=floral] .world-near{background:radial-gradient(ellipse at 15% 98%,#dba2b230,transparent 30%),radial-gradient(ellipse at 85% 98%,#e1c17930,transparent 30%)}
+.world-scene[data-effect=ribbon] .world-near{background:radial-gradient(ellipse at 15% 100%,#d84e5028,transparent 34%)}
+@media(max-width:600px){.occasion-list{grid-template-columns:1fr}.occasion-fields{grid-template-columns:1fr}.occasion-toolbar{align-items:stretch;flex-direction:column}.occasion-landscape{height:200px}.occasion-admin header{flex-wrap:wrap}}
+
+.occasion-landscape .world-far{object-position:center 42%}
+.occasion-check input{appearance:auto;accent-color:var(--app-accent,#d0df79)}
+
+/* A single ambient layer, two CSS transforms; no timers, canvas or input listeners. */
+.world-weather{position:absolute;inset:0;overflow:hidden;pointer-events:none;contain:strict;opacity:.55}
+.world-weather::before,.world-weather::after{content:"";position:absolute;inset:-25% -10%;pointer-events:none;animation:ambient-rain 1.9s linear infinite}
+.weather-rain::before,.weather-rain::after{background-image:linear-gradient(105deg,transparent 46%,#d3e4e780 48%,transparent 51%);background-size:89px 147px;opacity:.38}
+.weather-rain::after{background-size:137px 233px;animation-duration:2.7s;animation-delay:-1s;opacity:.24}
+.weather-snow::before,.weather-snow::after{background-image:radial-gradient(circle at 21% 17%,#fffb 0 1px,transparent 2px),radial-gradient(circle at 69% 63%,#fffa 0 1.3px,transparent 2.5px);background-size:103px 147px;animation:ambient-snow 12s linear infinite;opacity:.6}
+.weather-snow::after{background-size:177px 237px;animation-duration:19s;animation-delay:-8s;opacity:.3}
+.weather-fireflies::before,.weather-fireflies::after{background-image:radial-gradient(circle at 19% 67%,#fff3adbd 0 1px,#e5db6520 2px,transparent 6px),radial-gradient(circle at 79% 83%,#d6f3aa94 0 1px,transparent 5px);background-size:271px 349px;animation:ambient-fireflies 9s ease-in-out infinite alternate;opacity:.7}
+.weather-fireflies::after{background-size:419px 277px;animation-duration:13s;opacity:.4}
+.world-scene[data-motion=false] .world-weather{display:none}
+.world-scene[data-motion-paused=true] .world-weather::before,.world-scene[data-motion-paused=true] .world-weather::after,.world-scene[data-offscreen=true] .world-weather::before,.world-scene[data-offscreen=true] .world-weather::after,.pocket-app:has(.pocket-sheet[open]) .world-weather::before,.pocket-app:has(.pocket-sheet[open]) .world-weather::after{animation-play-state:paused}
+@keyframes ambient-rain{from{transform:translate3d(0,-12%,0)}to{transform:translate3d(-20px,12%,0)}}
+@keyframes ambient-snow{from{transform:translate3d(-8px,-10%,0)}to{transform:translate3d(14px,10%,0)}}
+@keyframes ambient-fireflies{from{transform:translate3d(-4px,6px,0);opacity:.25}to{transform:translate3d(5px,-9px,0);opacity:.8}}
+@media(prefers-reduced-motion:reduce){.world-weather{display:none}.world-weather::before,.world-weather::after{animation:none}}
+.background-preferences select{min-height:44px;width:100%;background:var(--app-surface);color:var(--app-ink);border:1px solid var(--app-line);border-radius:10px;padding:.7rem;font:inherit;font-size:.8rem;margin:.5rem 0}
+.background-preferences label{font-size:.8rem}
+.background-library{margin:1.5rem 0;padding:1.25rem 0;border-block:1px solid var(--app-line)}
+.background-library h4{font-size:1.1rem;font-weight:700;margin-bottom:.5rem}.background-library form{display:grid;grid-template-columns:1fr 1fr auto;gap:.6rem;align-items:end;margin:1rem 0}
+.background-library .background-global{display:flex;flex-wrap:wrap;gap:.6rem;align-items:end}.background-global label{flex:1;min-width:150px}
+@media(max-width:600px){.background-library form{grid-template-columns:1fr}}
+
+.canicas-shell .hero-art{position:relative;isolation:isolate;overflow:hidden}
+.canicas-shell .hero-art>.world-scene{z-index:0;opacity:.85}
+.canicas-shell .hero-art>.marble-preview,.canicas-shell .hero-art>.art-caption{position:relative;z-index:1}
+.pocket-app[data-sheet-open=true] .world-weather::before,.pocket-app[data-sheet-open=true] .world-weather::after{animation-play-state:paused}
+
+/* Shared framing keeps the horizon visible across place/season changes. */
+.world-meadow .world-far { object-position: 54% 48%; }

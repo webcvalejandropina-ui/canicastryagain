@@ -1,3 +1,5 @@
+import type { Game } from '@/backend/game/domain/Game';
+
 type GameEventSource = 'create' | 'join' | 'move' | 'leave' | 'manual';
 
 export type GameEvent = {
@@ -5,6 +7,8 @@ export type GameEvent = {
   gameId: string;
   source: GameEventSource;
   at: number;
+  /** Committed in-process state; consumed locally, never exposed to the browser. */
+  game?: Game;
 };
 
 type GameEventListener = (event: GameEvent) => void;
@@ -39,7 +43,7 @@ export function subscribeToGameEvents(gameId: string, listener: GameEventListene
   };
 }
 
-export function publishGameUpdated(gameId: string, source: GameEventSource = 'manual'): void {
+export function publishGameUpdated(gameId: string, source: GameEventSource = 'manual', game?: Game): void {
   const normalizedGameId = gameId.trim();
   if (!normalizedGameId) return;
 
@@ -50,7 +54,8 @@ export function publishGameUpdated(gameId: string, source: GameEventSource = 'ma
     type: 'updated',
     gameId: normalizedGameId,
     source,
-    at: Date.now()
+    at: Date.now(),
+    game
   };
 
   for (const listener of Array.from(listeners)) {

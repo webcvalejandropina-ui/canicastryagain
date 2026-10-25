@@ -1,3 +1,5 @@
+import { requireAdmin,sameOrigin } from '@/backend/appearance/runtime';
+import { readSmallJson } from '@/backend/shared/infrastructure/requestSecurity';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -11,11 +13,7 @@ const deleteSchema = z.object({
 
 export async function GET(request: Request): Promise<NextResponse> {
   try {
-    const adminId = new URL(request.url).searchParams.get('adminId') ?? '';
-    if (!adminId) {
-      return NextResponse.json({ error: 'adminId requerido', code: 'MISSING_ADMIN_ID' }, { status: 400 });
-    }
-
+    const adminId = requireAdmin(request);
     const users = container.adminUseCase.listUsers(adminId);
     return NextResponse.json({ users });
   } catch (error) {
@@ -26,8 +24,9 @@ export async function GET(request: Request): Promise<NextResponse> {
 
 export async function DELETE(request: Request): Promise<NextResponse> {
   try {
-    const payload = deleteSchema.parse(await request.json());
-    container.adminUseCase.deleteUser(payload.adminId, payload.targetId);
+    sameOrigin(request);const adminId=requireAdmin(request);
+    const payload = deleteSchema.parse(await readSmallJson(request));
+    container.adminUseCase.deleteUser(adminId, payload.targetId);
     return NextResponse.json({ success: true });
   } catch (error) {
     const httpError = toHttpError(error);

@@ -12,5 +12,7 @@ fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
 export const sqlite = new Database(sqlitePath);
 sqlite.pragma('journal_mode = WAL');
 sqlite.pragma('foreign_keys = ON');
+// Short contention waits keep a locked writer from blocking the Node event loop for seconds.
+sqlite.pragma('busy_timeout = 1000');
 
 runMigrations(sqlite);

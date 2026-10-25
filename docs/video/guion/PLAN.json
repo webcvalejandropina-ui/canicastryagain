@@ -1,0 +1,171 @@
+[
+  {
+    "id": "01",
+    "duration": 3,
+    "kind": "hero",
+    "title": [
+      "La última",
+      "pierde."
+    ],
+    "subtitle": "Dos personas. Tú eliges la estrategia.",
+    "voice": "En Canicas, quien quita la última pierde.",
+    "start": 0,
+    "end": 3
+  },
+  {
+    "id": "02",
+    "duration": 4,
+    "kind": "invite",
+    "title": [
+      "De 1 a",
+      "100 filas."
+    ],
+    "subtitle": "Enlace privado: 5 min · WhatsApp o código",
+    "voice": "Elige hasta cien filas. Invita por WhatsApp o código.",
+    "start": 3,
+    "end": 7
+  },
+  {
+    "id": "03",
+    "duration": 4,
+    "kind": "zoom",
+    "title": [
+      "Toda la mesa.",
+      "A tu medida."
+    ],
+    "subtitle": "Toca una zona · Zoom hasta el 200 %",
+    "voice": "Acerca la mesa o pulsa Ver todo.",
+    "start": 7,
+    "end": 11
+  },
+  {
+    "id": "04",
+    "duration": 6,
+    "kind": "select",
+    "title": [
+      "Una fila.",
+      "Todas seguidas."
+    ],
+    "subtitle": "Elige las canicas. Después pulsa Quitar.",
+    "voice": "Alternad turnos. Elige canicas seguidas de una fila y pulsa Quitar.",
+    "start": 11,
+    "end": 17
+  },
+  {
+    "id": "05",
+    "duration": 4,
+    "kind": "counter",
+    "title": [
+      "Cada jugada,",
+      "una más."
+    ],
+    "subtitle": "El límite es compartido. Puedes quitar menos.",
+    "voice": "Primero hasta una, luego dos, tres. Puedes quitar menos.",
+    "start": 17,
+    "end": 21
+  },
+  {
+    "id": "06",
+    "duration": 3,
+    "kind": "gap",
+    "title": [
+      "No saltes",
+      "los huecos."
+    ],
+    "subtitle": "Jugada normal = un bloque continuo.",
+    "voice": "No puedes saltar huecos en una jugada normal.",
+    "start": 21,
+    "end": 24
+  },
+  {
+    "id": "07",
+    "duration": 4,
+    "kind": "dice",
+    "title": [
+      "Un dado.",
+      "Ocho poderes."
+    ],
+    "subtitle": "1 uso por persona · También consume turno",
+    "voice": "Un dado por persona. Ocho poderes, igual probabilidad. Consume turno.",
+    "start": 24,
+    "end": 28
+  },
+  {
+    "id": "08",
+    "duration": 6,
+    "kind": "powers",
+    "title": [
+      "Un giro a",
+      "la estrategia."
+    ],
+    "subtitle": "El poder sale al azar. Tú eliges cuándo tirar.",
+    "voice": "Elimina filas, canicas o diagonales. Avalancha baja por ramas; Fantasma salta huecos; Remolino mezcla.",
+    "start": 28,
+    "end": 34
+  },
+  {
+    "id": "09",
+    "duration": 4,
+    "kind": "revive",
+    "title": [
+      "Resurrección.",
+      "Vuelven al azar."
+    ],
+    "subtitle": "Entre 1 y todas, por toda la mesa.",
+    "voice": "Resurrección devuelve entre una y todas las eliminadas, al azar.",
+    "start": 34,
+    "end": 38
+  },
+  {
+    "id": "10",
+    "duration": 8,
+    "kind": "manual",
+    "title": [
+      "Tirada antigua.",
+      "Apunta y carga."
+    ],
+    "subtitle": "Dedo o ratón · Mantén y suelta",
+    "voice": "Con Tirada antigua, elige una canica. Apunta con dedo o ratón, mantén para cargar y suelta. Los choques gastan fuerza.",
+    "start": 38,
+    "end": 46
+  },
+  {
+    "id": "11",
+    "duration": 4,
+    "kind": "resume",
+    "title": [
+      "Hasta 5 mesas.",
+      "A tu ritmo."
+    ],
+    "subtitle": "Cada jugada válida renueva las 24 horas.",
+    "voice": "Hasta cinco partidas. Caducan tras veinticuatro horas sin jugadas.",
+    "start": 46,
+    "end": 50
+  },
+  {
+    "kind": "worlds",
+    "duration": 5,
+    "title": [
+      "Tu mesa.",
+      "Tu momento."
+    ],
+    "subtitle": "Eventos y paisajes · Elige o sigue el calendario",
+    "voice": "Cambia de paisaje. Con cuenta, tu cumpleaños se celebra tres días.",
+    "id": "12",
+    "start": 50,
+    "end": 55
+  },
+  {
+    "id": "13",
+    "duration": 4,
+    "kind": "outro",
+    "title": [
+      "Deja la última",
+      "a tu rival."
+    ],
+    "subtitle": "También con poderes: quitar la última pierde.",
+    "voice": "Deja la última al rival. También con poderes, la última pierde.",
+    "start": 55,
+    "end": 59
+  }
+]

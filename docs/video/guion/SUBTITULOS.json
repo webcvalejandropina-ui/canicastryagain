@@ -1,0 +1,134 @@
+[
+  {
+    "id": "01",
+    "a": 0.1,
+    "b": 2.267483,
+    "text": "En Canicas, quien quita la última pierde."
+  },
+  {
+    "id": "02",
+    "a": 0.1,
+    "b": 3.079955,
+    "text": "Elige hasta cien filas. Invita por WhatsApp o código."
+  },
+  {
+    "id": "03",
+    "a": 0.1,
+    "b": 1.815147,
+    "text": "Acerca la mesa o pulsa Ver todo."
+  },
+  {
+    "id": "04",
+    "a": 0.1,
+    "b": 2.5213273636363636,
+    "text": "Alternad turnos. Elige canicas seguidas de una"
+  },
+  {
+    "id": "04",
+    "a": 2.5213273636363636,
+    "b": 3.9049430000000003,
+    "text": "fila y pulsa Quitar."
+  },
+  {
+    "id": "05",
+    "a": 0.1,
+    "b": 3.528254,
+    "text": "Primero hasta una, luego dos, tres. Puedes quitar menos."
+  },
+  {
+    "id": "06",
+    "a": 0.1,
+    "b": 2.348844,
+    "text": "No puedes saltar huecos en una jugada normal."
+  },
+  {
+    "id": "07",
+    "a": 0.1,
+    "b": 2.025,
+    "text": "Un dado por persona. Ocho"
+  },
+  {
+    "id": "07",
+    "a": 2.025,
+    "b": 3.95,
+    "text": "poderes, igual probabilidad. Consume turno."
+  },
+  {
+    "id": "08",
+    "a": 0.1,
+    "b": 3.4428571428571426,
+    "text": "Elimina filas, canicas o diagonales. Avalancha baja por"
+  },
+  {
+    "id": "08",
+    "a": 3.4428571428571426,
+    "b": 5.949999999999999,
+    "text": "ramas; Fantasma salta huecos; Remolino mezcla."
+  },
+  {
+    "id": "09",
+    "a": 0.1,
+    "b": 2.1187210000000003,
+    "text": "Resurrección devuelve entre una y todas"
+  },
+  {
+    "id": "09",
+    "a": 2.1187210000000003,
+    "b": 3.4645350000000006,
+    "text": "las eliminadas, al azar."
+  },
+  {
+    "id": "10",
+    "a": 0.1,
+    "b": 3.5442175,
+    "text": "Con Tirada antigua, elige una canica. Apunta con dedo o"
+  },
+  {
+    "id": "10",
+    "a": 3.5442175,
+    "b": 5.610747999999999,
+    "text": "ratón, mantén para cargar y suelta."
+  },
+  {
+    "id": "10",
+    "a": 5.610747999999999,
+    "b": 6.988434999999999,
+    "text": "Los choques gastan fuerza."
+  },
+  {
+    "id": "11",
+    "a": 0.1,
+    "b": 2.059057777777778,
+    "text": "Hasta cinco partidas. Caducan tras"
+  },
+  {
+    "id": "11",
+    "a": 2.059057777777778,
+    "b": 3.626304,
+    "text": "veinticuatro horas sin jugadas."
+  },
+  {
+    "id": "12",
+    "a": 0.1,
+    "b": 2.5698698181818185,
+    "text": "Cambia de paisaje. Con cuenta, tu cumpleaños"
+  },
+  {
+    "id": "12",
+    "a": 2.5698698181818185,
+    "b": 3.981224,
+    "text": "se celebra tres días."
+  },
+  {
+    "id": "13",
+    "a": 0.1,
+    "b": 2.403117090909091,
+    "text": "Deja la última al rival. También con"
+  },
+  {
+    "id": "13",
+    "a": 2.403117090909091,
+    "b": 3.7191840000000003,
+    "text": "poderes, la última pierde."
+  }
+]

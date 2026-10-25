@@ -1,0 +1,22 @@
+{
+  "none": {
+    "small": "/worlds/cadiz-640.a9ce767d69.webp",
+    "large": "/worlds/cadiz-1280.20ac8296ed.webp"
+  },
+  "christmas": {
+    "small": "/worlds/christmas-640.6ba4be744c.webp",
+    "large": "/worlds/christmas-1280.93fa27fccc.webp"
+  },
+  "summer": {
+    "small": "/worlds/summer-640.33d9d53c87.webp",
+    "large": "/worlds/summer-1280.5e0a026aae.webp"
+  },
+  "birthday": {
+    "small": "/worlds/birthday-640.0e1243a866.webp",
+    "large": "/worlds/birthday-1280.b27eb6fbd8.webp"
+  },
+  "halloween": {
+    "small": "/worlds/halloween-640.bdc091d31f.webp",
+    "large": "/worlds/halloween-1280.9829ed1885.webp"
+  }
+}

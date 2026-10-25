@@ -1,5 +1,6 @@
 'use client';
 
+import { AppearanceAdmin } from './AppearanceAdmin';
 import { useCallback, useEffect, useState } from 'react';
 
 type UserView = {
@@ -90,7 +91,7 @@ export function AdminPanel({ adminId }: AdminPanelProps): React.ReactElement {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adminId, targetId })
       });
-      const data = await response.json() as { error?: string };
+      const data = await response.json() as { error?: string;temporaryPassword?:string };
       if (!response.ok) {
         setError(data.error ?? 'Error al eliminar usuario');
         return;
@@ -112,12 +113,13 @@ export function AdminPanel({ adminId }: AdminPanelProps): React.ReactElement {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adminId, targetId })
       });
-      const data = await response.json() as { error?: string };
+      const data = await response.json() as { error?: string;temporaryPassword?:string };
       if (!response.ok) {
         setError(data.error ?? 'Error al resetear contraseña');
         return;
       }
-      setUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, passwordReset: true } : u));
+      setError(`Contraseña temporal (compártela de forma privada): ${data.temporaryPassword}`);
+      setUsers((prev) => prev.map((u) => u.id === targetId ? { ...u, passwordReset: false } : u));
     } catch {
       setError('No se pudo conectar con el servidor');
     } finally {
@@ -241,6 +243,8 @@ export function AdminPanel({ adminId }: AdminPanelProps): React.ReactElement {
           </div>
         )}
       </div>
+
+      <AppearanceAdmin users={users}/>
 
       {confirmAction ? (
         <div

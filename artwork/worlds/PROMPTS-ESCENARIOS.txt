@@ -1,0 +1,7 @@
+Generados con herramienta integrada image_gen, octubre 2026. Recreaciones artísticas, no fotografías documentales. Fuentes PNG en esta carpeta; WebP optimizado en public/worlds.
+
+Gibraltar: paisaje fotográfico sereno desde la costa de La Línea hacia el Peñón; mar turquesa, arena y vegetación baja, luz de tarde, centro despejado para canicas; sin personas, piezas, textos ni logotipos.
+Tarifa: dunas claras, vegetación costera, Atlántico turquesa y costa marroquí distante; luz suave de tarde y centro despejado; sin personas ni textos.
+Semana Santa: calle histórica andaluza vacía al anochecer, velas, flores y bruma sutil; tonos piedra, violeta y oro, pavimento central despejado; sin personas, imágenes religiosas ni textos.
+Genérico: lago tranquilo, colinas y flores discretas en las esquinas; naturaleza sin monumentos, edificios ni molinos; luz de tarde y centro despejado.
+Cádiz: se conserva el recurso anterior como alternativa secundaria.

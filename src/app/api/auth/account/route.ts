@@ -1,3 +1,6 @@
+import { sameOrigin,clearSession } from '@/backend/appearance/runtime';
+import { requireGameActor } from '@/backend/game/infrastructure/PrivateGameSession';
+import { readSmallJson,limitAction } from '@/backend/shared/infrastructure/requestSecurity';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -11,14 +14,16 @@ const deleteSchema = z.object({
 
 export async function DELETE(request: Request): Promise<NextResponse> {
   try {
-    const payload = deleteSchema.parse(await request.json());
+    sameOrigin(request);
+    const payload = deleteSchema.parse(await readSmallJson(request));
+    requireGameActor(request,payload.playerId);limitAction(payload.playerId,"delete-account",5);
 
     await container.deleteAccountUseCase.execute({
       playerId: payload.playerId,
       password: payload.password
     });
 
-    return NextResponse.json({ success: true });
+    const response=NextResponse.json({ success: true });clearSession(request,response);return response;
   } catch (error) {
     const httpError = toHttpError(error);
     return NextResponse.json(httpError.body, { status: httpError.status });

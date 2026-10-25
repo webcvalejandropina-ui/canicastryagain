@@ -1,0 +1,759 @@
+/* The table stays put. Empty rows keep the same space as living rows. */
+.pocket-app .play-row.is-empty-row {
+  height: calc((100cqh - 12px) / var(--row-count));
+  min-height: 0;
+}
+.pocket-app .is-scrollable:not(.is-large) .play-grid {
+  min-height: calc(var(--row-count) * 52px);
+}
+.pocket-app .is-scrollable:not(.is-large) .play-row {
+  height: 52px;
+  min-height: 52px;
+}
+.pocket-app .is-empty-row .dead-marble {
+  height: 100%;
+}
+.pocket-app .is-empty-row .dead-marble b {
+  font-size: 18px;
+}
+.pocket-app .is-empty-row .dead-marble small {
+  display: block;
+}
+.pocket-app .is-large .play-row {
+  height: 48px;
+  min-height: 48px;
+}
+.header-history {
+  margin-left: auto;
+}
+.pocket-header .network-chip {
+  margin-left: 0;
+}
+.move-receipt-space {
+  height: 30px;
+  flex-shrink: 0;
+}
+.move-receipt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  height: 100%;
+  color: var(--app-muted);
+  font-size: 11px;
+  text-align: left;
+}
+.move-receipt[data-player="1"],
+.history-replay[data-player="1"] {
+  --seat: var(--app-p1);
+}
+.move-receipt[data-player="2"],
+.history-replay[data-player="2"] {
+  --seat: var(--app-p2);
+}
+.move-receipt > i,
+.replay-description > i,
+.history-actor > i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--seat);
+  flex-shrink: 0;
+}
+.move-receipt strong {
+  color: var(--seat);
+  font-variant-numeric: tabular-nums;
+}
+.move-receipt > svg {
+  width: 14px;
+  height: 14px;
+  margin-left: auto;
+}
+
+/* One visual language for the live receipt, the replay and the move list. */
+.move-history {
+  user-select: none;
+}
+.history-replay {
+  padding-bottom: 16px;
+}
+.replay-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--app-muted);
+}
+.replay-topline strong {
+  color: var(--app-ink);
+  font-size: 16px;
+  margin-inline: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.replay-topline button {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 22px;
+  color: var(--app-ink);
+}
+.replay-topline button:disabled {
+  opacity: 0.25;
+}
+.replay-court {
+  height: clamp(170px, 28dvh, 240px);
+  display: grid;
+  place-items: center;
+  padding: 10px;
+}
+.replay-court svg {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+.replay-live > circle {
+  fill: var(--orb-mid);
+}
+.replay-live > .replay-glint {
+  fill: #fff;
+  opacity: 0.7;
+}
+.replay-dead {
+  fill: none;
+  stroke: var(--app-muted);
+  opacity: 0.22;
+  stroke-width: 1;
+}
+.replay-changed {
+  opacity: 1;
+}
+.replay-changed > path {
+  stroke: var(--seat);
+  stroke-width: 1.4;
+}
+.replay-live > .replay-ring,
+.replay-dead > .replay-ring {
+  fill: none;
+  stroke: var(--seat);
+  stroke-width: 1;
+  opacity: 0.65;
+}
+.replay-description {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.replay-description > strong {
+  max-width: 35%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.replay-description > span {
+  color: var(--app-muted);
+}
+.replay-description > b {
+  color: var(--seat);
+  font-size: 18px;
+}
+.replay-caption {
+  font-size: 10px;
+  color: var(--app-muted);
+  text-align: center;
+  margin-top: 8px;
+}
+.pocket-history.unified-history {
+  margin: 4px 0 0;
+}
+.pocket-history.unified-history li {
+  display: block;
+  padding: 0;
+}
+.history-step {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  text-align: left;
+  min-height: 66px;
+  border-radius: 8px;
+}
+.history-step[aria-current="step"] {
+  background: color-mix(in srgb, var(--seat) 9%, transparent);
+}
+.history-index {
+  width: 24px;
+  flex-shrink: 0;
+  font: 11px var(--club-mono);
+  color: var(--app-muted);
+}
+.history-actor {
+  position: relative;
+  display: grid;
+  grid-template-columns: 7px minmax(0, 1fr);
+  gap: 5px 9px;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+}
+.pocket-history .history-actor strong {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.history-actor small {
+  grid-column: 2;
+  font-size: 11px;
+  color: var(--app-muted);
+}
+.pocket-history .history-step > svg {
+  width: 19px;
+  height: 19px;
+  color: var(--seat);
+}
+.pocket-history .history-amount {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--seat);
+  min-width: 30px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Seasonal light and a short flourish live at the edges, behind the pieces. */
+.season-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.board-viewport {
+  position: relative;
+  z-index: 1;
+}
+.season-halo {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 74%,
+    var(--orb-aura),
+    transparent 67%
+  );
+  opacity: 0.65;
+}
+.scene-halloween .season-halo {
+  background:
+    radial-gradient(ellipse at 78% 35%, #b8782515, transparent 60%),
+    radial-gradient(ellipse at 10% 85%, #9d66251a, transparent 40%);
+}
+.season-moon {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  right: 8px;
+  top: 5%;
+  border-radius: 50%;
+  box-shadow: -7px 3px 0 0 color-mix(in srgb, var(--orb-mid) 24%, transparent);
+  transform: rotate(-25deg);
+}
+.season-day-mark {
+  position: absolute;
+  top: 15%;
+  left: 3%;
+  width: 50px;
+  height: 40px;
+  opacity: 0.2;
+  transform: rotate(-12deg);
+}
+.season-scene.is-celebration .season-halo {
+  opacity: 1;
+}
+.season-scene.is-celebration .season-moon {
+  width: 46px;
+  height: 46px;
+  box-shadow: -9px 3px 0 0 color-mix(in srgb, var(--orb-mid) 45%, transparent);
+}
+.season-wisp {
+  position: absolute;
+  top: calc(24% + var(--wisp) * 9%);
+  left: 2%;
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  animation: season-flourish 1.5s ease-out both;
+  animation-delay: calc(var(--wisp) * 70ms);
+}
+.season-wisp:nth-child(even) {
+  left: auto;
+  right: 2%;
+}
+.season-wisp .seasonal-detail {
+  inset: 0;
+  color: var(--die-glow);
+}
+.scene-halloween .season-wisp {
+  width: 29px;
+  height: 23px;
+}
+.scene-christmas .season-wisp {
+  width: 18px;
+  height: 18px;
+}
+@keyframes season-flourish {
+  0% {
+    transform: translate3d(calc(var(--side) * -4px), 14px, 0) rotate(-12deg)
+      scale(0.65);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate3d(calc(var(--side) * 12px), -32px, 0) rotate(16deg)
+      scale(1.1);
+    opacity: 0;
+  }
+}
+.pocket-app[data-sheet-open="true"] .season-wisp {
+  animation-play-state: paused;
+}
+html[data-theme="light"] .season-moon {
+  opacity: 0.7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .season-wisp {
+    animation: none;
+    display: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .pocket-app {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 44px 34px minmax(0, 1fr) auto;
+    padding-inline: 0;
+  }
+  .pocket-app .pocket-header {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 0 12px;
+    gap: 7px;
+  }
+  .pocket-app .pocket-logo {
+    font-size: 17px;
+  }
+  .pocket-app .pocket-edition {
+    display: none;
+  }
+  .pocket-header .network-chip {
+    min-width: 24px;
+    justify-content: center;
+  }
+  .network-chip > span {
+    display: none;
+  }
+  .network-chip i {
+    width: 6px;
+    height: 6px;
+  }
+  .pocket-header .header-history {
+    width: 40px;
+  }
+  .pocket-app .versus-strip {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 0 20px 3px;
+    gap: 28px;
+  }
+  .pocket-app .pocket-player {
+    padding: 2px 0;
+    gap: 5px;
+  }
+  .pocket-app .pocket-avatar {
+    width: 23px;
+    height: 25px;
+    font-size: 10px;
+  }
+  .pocket-app .pocket-player > div {
+    gap: 0;
+  }
+  .pocket-app .pocket-player > div > span {
+    display: none;
+  }
+  .pocket-app .pocket-player strong {
+    font-size: 11px;
+  }
+  .pocket-app .pocket-player::after {
+    height: 1px;
+  }
+  .pocket-app .versus-mark {
+    top: 10px;
+    display: block;
+    font-size: 8px;
+  }
+  .pocket-app .pocket-stage {
+    grid-row: 3;
+    grid-column: 1;
+    padding: 0 16px;
+  }
+  .pocket-app .pocket-status {
+    padding: 10px 0 5px;
+    min-height: 62px;
+    gap: 12px;
+  }
+  .pocket-app .pocket-status > div:first-child {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 0 9px;
+  }
+  .pocket-app .pocket-status h1 {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 23px;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    margin: 0;
+    animation: none;
+  }
+  .pocket-app .turn-kicker {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 9px;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .pocket-app .pocket-status p {
+    grid-column: 1/-1;
+    margin: 4px 0 0;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  .pocket-app .remaining-counter {
+    gap: 2px;
+    align-items: center;
+  }
+  .pocket-app .remaining-counter strong {
+    font-size: 23px;
+    color: var(--app-ink);
+    -webkit-text-stroke: 0;
+    letter-spacing: -0.5px;
+  }
+  .pocket-app .remaining-counter strong small {
+    display: none;
+  }
+  .pocket-app .remaining-counter > span {
+    font-size: 6px;
+    letter-spacing: 0.2px;
+  }
+  .pocket-app .marble-legend,
+  .pocket-app .board-footnote {
+    display: none;
+  }
+  .pocket-app .pocket-board::before {
+    display: none;
+  }
+  .pocket-app .pocket-board {
+    min-height: 0;
+  }
+  .pocket-app .board-viewport {
+    padding: 6px 0;
+  }
+  .pocket-app .move-receipt-space {
+    height: 28px;
+  }
+  .pocket-app .move-receipt {
+    font-size: 10px;
+  }
+  .pocket-app .thumb-dock {
+    grid-column: 1;
+    grid-row: 4;
+    position: relative;
+    padding: 4px 16px max(10px, env(safe-area-inset-bottom));
+    background: var(--app-bg);
+  }
+  .pocket-app .dock-topline {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    position: absolute;
+    right: 16px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: 44px;
+    margin: 0;
+    height: 48px;
+  }
+  .pocket-app .quantity-caption,
+  .dock-tools [data-dock-history] {
+    display: none;
+  }
+  .pocket-app .quantity-control {
+    display: none;
+  }
+  .pocket-app .quantity-control button {
+    width: 40px;
+    height: 34px;
+    font-size: 20px;
+  }
+  .pocket-app .quantity-control > span:not(.quantity-caption) {
+    min-width: 52px;
+    font-size: 10px;
+  }
+  .pocket-app .quantity-control strong {
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+  .pocket-app .dock-tools .pocket-icon {
+    width: 44px;
+    height: 48px;
+  }
+  .pocket-app .dock-action-row {
+    grid-template-columns: 48px minmax(0, 1fr);
+    margin-right: 52px;
+    gap: 8px;
+  }
+  .pocket-app .dice-shortcut {
+    order: 0;
+    min-height: 48px;
+  }
+  .pocket-app .dice-shortcut svg {
+    width: 26px;
+    height: 26px;
+  }
+  .pocket-app .dice-shortcut > span {
+    display: none;
+  }
+  .pocket-app .pocket-primary {
+    min-height: 48px;
+    font-size: 13px;
+    gap: 8px;
+  }
+  .pocket-app .row-number {
+    font-size: 9px;
+    opacity: 0.65;
+  }
+}
+@media (max-width: 350px) {
+  .pocket-app .pocket-stage {
+    padding-inline: 10px;
+  }
+  .pocket-app .pocket-status h1 {
+    font-size: 20px;
+  }
+  .pocket-app .pocket-status {
+    min-height: 55px;
+  }
+  .pocket-app .versus-strip {
+    padding-inline: 12px;
+  }
+  .pocket-app .pocket-player strong {
+    font-size: 10px;
+  }
+}
+@media (max-width: 899px) and (orientation: landscape) and (max-height: 570px) {
+  .pocket-app {
+    grid-template-columns: minmax(0, 1fr) 190px;
+    grid-template-rows: 40px minmax(0, 1fr);
+  }
+  .pocket-app .pocket-header {
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .pocket-app .versus-strip {
+    grid-row: 1;
+    grid-column: 2;
+    gap: 8px;
+    padding: 3px 6px;
+  }
+  .pocket-app .pocket-player strong {
+    font-size: 9px;
+  }
+  .pocket-app .versus-mark {
+    display: none;
+  }
+  .pocket-app .pocket-stage {
+    grid-row: 2;
+    grid-column: 1;
+  }
+  .pocket-app .pocket-status {
+    min-height: 46px;
+    padding-top: 3px;
+  }
+  .pocket-app .thumb-dock {
+    grid-row: 2;
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px;
+  }
+  .pocket-app .dock-topline {
+    position: static;
+    width: auto;
+    justify-content: flex-end;
+  }
+  .pocket-app .dock-action-row {
+    grid-template-columns: 1fr;
+    margin-right: 0;
+  }
+  .pocket-app .dice-shortcut {
+    order: 2;
+  }
+}
+
+.pocket-sheet .replay-court {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(170px, 28dvh, 230px);
+  min-height: 0;
+  overflow: hidden;
+}
+.pocket-sheet .replay-court > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: 230px;
+  flex: 0 1 230px;
+}
+.pocket-sheet:has(.move-history) {
+  height: min(760px, calc(100dvh - 20px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pocket-sheet:has(.move-history) > header {
+  flex-shrink: 0;
+}
+.move-history {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.history-replay {
+  flex-shrink: 0;
+}
+.pocket-history.unified-history {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (max-width: 899px) {
+  .match-toast {
+    top: max(6px, env(safe-area-inset-top));
+    bottom: auto;
+    padding: 9px 12px;
+    font-size: 11px;
+    pointer-events: none;
+  }
+}
+.pocket-sheet:has(.move-history) > .sheet-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.pocket-history.unified-history {
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-line) transparent;
+}
+.dice-shortcut[data-used="true"] { position: relative; opacity: .45; }
+.dice-shortcut[data-used="true"]::after { content: "✓"; position: absolute; top: 4px; right: 5px; font-size: 9px; color: var(--app-muted); }
+
+/* A landscape phone has width to spare, not height: keep the die beside its rules. */
+@media (min-width: 600px) and (max-height: 500px) {
+  .pocket-sheet:has(.dice-panel) {
+    max-width: 820px;
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right) - 24px);
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .dice-panel {
+    display: grid;
+    grid-template-columns: minmax(160px, .8fr) minmax(240px, 1.2fr);
+    column-gap: 20px;
+    text-align: left;
+  }
+  .dice-panel > .dice-scene {
+    grid-column: 1; grid-row: 1 / 8;
+    align-self: start; position: sticky; top: 52px;
+    width: 100%; height: 180px; margin: 0;
+  }
+  .dice-panel > :not(.dice-scene) { grid-column: 2; }
+  .dice-panel .dice-heading { font-size: 25px; margin: 4px 0; }
+  .dice-panel .dice-explainer { margin: 0 0 8px; font-size: 11px; max-width: none; }
+  .dice-panel .power-cards { gap: 9px 12px; margin: 5px 0; }
+  .dice-panel .power-card strong { font-size: 12px; }
+  .dice-panel .power-card p { margin-top: 2px; font-size: 10px; }
+  .dice-panel .dice-warning { margin: 6px 0; }
+}
+
+@media (min-width: 900px) and (max-height: 800px) {
+  .pocket-app { margin: 12px auto; height: calc(100dvh - 24px); grid-template-rows: 40px 48px minmax(0, 1fr); }
+  .pocket-app .versus-strip { padding-block: 3px; }
+  .pocket-app .versus-mark { top: 17px; }
+  .pocket-app .pocket-status { padding: 8px 0; }
+  .pocket-app .pocket-status h1 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -2px; margin: 4px 0; }
+  .pocket-app .remaining-counter strong { font-size: 42px; }
+  .pocket-app .marble-legend { padding-bottom: 5px; }
+  .pocket-app .thumb-dock { padding-block: 16px; }
+  .pocket-app .thumb-dock::before { font-size: 34px; padding-top: 0; }
+  .pocket-app .dock-topline { gap: 6px; margin-bottom: 8px; }
+}
+@media (min-width: 900px) and (max-height: 600px) {
+  .pocket-app .thumb-dock { min-height: 0; overflow-y: auto; justify-content: flex-end; }
+  .pocket-app .thumb-dock::before { display: none; }
+  .pocket-app .quantity-control { height: 40px; }
+  .pocket-app .quantity-control strong { font-size: 30px; }
+}
+
+@media (min-width: 600px) and (max-height: 500px) {
+  .dice-panel > .pocket-primary { position: static; box-shadow: none; min-height: 44px; }
+  .dice-panel .power-impact { margin: 5px 0; }
+  .dice-panel .power-impact strong { font-size: 40px; }
+  .dice-panel .dice-warning { font-size: 9px; }
+}
+
+/* Long games retain a tactile cell size; only nearby rows mount their marbles. */
+.large-board-nav {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 4px 10px;
+  background: var(--app-bg, #f4f5ec);
+  color: var(--app-muted);
+  font-size: 12px;
+}
+.large-board-nav label { display:flex; align-items:center; gap:8px; }
+.large-board-nav select { min-height:36px; padding:4px 10px; background:var(--app-surface,#eef0e6); color:var(--app-text); border-radius:8px; font-size:14px; }
+/* Zoom changes layout dimensions, never CSS transforms on pointer targets. */
+.pocket-app .is-large .play-grid{--cell-size:var(--board-cell-size,43px);min-width:calc(var(--row-count)*var(--board-cell-size,43px) + 20px)}
+.pocket-app .is-large .play-row{height:var(--board-row-height,48px);min-height:var(--board-row-height,48px);max-height:none;contain-intrinsic-size:auto var(--board-row-height,48px)}
+.pocket-app .is-large .marble-target{--ball-size:var(--board-ball-size,32px)}
+.board-zoom{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.board-zoom button{min-width:36px;min-height:36px;font-size:20px;border-radius:8px;color:var(--app-ink);background:var(--app-surface,#eef0e6);touch-action:manipulation}
+.board-zoom button:disabled{opacity:.3}
+.board-zoom .board-zoom-fit{font-size:11px;padding:0 6px}
+.board-zoom button[aria-pressed="true"]{background:var(--app-ink);color:var(--app-bg)}
+.board-zoom output{font-size:10px;min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+.board-overview{position:relative;display:block;border:0;padding:0;background:transparent;overflow:hidden;touch-action:manipulation;cursor:zoom-in;max-width:100%}
+.board-overview canvas{display:block;max-width:100%;pointer-events:none}
+.board-overview>span{position:absolute;bottom:0;left:0;width:100%;font-size:11px;text-align:center;color:var(--app-ink);pointer-events:none}
+.board-viewport.is-overview{overflow:hidden}
+@media(max-width:380px){.large-board-nav{padding-inline:3px}.large-board-nav label{gap:3px;font-size:10px}.large-board-nav select{max-width:64px;padding-inline:4px}.board-zoom{gap:2px}.board-zoom output{min-width:34px;font-size:9px}.board-zoom .board-zoom-fit{font-size:10px;padding-inline:4px}}
+.board-viewport,.ancient-board{overflow-anchor:none}

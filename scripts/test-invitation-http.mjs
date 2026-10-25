@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+const origin=process.env.PWA_QA_ORIGIN||'http://localhost:13001';
+assert.ok(['localhost','127.0.0.1'].includes(new URL(origin).hostname));
+const response=await fetch(origin+'/invitar',{headers:{'user-agent':'facebookexternalhit/1.1'}});
+assert.equal(response.status,200);const html=await response.text();
+assert.ok(html.includes(`property="og:image" content="${origin}/share/canicas-invitacion.jpg"`));
+assert.ok(!html.includes('cta2.'));assert.match(html,/og:image:width" content="1200/);
+assert.equal(response.headers.get('x-frame-options'),'DENY');assert.equal(response.headers.get('referrer-policy'),'no-referrer');
+assert.equal((await fetch(origin+'/favicon.ico')).status,200);
+assert.equal((await fetch(origin+'/api/games?playerId=someone')).status,403);
+assert.equal((await fetch(origin+'/api/admin/users?adminId=someone')).status,401);
+assert.equal((await (await fetch(origin+'/api/auth/session')).json()).actor,null);
+const image=await fetch(origin+'/share/canicas-invitacion.jpg');assert.match(image.headers.get('content-type'),/image\/jpeg/);
+console.log('OK: social crawler receives absolute public image (1200x630), no invitation token, favicon and security headers; anonymous list/admin access rejected and session endpoint reflects cookies');

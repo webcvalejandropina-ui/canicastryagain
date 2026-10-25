@@ -2,7 +2,7 @@ import { GameRepository } from '@/backend/game/domain/GameRepository';
 import { GameView, toGameView } from '@/backend/game/application/GameView';
 import { publishGameUpdated } from '@/backend/game/infrastructure/GameEvents';
 import { RankingRepository } from '@/backend/ranking/domain/RankingRepository';
-import { DiceResult } from '@/backend/game/domain/types';
+import { AncientShot, DiceResult } from '@/backend/game/domain/types';
 import { AppError } from '@/backend/shared/domain/AppError';
 
 export class UseDiceUseCase {
@@ -12,6 +12,9 @@ export class UseDiceUseCase {
   ) {}
 
   async execute(input: {
+    expectedRevision?: number;
+    shot?: AncientShot;
+    target?: import("../domain/DicePowers").DiceTarget;
     gameId: string;
     playerId: string;
   }): Promise<{ game: GameView; dice: DiceResult }> {
@@ -20,10 +23,14 @@ export class UseDiceUseCase {
       throw new AppError('Partida no encontrada', 404, 'GAME_NOT_FOUND');
     }
 
-    const result = game.useDice(input.playerId);
+    if (input.expectedRevision !== undefined && input.expectedRevision !== game.revision) {
+      throw new AppError('La partida ha cambiado. Comprueba el turno actual.', 409, 'STALE_GAME_STATE');
+    }
+
+    const result = input.target ? game.resolveDiceTarget(input.playerId,input.target) : input.shot ? game.launchAncientShot(input.playerId,input.shot) : game.useDice(input.playerId);
 
     await this.gameRepository.save(game);
-    publishGameUpdated(game.id, 'move');
+    publishGameUpdated(game.id, 'move', game);
 
     if (result.gameOver) {
       const winner = result.winner === 1 ? game.player1 : game.player2;

@@ -1,0 +1,23 @@
+// Run only against the isolated QA database created for this task.
+import assert from 'node:assert/strict';
+const origin=process.env.APPEARANCE_QA_ORIGIN;
+if(!origin||!origin.startsWith('http://127.0.0.1:'))throw new Error('Set APPEARANCE_QA_ORIGIN to the isolated QA server');
+const login=async(alias)=>{const r=await fetch(`${origin}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json',Origin:origin},body:JSON.stringify({alias,password:'PruebaLocal2026'})});assert.equal(r.status,200);return r.headers.get('set-cookie').split(';')[0];};
+const admin=await login('EventosQA');const user=await login('JugadorQA');
+assert.equal((await fetch(`${origin}/api/admin/appearance?adminId=calendar-qa-admin`)).status,401);
+assert.equal((await fetch(`${origin}/api/admin/appearance`,{headers:{Cookie:user}})).status,403);
+const publicResponse=await fetch(`${origin}/api/appearance`);assert.equal(publicResponse.status,200);
+const catalog=await publicResponse.json();assert(catalog.events.length>=34);
+assert.equal((await fetch(`${origin}/api/appearance`,{headers:{'If-None-Match':publicResponse.headers.get('etag')}})).status,304);
+const event={...catalog.events.find(e=>e.id==='san-fermin'),id:'qa-personal',title:'Regalo privado QA',recurrence:'always'};
+const post=(cookie,body,requestOrigin=origin)=>fetch(`${origin}/api/admin/appearance`,{method:'POST',headers:{Cookie:cookie,'Content-Type':'application/json',Origin:requestOrigin},body:JSON.stringify(body)});
+assert.equal((await post(admin,{action:'assign',playerId:'calendar-qa-player',event},'https://another.example')).status,403);
+assert.equal((await post(admin,{action:'assign',playerId:'calendar-qa-player',event})).status,200);
+const personal=await fetch(`${origin}/api/appearance/me`,{headers:{Cookie:user}});assert.equal((await personal.json()).scene.title,event.title);
+assert.match(personal.headers.get('cache-control'),/no-store/);
+assert.equal((await (await fetch(`${origin}/api/appearance/me`)).json()).scene,null);
+assert(!JSON.stringify(await (await fetch(`${origin}/api/appearance`)).json()).includes(event.title));
+assert.equal((await post(admin,{action:'assign',playerId:'calendar-qa-player',event:null})).status,200);
+await fetch(`${origin}/api/auth/logout`,{method:'POST',headers:{Cookie:user,Origin:origin}});
+assert.equal((await (await fetch(`${origin}/api/appearance/me`,{headers:{Cookie:user}})).json()).scene,null);
+console.log('HTTP: admin authentication, CSRF, ETag/304, private assignments and logout OK');

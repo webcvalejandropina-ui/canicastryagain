@@ -10,6 +10,8 @@ Juega desde el móvil, la tableta o el ordenador. Invita a una persona por enlac
 
 **[Ver cómo se juega en 59 segundos](docs/video/CANICAS_COMO_JUGAR_59s.mp4)** · [Guion y subtítulos](docs/video/guion/) · [Arquitectura](docs/ARQUITECTURA.md) · [Pruebas](docs/PRUEBAS.md)
 
+**[Instalación desde cero y configuración privada](docs/INSTALACION.md)**. El repositorio incluye código, recursos, pruebas, vídeo y licencia; no incluye cuentas reales, contraseñas de usuarios, sesiones vigentes ni datos de una instalación. `.env.example` es una plantilla sin credenciales. Cada servidor crea sus propios datos y claves.
+
 ## Contenido
 
 - [Empezar a jugar](#empezar-a-jugar)

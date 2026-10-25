@@ -28,6 +28,7 @@ docker push tu-registro/canicas-try-again:latest
    - `NODE_ENV` = `production`
    - `PORT` = `3000`
    - `SQLITE_PATH` = `/app/data/game.db`
+   - `PUBLIC_ORIGIN` = el origen HTTPS público de tu instalación, cuando esté publicada.
 5. **Volúmenes**: mapear un volumen o bind a `/app/data` para persistir la base SQLite.
 6. Crear el contenedor.
 
@@ -47,5 +48,11 @@ docker push tu-registro/canicas-try-again:latest
 | `NODE_ENV`     | `production`           | Entorno Node                   |
 | `PORT`         | `3000`                 | Puerto interno del contenedor  |
 | `SQLITE_PATH`  | `/app/data/game.db`    | Ruta del archivo SQLite        |
+| `PUBLIC_ORIGIN` | Vacío en local | Origen HTTPS público; configúralo tras el proxy. |
+| `GAME_STREAM_LIMIT` | `1000` | Límite SSE por proceso, con alternativa HTTP. |
 
 El directorio `/app/data` debe ser un volumen persistente para no perder partidas ni ranking.
+
+No hay un usuario ni una contraseña de administrador predeterminados. Las cuentas se crean en cada instalación; el rol de administración debe concederlo el responsable desde el servidor. Un alias en variables de entorno no concede permisos.
+
+Las claves y los datos reales pertenecen al servidor o al gestor privado de configuración de Portainer, nunca a un archivo publicado en GitHub. La clave de firma se genera automáticamente y se conserva en SQLite; normalmente no necesitas configurarla. Consulta la [guía de instalación](docs/INSTALACION.md).

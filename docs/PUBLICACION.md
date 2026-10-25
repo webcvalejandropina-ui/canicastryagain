@@ -4,6 +4,8 @@ El código, recursos originales, documentación y vídeo se versionan. No se inc
 
 El repositorio de publicación es [webcvalejandropina-ui/canicastryagain](https://github.com/webcvalejandropina-ui/canicastryagain), de visibilidad pública. Solo se publica código y material seleccionado: nunca la base de datos ni la configuración privada de una instalación.
 
+La [guía de instalación desde cero](INSTALACION.md) explica cómo levantarlo sin credenciales del autor y cómo mantener la configuración privada fuera del código.
+
 ## Protecciones del repositorio
 
 Se verificaron la detección de secretos y la protección de subidas de GitHub, ambas activas. Las alertas de vulnerabilidades de dependencias están activadas. Estas protecciones complementan las pruebas locales; no sustituyen la revisión del código ni la configuración segura del servidor.
